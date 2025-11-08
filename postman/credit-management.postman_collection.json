@@ -1,0 +1,583 @@
+{
+  "info": {
+    "name": "Credit Management API",
+    "description": "API REST para la gestión y evaluación de productos crediticios bancarios",
+    "version": "1.0.0",
+    "_postman_id": "credit-management-api-collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api.banco.com/v1",
+      "description": "Base URL del servidor de producción"
+    },
+    {
+      "key": "devUrl",
+      "value": "https://api-dev.banco.com/v1",
+      "description": "Base URL del servidor de desarrollo"
+    }
+  ],
+  "item": [
+    {
+      "name": "Products",
+      "description": "Operaciones para la gestión de productos crediticios",
+      "item": [
+        {
+          "name": "Obtener lista de productos crediticios",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products?category=Crédito Revolvente&currency=S/&minAmount=10000&maxAmount=100000",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "Crédito Revolvente",
+                  "description": "Filtrar por categoría de producto",
+                  "disabled": true
+                },
+                {
+                  "key": "currency",
+                  "value": "S/",
+                  "description": "Filtrar por moneda",
+                  "disabled": true
+                },
+                {
+                  "key": "minAmount",
+                  "value": "10000",
+                  "description": "Monto mínimo requerido",
+                  "disabled": true
+                },
+                {
+                  "key": "maxAmount",
+                  "value": "100000",
+                  "description": "Monto máximo requerido",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Devuelve una lista completa de productos crediticios disponibles con opciones de filtrado por categoría, moneda y rangos de monto."
+          },
+          "response": [
+            {
+              "name": "Lista de productos crediticios obtenida exitosamente",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/products",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"CRV-PEN-001\",\n      \"name\": \"Crédito Revolvente Empresarial\",\n      \"description\": \"Línea de crédito revolvente para empresas que necesitan capital de trabajo flexible.\",\n      \"category\": \"Crédito Revolvente\",\n      \"subcategory\": \"Crédito Revolvente Capital Trabajo\",\n      \"minimumAmount\": 20000,\n      \"maximumAmount\": 300000,\n      \"currency\": \"S/\",\n      \"term\": \"12 meses renovables\",\n      \"minimumRate\": 9.00,\n      \"maximumRate\": 14.00,\n      \"requirements\": [\n        \"RUC vigente\",\n        \"Estados financieros de los últimos 2 años\",\n        \"Flujo de caja mensual\",\n        \"Constitución de la empresa\",\n        \"Historial crediticio empresarial bueno\",\n        \"Ventas anuales mínimas S/ 300,000\",\n        \"Garantías líquidas\"\n      ]\n    },\n    {\n      \"id\": \"CHP-PEN-002\",\n      \"name\": \"Crédito Hipotecario Premium\",\n      \"description\": \"Préstamo hipotecario para adquisición de vivienda con condiciones preferenciales.\",\n      \"category\": \"Crédito Hipotecario\",\n      \"subcategory\": \"Crédito Hipotecario Vivienda\",\n      \"minimumAmount\": 80000,\n      \"maximumAmount\": 800000,\n      \"currency\": \"S/\",\n      \"term\": \"Hasta 30 años\",\n      \"minimumRate\": 7.50,\n      \"maximumRate\": 12.00,\n      \"requirements\": [\n        \"DNI vigente\",\n        \"Recibos de sueldo últimos 3 meses\",\n        \"Declaración jurada de ingresos\",\n        \"Certificado de trabajo\",\n        \"Tasación de inmueble\",\n        \"Historial crediticio bueno\"\n      ]\n    }\n  ],\n  \"total\": 25,\n  \"totalPages\": 3,\n  \"currentPage\": 1\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has required structure\", function () {",
+                  "    pm.response.to.be.json;",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData).to.have.property('total');",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test(\"Each product has required fields\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    jsonData.data.forEach(product => {",
+                  "        pm.expect(product).to.have.property('id');",
+                  "        pm.expect(product).to.have.property('name');",
+                  "        pm.expect(product).to.have.property('description');",
+                  "        pm.expect(product).to.have.property('category');",
+                  "        pm.expect(product).to.have.property('subcategory');",
+                  "        pm.expect(product).to.have.property('minimumAmount');",
+                  "        pm.expect(product).to.have.property('maximumAmount');",
+                  "        pm.expect(product).to.have.property('currency');",
+                  "        pm.expect(product).to.have.property('requirements');",
+                  "        pm.expect(product.requirements).to.be.an('array');",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test(\"Currency values are valid\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    jsonData.data.forEach(product => {",
+                  "        pm.expect(product.currency).to.be.oneOf(['S/', 'USD']);",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener detalles de producto específico",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/CRV-PEN-001",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "CRV-PEN-001"]
+            },
+            "description": "Devuelve información completa de un producto crediticio por su ID único."
+          },
+          "response": [
+            {
+              "name": "Detalles del producto crediticio obtenidos exitosamente",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/products/CRV-PEN-001",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "CRV-PEN-001"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"CRV-PEN-001\",\n  \"name\": \"Crédito Revolvente Empresarial\",\n  \"description\": \"Línea de crédito revolvente para empresas que necesitan capital de trabajo flexible. Permite disposiciones parciales y pagos variables según el flujo de caja de la empresa.\",\n  \"category\": \"Crédito Revolvente\",\n  \"subcategory\": \"Crédito Revolvente Capital Trabajo\",\n  \"minimumAmount\": 20000,\n  \"maximumAmount\": 300000,\n  \"currency\": \"S/\",\n  \"term\": \"12 meses renovables\",\n  \"minimumRate\": 9.00,\n  \"maximumRate\": 14.00,\n  \"requirements\": [\n    \"RUC vigente\",\n    \"Estados financieros de los últimos 2 años\",\n    \"Flujo de caja mensual\",\n    \"Constitución de la empresa\",\n    \"Historial crediticio empresarial bueno\",\n    \"Ventas anuales mínimas S/ 300,000\",\n    \"Garantías líquidas\"\n  ],\n  \"features\": [\n    \"Disposiciones parciales\",\n    \"Pagos flexibles\",\n    \"Sin comisión por prepago\",\n    \"Renovación automática\",\n    \"Banca digital incluida\"\n  ],\n  \"benefits\": [\n    \"Capital de trabajo inmediato\",\n    \"Flexibilidad en el uso de fondos\",\n    \"Tasas competitivas\",\n    \"Gestión 100% digital\"\n  ]\n}"
+            },
+            {
+              "name": "Producto crediticio no encontrado",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/products/INVALID-ID",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "INVALID-ID"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"Product Not Found\",\n  \"message\": \"El producto con ID INVALID-ID no existe\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is a valid product object\", function () {",
+                  "    pm.response.to.be.json;",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('name');",
+                  "    pm.expect(jsonData).to.have.property('description');",
+                  "    pm.expect(jsonData).to.have.property('category');",
+                  "    pm.expect(jsonData).to.have.property('subcategory');",
+                  "    pm.expect(jsonData).to.have.property('minimumAmount');",
+                  "    pm.expect(jsonData).to.have.property('maximumAmount');",
+                  "    pm.expect(jsonData).to.have.property('currency');",
+                  "    pm.expect(jsonData).to.have.property('term');",
+                  "    pm.expect(jsonData).to.have.property('minimumRate');",
+                  "    pm.expect(jsonData).to.have.property('maximumRate');",
+                  "    pm.expect(jsonData).to.have.property('requirements');",
+                  "});",
+                  "",
+                  "pm.test(\"Product has additional details\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('features');",
+                  "    pm.expect(jsonData).to.have.property('benefits');",
+                  "    pm.expect(jsonData.features).to.be.an('array');",
+                  "    pm.expect(jsonData.benefits).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test(\"Amount ranges are valid\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.minimumAmount).to.be.at.least(0);",
+                  "    pm.expect(jsonData.maximumAmount).to.be.above(jsonData.minimumAmount);",
+                  "});",
+                  "",
+                  "pm.test(\"Rate ranges are valid\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.minimumRate).to.be.at.least(0);",
+                  "    pm.expect(jsonData.maximumRate).to.be.above(jsonData.minimumRate);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Evaluation",
+      "description": "Operaciones para la evaluación de elegibilidad crediticia",
+      "item": [
+        {
+          "name": "Evaluar elegibilidad del cliente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identityDocument\": \"10456789012\",\n  \"requestedAmount\": 50000,\n  \"requestedCurrency\": \"S/\",\n  \"category\": \"Crédito Revolvente\",\n  \"additionalInfo\": {\n    \"monthlyIncome\": 15000,\n    \"currentDebt\": 5000,\n    \"creditScore\": 750,\n    \"employmentType\": \"Dependiente\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/evaluate",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "evaluate"]
+            },
+            "description": "Evalúa la elegibilidad de un cliente para productos crediticios basado en su perfil financiero y devuelve recomendaciones personalizadas."
+          },
+          "response": [
+            {
+              "name": "Evaluación completada exitosamente",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"identityDocument\": \"10456789012\",\n  \"requestedAmount\": 50000,\n  \"requestedCurrency\": \"S/\",\n  \"category\": \"Crédito Revolvente\",\n  \"additionalInfo\": {\n    \"monthlyIncome\": 15000,\n    \"currentDebt\": 5000,\n    \"creditScore\": 750,\n    \"employmentType\": \"Dependiente\"\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/products/evaluate",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "evaluate"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"clientProfile\": {\n    \"identityDocument\": \"10456789012\",\n    \"creditScore\": 750,\n    \"riskLevel\": \"Bajo\",\n    \"approvedAmount\": 45000,\n    \"recommendedTerm\": \"12 meses\"\n  },\n  \"eligibleProducts\": [\n    {\n      \"id\": \"CRV-PEN-001\",\n      \"name\": \"Crédito Revolvente Empresarial\",\n      \"approvedAmount\": 45000,\n      \"approvedRate\": 10.50,\n      \"eligibilityScore\": 85,\n      \"recommendation\": \"Altamente recomendado\",\n      \"conditions\": [\n        \"Garantía líquida del 20%\",\n        \"Evaluación crediticia mensual\"\n      ]\n    },\n    {\n      \"id\": \"CPE-PEN-003\",\n      \"name\": \"Crédito Personal Ejecutivo\",\n      \"approvedAmount\": 40000,\n      \"approvedRate\": 12.00,\n      \"eligibilityScore\": 78,\n      \"recommendation\": \"Recomendado\",\n      \"conditions\": [\n        \"Débito automático obligatorio\",\n        \"Seguro de desgravamen incluido\"\n      ]\n    }\n  ],\n  \"summary\": {\n    \"totalEligibleProducts\": 2,\n    \"bestOption\": {\n      \"productId\": \"CRV-PEN-001\",\n      \"reason\": \"Mejor tasa de interés y mayor flexibilidad\"\n    },\n    \"evaluationDate\": \"2024-11-08T16:30:00Z\"\n  }\n}"
+            },
+            {
+              "name": "Datos de evaluación inválidos",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"identityDocument\": \"123\",\n  \"requestedAmount\": -1000,\n  \"requestedCurrency\": \"EUR\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/products/evaluate",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "evaluate"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"Invalid Evaluation Data\",\n  \"message\": \"Los datos proporcionados para la evaluación son inválidos\",\n  \"details\": [\n    {\n      \"field\": \"identityDocument\",\n      \"message\": \"El documento de identidad debe tener 11 dígitos para RUC\"\n    },\n    {\n      \"field\": \"requestedAmount\",\n      \"message\": \"El monto solicitado debe ser mayor a 0\"\n    }\n  ]\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has evaluation structure\", function () {",
+                  "    pm.response.to.be.json;",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('clientProfile');",
+                  "    pm.expect(jsonData).to.have.property('eligibleProducts');",
+                  "    pm.expect(jsonData).to.have.property('summary');",
+                  "});",
+                  "",
+                  "pm.test(\"Client profile has required fields\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const profile = jsonData.clientProfile;",
+                  "    pm.expect(profile).to.have.property('identityDocument');",
+                  "    pm.expect(profile).to.have.property('creditScore');",
+                  "    pm.expect(profile).to.have.property('riskLevel');",
+                  "    pm.expect(profile).to.have.property('approvedAmount');",
+                  "    pm.expect(profile.riskLevel).to.be.oneOf(['Bajo', 'Medio', 'Alto']);",
+                  "});",
+                  "",
+                  "pm.test(\"Eligible products are valid\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.eligibleProducts).to.be.an('array');",
+                  "    jsonData.eligibleProducts.forEach(product => {",
+                  "        pm.expect(product).to.have.property('id');",
+                  "        pm.expect(product).to.have.property('name');",
+                  "        pm.expect(product).to.have.property('approvedAmount');",
+                  "        pm.expect(product).to.have.property('approvedRate');",
+                  "        pm.expect(product).to.have.property('eligibilityScore');",
+                  "        pm.expect(product).to.have.property('recommendation');",
+                  "        pm.expect(product.eligibilityScore).to.be.within(0, 100);",
+                  "        pm.expect(product.recommendation).to.be.oneOf(['Altamente recomendado', 'Recomendado', 'No recomendado']);",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test(\"Summary has required fields\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const summary = jsonData.summary;",
+                  "    pm.expect(summary).to.have.property('totalEligibleProducts');",
+                  "    pm.expect(summary).to.have.property('bestOption');",
+                  "    pm.expect(summary).to.have.property('evaluationDate');",
+                  "    pm.expect(summary.bestOption).to.have.property('productId');",
+                  "    pm.expect(summary.bestOption).to.have.property('reason');",
+                  "});",
+                  "",
+                  "pm.test(\"Total eligible products matches array length\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.summary.totalEligibleProducts).to.equal(jsonData.eligibleProducts.length);",
+                  "});",
+                  "",
+                  "pm.test(\"Credit score is within valid range\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.clientProfile.creditScore).to.be.within(300, 850);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Evaluar elegibilidad - Cliente con bajo score crediticio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identityDocument\": \"20123456789\",\n  \"requestedAmount\": 25000,\n  \"requestedCurrency\": \"S/\",\n  \"category\": \"Crédito Personal\",\n  \"additionalInfo\": {\n    \"monthlyIncome\": 3500,\n    \"currentDebt\": 8000,\n    \"creditScore\": 420,\n    \"employmentType\": \"Dependiente\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/evaluate",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "evaluate"]
+            },
+            "description": "Ejemplo de evaluación para un cliente con perfil crediticio de mayor riesgo y menor score."
+          },
+          "response": [
+            {
+              "name": "Evaluación para cliente con bajo score",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"identityDocument\": \"20123456789\",\n  \"requestedAmount\": 25000,\n  \"requestedCurrency\": \"S/\",\n  \"category\": \"Crédito Personal\",\n  \"additionalInfo\": {\n    \"monthlyIncome\": 3500,\n    \"currentDebt\": 8000,\n    \"creditScore\": 420,\n    \"employmentType\": \"Dependiente\"\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/products/evaluate",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "evaluate"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"clientProfile\": {\n    \"identityDocument\": \"20123456789\",\n    \"creditScore\": 420,\n    \"riskLevel\": \"Alto\",\n    \"approvedAmount\": 8000,\n    \"recommendedTerm\": \"6 meses\"\n  },\n  \"eligibleProducts\": [\n    {\n      \"id\": \"CPB-PEN-005\",\n      \"name\": \"Crédito Personal Básico\",\n      \"approvedAmount\": 8000,\n      \"approvedRate\": 18.50,\n      \"eligibilityScore\": 45,\n      \"recommendation\": \"No recomendado\",\n      \"conditions\": [\n        \"Garantía personal requerida\",\n        \"Evaluación crediticia semanal\",\n        \"Seguro de vida obligatorio\"\n      ]\n    }\n  ],\n  \"summary\": {\n    \"totalEligibleProducts\": 1,\n    \"bestOption\": {\n      \"productId\": \"CPB-PEN-005\",\n      \"reason\": \"Única opción disponible con el perfil actual\"\n    },\n    \"evaluationDate\": \"2024-11-08T16:30:00Z\"\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"High risk profile is correctly identified\", function () {",
+                  "    pm.response.to.be.json;",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.clientProfile.riskLevel).to.equal('Alto');",
+                  "});",
+                  "",
+                  "pm.test(\"Approved amount is lower for high risk\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.clientProfile.approvedAmount).to.be.below(25000);",
+                  "});",
+                  "",
+                  "pm.test(\"Products have appropriate conditions for high risk\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    jsonData.eligibleProducts.forEach(product => {",
+                  "        pm.expect(product.conditions).to.be.an('array');",
+                  "        pm.expect(product.conditions.length).to.be.above(0);",
+                  "        pm.expect(product.approvedRate).to.be.above(15); // Higher rate for high risk",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Script global que se ejecuta antes de cada request",
+          "// Configuración de headers comunes y logging",
+          "console.log('Ejecutando request a:', pm.request.url.toString());",
+          "console.log('Método:', pm.request.method);"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Script global que se ejecuta después de cada response",
+          "// Validaciones comunes para todas las respuestas",
+          "pm.test(\"Response time is less than 10000ms\", function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(10000);",
+          "});",
+          "",
+          "pm.test(\"Content-Type header is present\", function () {",
+          "    pm.response.to.have.header(\"Content-Type\");",
+          "});",
+          "",
+          "// Validación específica para errores HTTP",
+          "if (pm.response.code >= 400) {",
+          "    pm.test(\"Error response has required structure\", function () {",
+          "        pm.response.to.be.json;",
+          "        const jsonData = pm.response.json();",
+          "        pm.expect(jsonData).to.have.property('error');",
+          "        pm.expect(jsonData).to.have.property('message');",
+          "    });",
+          "}"
+        ]
+      }
+    }
+  ]
+}
