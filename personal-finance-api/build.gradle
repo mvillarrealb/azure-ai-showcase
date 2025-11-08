@@ -28,13 +28,33 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	
+	// MapStruct para mapeo automático Entity <-> DTO
+	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+	
+	// Tipos especiales para PostgreSQL (JSON, arrays, etc)
+	implementation 'com.vladmihalcea:hibernate-types-60:2.21.1'
+	
+	// PostgreSQL driver
+	runtimeOnly 'org.postgresql:postgresql'
+	
+	// Lombok
 	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 	annotationProcessor 'org.projectlombok:lombok'
+	
+	// Métricas
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+	
+	// Testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'io.projectreactor:reactor-test'
+	testImplementation 'org.testcontainers:junit-jupiter:1.19.6'
+	testImplementation 'org.testcontainers:postgresql:1.19.6'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	
+	// Base de datos embebida para tests
+	testRuntimeOnly 'com.h2database:h2'
 }
 
 tasks.named('test') {
