@@ -1,0 +1,29 @@
+<app-sidenav-navigation 
+  [title]="title"
+  [navigationLinks]="navigationLinks"
+  [showBackButton]="true"
+  backButtonIcon="fas fa-home"
+  headerClasses="bg-gradient-to-r from-green-400 to-emerald-500 text-white border-emerald-600/30"
+  sidebarIcon="fas fa-chart-line"
+  sidebarIconClasses="bg-gradient-to-br from-green-400 to-emerald-500">
+  
+  <!-- Header actions -->
+  <div slot="header-actions">
+
+  </div>
+
+  <!-- Main content -->
+  <div class="space-y-6">
+    <div class="bg-white/25 backdrop-blur-md rounded-2xl shadow-lg p-6 border border-white/20">
+      <h2 class="text-2xl font-bold text-gray-900 mb-4">
+        Bienvenido a Finanzas Personales
+      </h2>
+      <p class="text-gray-700 mb-6">
+        Desde aquí podrás gestionar todos los aspectos de tus finanzas personales de manera integral.
+      </p>
+    </div>
+    
+    <!-- Router outlet para contenido dinámico -->
+    <router-outlet></router-outlet>
+  </div>
+</app-sidenav-navigation>

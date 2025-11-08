@@ -1,0 +1,29 @@
+<app-sidenav-navigation 
+  [title]="title"
+  [navigationLinks]="navigationLinks"
+  [showBackButton]="true"
+  backButtonIcon="fas fa-home"
+  headerClasses="bg-gradient-to-r from-orange-400 to-red-500 text-white border-red-600/30"
+  sidebarIcon="fas fa-exclamation-triangle"
+  sidebarIconClasses="bg-gradient-to-br from-orange-400 to-red-500">
+  
+  <!-- Header actions -->
+  <div slot="header-actions">
+
+  </div>
+
+  <!-- Main content -->
+  <div class="space-y-6">
+    <div class="bg-white/25 backdrop-blur-md rounded-2xl shadow-lg p-6 border border-white/20">
+      <h2 class="text-2xl font-bold text-gray-900 mb-4">
+        Centro de Gestión de Reclamos
+      </h2>
+      <p class="text-gray-700 mb-6">
+        Registra, gestiona y da seguimiento a todos tus reclamos bancarios y financieros.
+      </p>
+    </div>
+    
+    <!-- Router outlet para contenido dinámico -->
+    <router-outlet></router-outlet>
+  </div>
+</app-sidenav-navigation>
