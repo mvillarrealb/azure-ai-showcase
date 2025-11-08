@@ -1,0 +1,152 @@
+// PageableGrid Component Styles - Tailwind + Glassmorphism
+
+// Custom hover color for headers (gray-150)
+.hover\:bg-gray-150:hover {
+  background-color: rgb(243 244 246);
+}
+
+// Badge styles más sutiles
+:host ::ng-deep .badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid;
+  
+  &.badge-alta {
+    background-color: rgb(254 242 242);
+    color: rgb(185 28 28);
+    border-color: rgb(254 202 202);
+  }
+  
+  &.badge-media {
+    background-color: rgb(254 249 195);
+    color: rgb(161 98 7);
+    border-color: rgb(254 240 138);
+  }
+  
+  &.badge-baja {
+    background-color: rgb(240 253 244);
+    color: rgb(22 101 52);
+    border-color: rgb(187 247 208);
+  }
+  
+  &.badge-resuelto {
+    background-color: rgb(236 253 245);
+    color: rgb(6 95 70);
+    border-color: rgb(167 243 208);
+  }
+  
+  &.badge-pendiente {
+    background-color: rgb(255 247 237);
+    color: rgb(154 52 18);
+    border-color: rgb(253 186 116);
+  }
+  
+  &.badge-en-progreso {
+    background-color: rgb(239 246 255);
+    color: rgb(29 78 216);
+    border-color: rgb(191 219 254);
+  }
+  
+  &.badge-cancelled {
+    background-color: rgb(249 250 251);
+    color: rgb(55 65 81);
+    border-color: rgb(229 231 235);
+  }
+}
+
+.pageable-grid {
+  // Glassmorphism effect enhancement
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+    border-radius: inherit;
+    pointer-events: none;
+  }
+}
+
+// Table row hover effects
+.table-row {
+  transition: all 0.2s ease-in-out;
+  
+  &:hover {
+    background-color: rgba(59, 130, 246, 0.05);
+    transform: translateX(2px);
+    box-shadow: inset 3px 0 0 rgb(59, 130, 246);
+  }
+}
+
+// Sortable column header effects
+.sortable-header {
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  
+  &:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+}
+
+// Page button active state
+.page-button-active {
+  background: linear-gradient(135deg, rgb(59, 130, 246), rgb(99, 102, 241));
+  color: white;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+// Loading shimmer effect
+.loading-shimmer {
+  background: linear-gradient(90deg, 
+    rgba(255,255,255,0) 0%, 
+    rgba(255,255,255,0.8) 50%, 
+    rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// Status badges - using CSS instead of @apply for Tailwind 4 compatibility
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  
+  &.status-pending { background-color: #fef3c7; color: #92400e; }
+  &.status-confirmed { background-color: #dbeafe; color: #1e40af; }
+  &.status-processing { background-color: #e0e7ff; color: #3730a3; }
+  &.status-shipped { background-color: #ede9fe; color: #6b21a8; }
+  &.status-delivered { background-color: #dcfce7; color: #166534; }
+  &.status-cancelled { background-color: #fee2e2; color: #991b1b; }
+  &.status-returned { background-color: #f3f4f6; color: #374151; }
+  &.status-resolved { background-color: #dcfce7; color: #166534; }
+  &.status-rejected { background-color: #fee2e2; color: #991b1b; }
+  &.status-closed { background-color: #f3f4f6; color: #374151; }
+}
+
+// Currency formatting - using CSS instead of @apply
+.currency-cell {
+  text-align: right;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  
+  &.positive { color: #059669; }
+  &.negative { color: #dc2626; }
+  &.zero { color: #6b7280; }
+}

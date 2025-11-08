@@ -43,8 +43,8 @@
       0 4px 32px 0 rgba(0, 0, 0, 0.15);
   }
   
-  // Active effect
-  &:active {
+  // Active effect for interactive elements
+  &.interactive:active {
     transform: scale(0.98);
   }
 }

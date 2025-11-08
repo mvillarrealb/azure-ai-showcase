@@ -1,0 +1,33 @@
+<!-- Grid de datos con glassmorphism -->
+<div class="ios-card">
+  <div class="p-6">
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center">
+        <div class="w-10 h-10 mr-4 rounded-xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-lg">
+          <i class="fas fa-list text-white text-lg"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Mis Transacciones</h1>
+          <p class="text-gray-600 text-sm">Gestiona tu historial financiero</p>
+        </div>
+      </div>
+      <button 
+        (click)="showTransactionForm.emit()"
+        class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-105">
+        <div class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
+          <i class="fas fa-plus text-xs"></i>
+        </div>
+        <span class="font-medium">Nueva Transacción</span>
+      </button>
+    </div>
+    
+    <!-- Grid de transacciones -->
+    <app-pageable-grid
+      [adapter]="transactionsAdapter"
+      [columns]="gridColumns"
+      [config]="gridConfig"
+      (rowClick)="onViewDetails($event)">
+    </app-pageable-grid>
+  </div>
+</div>
+

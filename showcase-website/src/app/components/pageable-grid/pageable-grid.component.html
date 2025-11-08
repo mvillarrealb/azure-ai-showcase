@@ -1,0 +1,172 @@
+<!-- PageableGrid Component - Clean Professional Design -->
+<div class="w-full">
+  
+  <!-- Header con título -->
+  @if (title) {
+    <div class="mb-6">
+      <h2 class="text-2xl font-bold text-gray-900">{{ title }}</h2>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-12 border border-blue-100/50 backdrop-blur-sm">
+      <div class="flex flex-col items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center animate-pulse">
+          <i class="fas fa-spinner fa-spin text-white text-xl"></i>
+        </div>
+        <span class="text-gray-600 font-medium">{{ config.loadingText || 'Cargando transacciones...' }}</span>
+      </div>
+    </div>
+  }
+
+  <!-- Data Table -->
+  @if (!isLoading() && data().length > 0) {
+    <!-- Table Container con glassmorphism -->
+    <div class="bg-white/40 backdrop-blur-md rounded-2xl border border-white/30 shadow-xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full">
+          <!-- Table Header con gradiente -->
+          <thead class="bg-gradient-to-r from-emerald-500 to-green-600">
+            <tr>
+              @for (column of columns; track column.key) {
+                @if (column.key !== 'actions' || hasActions()) {
+                  <th 
+                    [class]="getHeaderClasses(column)"
+                    [style.min-width]="column.width || '120px'"
+                    (click)="onSort(column)">
+                    <div class="flex items-center justify-between px-6 py-4">
+                      <span class="text-white font-semibold text-sm uppercase tracking-wide">{{ column.label }}</span>
+                      @if (column.sortable) {
+                        <div class="flex items-center ml-3">
+                          @if (currentSort().field === column.key && currentSort().direction === 'asc') {
+                            <i class="fas fa-sort-up text-white/90 text-sm"></i>
+                          } @else if (currentSort().field === column.key && currentSort().direction === 'desc') {
+                            <i class="fas fa-sort-down text-white/90 text-sm"></i>
+                          } @else {
+                            <i class="fas fa-sort text-white/60 hover:text-white/90 transition-colors text-sm cursor-pointer"></i>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </th>
+                }
+              }
+            </tr>
+          </thead>
+
+          <!-- Table Body -->
+          <tbody>
+            @for (row of data(); track $index; let isEven = $even) {
+              <tr 
+                [class]="getRowClasses(isEven)"
+                (click)="onRowClick(row)">
+                @for (column of columns; track column.key) {
+                  @if (column.key !== 'actions' || hasActions()) {
+                    <td 
+                      [class]="getCellClasses(column)"
+                      [title]="getCellTooltip(getColumnValue(row, column.key), column)">
+                      <div 
+                        [class]="getCellContentClasses(column)"
+                        [innerHTML]="formatCellValue(getColumnValue(row, column.key), column)">
+                      </div>
+                    </td>
+                  }
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Toolbar minimalista -->
+      @if (totalElements() > 0) {
+        <div class="bg-gradient-to-r from-emerald-600 to-green-700 px-6 py-4 backdrop-blur-sm border-t border-emerald-500/30">
+          <div class="flex items-center justify-between">
+            
+            <!-- Info de resultados simplificada -->
+            <div class="text-sm font-medium text-white/80">
+              Mostrando <span class="text-white font-semibold">{{ getStartRecord() }} - {{ getEndRecord() }}</span> de <span class="text-white font-semibold">{{ totalElements() }}</span> resultados
+            </div>
+
+            <!-- Controles de navegación minimalistas -->
+            <div class="flex items-center gap-2">
+              <!-- Primera página -->
+              <button 
+                [disabled]="currentPage() === 0"
+                (click)="goToPage(0)"
+                class="px-3 py-2 text-sm rounded-lg bg-white/20 border border-white/30 text-white/80 hover:bg-white/30 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 backdrop-blur-sm"
+                title="Primera página">
+                <i class="fas fa-angle-double-left"></i>
+              </button>
+
+              <!-- Página anterior -->
+              <button 
+                [disabled]="!hasPrevious()"
+                (click)="goToPage(currentPage() - 1)"
+                class="px-3 py-2 text-sm rounded-lg bg-white/20 border border-white/30 text-white/80 hover:bg-white/30 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 backdrop-blur-sm"
+                title="Página anterior">
+                <i class="fas fa-angle-left"></i>
+              </button>
+
+              <!-- Indicador de página actual -->
+              <div class="px-4 py-2 text-sm font-semibold text-white bg-white/20 rounded-lg backdrop-blur-sm border border-white/30">
+                {{ currentPage() + 1 }} / {{ totalPages() }}
+              </div>
+
+              <!-- Página siguiente -->
+              <button 
+                [disabled]="!hasNext()"
+                (click)="goToPage(currentPage() + 1)"
+                class="px-3 py-2 text-sm rounded-lg bg-white/20 border border-white/30 text-white/80 hover:bg-white/30 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 backdrop-blur-sm"
+                title="Página siguiente">
+                <i class="fas fa-angle-right"></i>
+              </button>
+
+              <!-- Última página -->
+              <button 
+                [disabled]="currentPage() === totalPages() - 1"
+                (click)="goToPage(totalPages() - 1)"
+                class="px-3 py-2 text-sm rounded-lg bg-white/20 border border-white/30 text-white/80 hover:bg-white/30 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 backdrop-blur-sm"
+                title="Última página">
+                <i class="fas fa-angle-double-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (!isLoading() && loadError()) {
+    <div class="bg-gradient-to-br from-red-50 to-pink-50 rounded-2xl p-12 border border-red-100/50 backdrop-blur-sm">
+      <div class="text-center">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-red-400 to-pink-500 flex items-center justify-center shadow-lg">
+          <i class="fas fa-exclamation-triangle text-white text-xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-red-700 mb-2">Error al cargar datos</h3>
+        <p class="text-red-600 mb-6">{{ loadError() }}</p>
+        <button 
+          (click)="retryLoad()"
+          class="bg-gradient-to-r from-red-500 to-pink-600 text-white px-6 py-3 rounded-xl hover:from-red-600 hover:to-pink-700 transition-all duration-200 flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-105 mx-auto">
+          <i class="fas fa-redo text-sm"></i>
+          <span class="font-medium">Intentar de nuevo</span>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading() && !loadError() && data().length === 0) {
+    <div class="bg-gradient-to-br from-gray-50 to-slate-100 rounded-2xl p-12 border border-gray-100/50 backdrop-blur-sm">
+      <div class="text-center">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-gray-400 to-slate-500 flex items-center justify-center shadow-lg">
+          <i class="fas fa-inbox text-white text-xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-700 mb-2">No hay transacciones</h3>
+        <p class="text-gray-600">{{ config.emptyText || 'No se encontraron transacciones para mostrar' }}</p>
+      </div>
+    </div>
+  }
+</div>

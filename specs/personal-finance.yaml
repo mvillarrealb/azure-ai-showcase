@@ -106,7 +106,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  transactions:
+                  data:
                     type: array
                     items:
                       $ref: '#/components/schemas/Transaction'
@@ -116,7 +116,7 @@ paths:
                 transacciones_ejemplo:
                   summary: Ejemplo de transacciones
                   value:
-                    transactions:
+                    data:
                       - id: "txn-001"
                         amount: -45.50
                         date: "2024-11-07T14:30:00Z"
