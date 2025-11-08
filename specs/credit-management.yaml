@@ -1,0 +1,579 @@
+openapi: 3.0.3
+info:
+  title: Credit Management API
+  description: API REST para la gestión y evaluación de productos crediticios bancarios
+  version: 1.0.0
+  contact:
+    name: Equipo de Desarrollo
+    email: dev-team@banco.com
+servers:
+  - url: https://api.banco.com/v1
+    description: Servidor de producción
+  - url: https://api-dev.banco.com/v1
+    description: Servidor de desarrollo
+
+paths:
+  /products:
+    get:
+      operationId: getProducts
+      summary: Obtener lista de productos crediticios
+      description: Devuelve una lista completa de productos crediticios disponibles
+      tags:
+        - Products
+      parameters:
+        - name: category
+          in: query
+          description: Filtrar por categoría de producto
+          required: false
+          schema:
+            type: string
+          example: "Crédito Revolvente"
+        - name: currency
+          in: query
+          description: Filtrar por moneda
+          required: false
+          schema:
+            type: string
+            enum: ["S/", "USD"]
+          example: "S/"
+        - name: minAmount
+          in: query
+          description: Monto mínimo requerido
+          required: false
+          schema:
+            type: number
+            format: float
+          example: 10000
+        - name: maxAmount
+          in: query
+          description: Monto máximo requerido
+          required: false
+          schema:
+            type: number
+            format: float
+          example: 100000
+      responses:
+        '200':
+          description: Lista de productos crediticios obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+              example:
+                data:
+                  - id: "CRV-PEN-001"
+                    name: "Crédito Revolvente Empresarial"
+                    description: "Línea de crédito revolvente para empresas que necesitan capital de trabajo flexible."
+                    category: "Crédito Revolvente"
+                    subcategory: "Crédito Revolvente Capital Trabajo"
+                    minimumAmount: 20000
+                    maximumAmount: 300000
+                    currency: "S/"
+                    term: "12 meses renovables"
+                    minimumRate: 9.00
+                    maximumRate: 14.00
+                    requirements:
+                      - "RUC vigente"
+                      - "Estados financieros de los últimos 2 años"
+                      - "Flujo de caja mensual"
+                      - "Constitución de la empresa"
+                      - "Historial crediticio empresarial bueno"
+                      - "Ventas anuales mínimas S/ 300,000"
+                      - "Garantías líquidas"
+                  - id: "CHP-PEN-002"
+                    name: "Crédito Hipotecario Premium"
+                    description: "Préstamo hipotecario para adquisición de vivienda con condiciones preferenciales."
+                    category: "Crédito Hipotecario"
+                    subcategory: "Crédito Hipotecario Vivienda"
+                    minimumAmount: 80000
+                    maximumAmount: 800000
+                    currency: "S/"
+                    term: "Hasta 30 años"
+                    minimumRate: 7.50
+                    maximumRate: 12.00
+                    requirements:
+                      - "DNI vigente"
+                      - "Recibos de sueldo últimos 3 meses"
+                      - "Declaración jurada de ingresos"
+                      - "Certificado de trabajo"
+                      - "Tasación de inmueble"
+                      - "Historial crediticio bueno"
+                total: 25
+                totalPages: 3
+                currentPage: 1
+        '400':
+          description: Parámetros de consulta inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Invalid Query Parameters"
+                message: "Los parámetros de búsqueda son inválidos"
+                details:
+                  - field: "minAmount"
+                    message: "El monto mínimo debe ser un número positivo"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products/{productId}:
+    get:
+      operationId: getProductById
+      summary: Obtener detalles de un producto crediticio específico
+      description: Devuelve información completa de un producto crediticio por su ID
+      tags:
+        - Products
+      parameters:
+        - name: productId
+          in: path
+          description: ID único del producto crediticio
+          required: true
+          schema:
+            type: string
+          example: "CRV-PEN-001"
+      responses:
+        '200':
+          description: Detalles del producto crediticio obtenidos exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+              example:
+                id: "CRV-PEN-001"
+                name: "Crédito Revolvente Empresarial"
+                description: "Línea de crédito revolvente para empresas que necesitan capital de trabajo flexible. Permite disposiciones parciales y pagos variables según el flujo de caja de la empresa."
+                category: "Crédito Revolvente"
+                subcategory: "Crédito Revolvente Capital Trabajo"
+                minimumAmount: 20000
+                maximumAmount: 300000
+                currency: "S/"
+                term: "12 meses renovables"
+                minimumRate: 9.00
+                maximumRate: 14.00
+                requirements:
+                  - "RUC vigente"
+                  - "Estados financieros de los últimos 2 años"
+                  - "Flujo de caja mensual"
+                  - "Constitución de la empresa"
+                  - "Historial crediticio empresarial bueno"
+                  - "Ventas anuales mínimas S/ 300,000"
+                  - "Garantías líquidas"
+                features:
+                  - "Disposiciones parciales"
+                  - "Pagos flexibles"
+                  - "Sin comisión por prepago"
+                  - "Renovación automática"
+                  - "Banca digital incluida"
+                benefits:
+                  - "Capital de trabajo inmediato"
+                  - "Flexibilidad en el uso de fondos"
+                  - "Tasas competitivas"
+                  - "Gestión 100% digital"
+        '404':
+          description: Producto crediticio no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Product Not Found"
+                message: "El producto con ID CRV-PEN-001 no existe"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products/evaluate:
+    post:
+      operationId: evaluateClientEligibility
+      summary: Evaluar elegibilidad del cliente para productos crediticios
+      description: Evalúa la elegibilidad de un cliente para productos crediticios basado en su perfil financiero
+      tags:
+        - Evaluation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationRequest'
+            example:
+              identityDocument: "10456789012"
+              requestedAmount: 50000
+              requestedCurrency: "S/"
+              category: "Crédito Revolvente"
+              additionalInfo:
+                monthlyIncome: 15000
+                currentDebt: 5000
+                creditScore: 750
+                employmentType: "Dependiente"
+      responses:
+        '200':
+          description: Evaluación completada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationResponse'
+              example:
+                clientProfile:
+                  identityDocument: "10456789012"
+                  creditScore: 750
+                  riskLevel: "Bajo"
+                  approvedAmount: 45000
+                  recommendedTerm: "12 meses"
+                eligibleProducts:
+                  - id: "CRV-PEN-001"
+                    name: "Crédito Revolvente Empresarial"
+                    approvedAmount: 45000
+                    approvedRate: 10.50
+                    eligibilityScore: 85
+                    recommendation: "Altamente recomendado"
+                    conditions:
+                      - "Garantía líquida del 20%"
+                      - "Evaluación crediticia mensual"
+                  - id: "CPE-PEN-003"
+                    name: "Crédito Personal Ejecutivo"
+                    approvedAmount: 40000
+                    approvedRate: 12.00
+                    eligibilityScore: 78
+                    recommendation: "Recomendado"
+                    conditions:
+                      - "Débito automático obligatorio"
+                      - "Seguro de desgravamen incluido"
+                summary:
+                  totalEligibleProducts: 2
+                  bestOption:
+                    productId: "CRV-PEN-001"
+                    reason: "Mejor tasa de interés y mayor flexibilidad"
+                  evaluationDate: "2024-11-08T16:30:00Z"
+        '400':
+          description: Datos de evaluación inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Invalid Evaluation Data"
+                message: "Los datos proporcionados para la evaluación son inválidos"
+                details:
+                  - field: "identityDocument"
+                    message: "El documento de identidad debe tener 11 dígitos para RUC"
+                  - field: "requestedAmount"
+                    message: "El monto solicitado debe ser mayor a 0"
+        '500':
+          description: Error interno del servidor durante la evaluación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID único del producto crediticio
+          example: "CRV-PEN-001"
+        name:
+          type: string
+          description: Nombre comercial del producto
+          example: "Crédito Revolvente Empresarial"
+        description:
+          type: string
+          description: Descripción detallada del producto
+          example: "Línea de crédito revolvente para empresas que necesitan capital de trabajo flexible."
+        category:
+          type: string
+          description: Categoría principal del producto
+          example: "Crédito Revolvente"
+        subcategory:
+          type: string
+          description: Subcategoría específica del producto
+          example: "Crédito Revolvente Capital Trabajo"
+        minimumAmount:
+          type: number
+          format: float
+          description: Monto mínimo del crédito
+          minimum: 0
+          example: 20000
+        maximumAmount:
+          type: number
+          format: float
+          description: Monto máximo del crédito
+          minimum: 0
+          example: 300000
+        currency:
+          type: string
+          description: Moneda del crédito
+          enum: ["S/", "USD"]
+          example: "S/"
+        term:
+          type: string
+          description: Plazo del crédito
+          example: "12 meses renovables"
+        minimumRate:
+          type: number
+          format: float
+          description: Tasa de interés mínima anual
+          minimum: 0
+          example: 9.00
+        maximumRate:
+          type: number
+          format: float
+          description: Tasa de interés máxima anual
+          minimum: 0
+          example: 14.00
+        requirements:
+          type: array
+          items:
+            type: string
+          description: Lista de requisitos para acceder al producto
+          example:
+            - "RUC vigente"
+            - "Estados financieros de los últimos 2 años"
+        features:
+          type: array
+          items:
+            type: string
+          description: Características principales del producto
+          example:
+            - "Disposiciones parciales"
+            - "Pagos flexibles"
+        benefits:
+          type: array
+          items:
+            type: string
+          description: Beneficios del producto
+          example:
+            - "Capital de trabajo inmediato"
+            - "Flexibilidad en el uso de fondos"
+      required:
+        - id
+        - name
+        - description
+        - category
+        - subcategory
+        - minimumAmount
+        - maximumAmount
+        - currency
+        - term
+        - minimumRate
+        - maximumRate
+        - requirements
+
+    ProductListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        total:
+          type: integer
+          description: Total de productos disponibles
+          example: 25
+        totalPages:
+          type: integer
+          description: Total de páginas
+          example: 3
+        currentPage:
+          type: integer
+          description: Página actual
+          example: 1
+      required:
+        - data
+        - total
+
+    EvaluationRequest:
+      type: object
+      properties:
+        identityDocument:
+          type: string
+          description: Documento de identidad del cliente (DNI o RUC)
+          minLength: 8
+          maxLength: 11
+          example: "10456789012"
+        requestedAmount:
+          type: number
+          format: float
+          description: Monto solicitado para el crédito
+          minimum: 1
+          example: 50000
+        requestedCurrency:
+          type: string
+          description: Moneda solicitada
+          enum: ["S/", "USD"]
+          example: "S/"
+        category:
+          type: string
+          description: Categoría de producto crediticio de interés
+          example: "Crédito Revolvente"
+        additionalInfo:
+          type: object
+          description: Información adicional del cliente para mejor evaluación
+          properties:
+            monthlyIncome:
+              type: number
+              format: float
+              description: Ingreso mensual del cliente
+              example: 15000
+            currentDebt:
+              type: number
+              format: float
+              description: Deuda actual total del cliente
+              example: 5000
+            creditScore:
+              type: integer
+              description: Score crediticio del cliente
+              minimum: 300
+              maximum: 850
+              example: 750
+            employmentType:
+              type: string
+              description: Tipo de empleo del cliente
+              enum: ["Dependiente", "Independiente", "Empresario"]
+              example: "Dependiente"
+      required:
+        - identityDocument
+        - requestedAmount
+        - requestedCurrency
+
+    EvaluationResponse:
+      type: object
+      properties:
+        clientProfile:
+          type: object
+          properties:
+            identityDocument:
+              type: string
+              example: "10456789012"
+            creditScore:
+              type: integer
+              example: 750
+            riskLevel:
+              type: string
+              enum: ["Bajo", "Medio", "Alto"]
+              example: "Bajo"
+            approvedAmount:
+              type: number
+              format: float
+              example: 45000
+            recommendedTerm:
+              type: string
+              example: "12 meses"
+          required:
+            - identityDocument
+            - creditScore
+            - riskLevel
+            - approvedAmount
+        eligibleProducts:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                example: "CRV-PEN-001"
+              name:
+                type: string
+                example: "Crédito Revolvente Empresarial"
+              approvedAmount:
+                type: number
+                format: float
+                example: 45000
+              approvedRate:
+                type: number
+                format: float
+                example: 10.50
+              eligibilityScore:
+                type: integer
+                minimum: 0
+                maximum: 100
+                example: 85
+              recommendation:
+                type: string
+                enum: ["Altamente recomendado", "Recomendado", "No recomendado"]
+                example: "Altamente recomendado"
+              conditions:
+                type: array
+                items:
+                  type: string
+                example:
+                  - "Garantía líquida del 20%"
+                  - "Evaluación crediticia mensual"
+            required:
+              - id
+              - name
+              - approvedAmount
+              - approvedRate
+              - eligibilityScore
+              - recommendation
+        summary:
+          type: object
+          properties:
+            totalEligibleProducts:
+              type: integer
+              example: 2
+            bestOption:
+              type: object
+              properties:
+                productId:
+                  type: string
+                  example: "CRV-PEN-001"
+                reason:
+                  type: string
+                  example: "Mejor tasa de interés y mayor flexibilidad"
+              required:
+                - productId
+                - reason
+            evaluationDate:
+              type: string
+              format: date-time
+              example: "2024-11-08T16:30:00Z"
+          required:
+            - totalEligibleProducts
+            - evaluationDate
+      required:
+        - clientProfile
+        - eligibleProducts
+        - summary
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Tipo de error
+          example: "Validation Error"
+        message:
+          type: string
+          description: Mensaje descriptivo del error
+          example: "Los datos proporcionados no son válidos"
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                description: Campo que causó el error
+                example: "requestedAmount"
+              message:
+                type: string
+                description: Mensaje específico del campo
+                example: "El monto solicitado debe ser mayor a 0"
+      required:
+        - error
+        - message
+tags:
+  - name: Products
+    description: Operaciones para la gestión de productos crediticios
+  - name: Evaluation
+    description: Operaciones para la evaluación de elegibilidad crediticia
