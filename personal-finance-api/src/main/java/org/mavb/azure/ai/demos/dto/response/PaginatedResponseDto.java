@@ -16,7 +16,7 @@ public class PaginatedResponseDto<T> {
     /**
      * Lista de elementos de la página actual
      */
-    private List<T> transactions;
+    private List<T> data;
     
     /**
      * Información de paginación

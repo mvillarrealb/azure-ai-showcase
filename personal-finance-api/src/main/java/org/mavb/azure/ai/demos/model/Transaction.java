@@ -2,9 +2,8 @@ package org.mavb.azure.ai.demos.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -21,7 +20,6 @@ import java.util.UUID;
     @Index(name = "idx_transaction_category", columnList = "category_id"),
     @Index(name = "idx_transaction_amount", columnList = "amount")
 })
-@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -66,14 +64,14 @@ public class Transaction {
     /**
      * Fecha de creación del registro (auditoría)
      */
-    @CreatedDate
+    @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
     
     /**
      * Fecha de última modificación (auditoría)
      */
-    @LastModifiedDate
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
     
     /**

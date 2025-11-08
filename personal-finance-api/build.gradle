@@ -29,20 +29,25 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    // https://mvnrepository.com/artifact/com.azure/azure-ai-documentintelligence
+    implementation 'com.azure:azure-ai-documentintelligence:1.0.6'
     implementation 'org.liquibase:liquibase-core'
+	// Lombok (debe ir antes de MapStruct para el annotationProcessor)
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	
 	// MapStruct para mapeo automático Entity <-> DTO
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+	
+	// Lombok + MapStruct binding
+	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 	
 	// Tipos especiales para PostgreSQL (JSON, arrays, etc)
 	implementation 'com.vladmihalcea:hibernate-types-60:2.21.1'
 	
 	// PostgreSQL driver
 	runtimeOnly 'org.postgresql:postgresql'
-	
-	// Lombok
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
 	
 	// Métricas
 	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'

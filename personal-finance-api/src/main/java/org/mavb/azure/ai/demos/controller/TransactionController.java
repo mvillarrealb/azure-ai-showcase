@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
  * Controlador para operaciones de transacciones según tag "Transacciones" del OpenAPI
  */
 @RestController
+@RequestMapping("/transactions")
 @RequiredArgsConstructor
 @Slf4j
 @Validated
@@ -40,7 +41,7 @@ public class TransactionController {
         PaginatedResponseDto<TransactionDto> response = transactionService.getTransactions(filter);
         
         log.debug("Retornando {} transacciones en la página {}", 
-                 response.getTransactions().size(), 
+                 response.getData().size(),
                  response.getPagination().getCurrentPage());
         
         return ResponseEntity.ok(response);

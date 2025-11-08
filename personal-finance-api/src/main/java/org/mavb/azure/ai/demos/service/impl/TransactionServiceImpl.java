@@ -44,16 +44,12 @@ public class TransactionServiceImpl implements TransactionService {
     public PaginatedResponseDto<TransactionDto> getTransactions(TransactionFilterDto filter) {
         log.debug("Obteniendo transacciones con filtros: {}", filter);
         
-        // Validaciones
         validateFilter(filter);
         
-        // Construir especificación de consulta
         Specification<Transaction> spec = buildSpecification(filter);
         
-        // Configurar paginación
         Pageable pageable = buildPageable(filter);
         
-        // Ejecutar consulta
         Page<Transaction> transactionsPage = transactionRepository.findAll(spec, pageable);
         
         log.debug("Se encontraron {} transacciones en la página {} de {}", 
@@ -61,10 +57,8 @@ public class TransactionServiceImpl implements TransactionService {
                  transactionsPage.getNumber() + 1, 
                  transactionsPage.getTotalPages());
         
-        // Mapear entidades a DTOs
         Page<TransactionDto> dtoPage = transactionsPage.map(transactionMapper::toDto);
         
-        // Crear respuesta paginada
         return paginationMapper.toPaginatedResponse(dtoPage);
     }
     
@@ -73,23 +67,18 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionDto createTransaction(CreateTransactionDto dto) {
         log.debug("Creando nueva transacción: {}", dto);
         
-        // Validaciones de negocio
         validateCreateTransaction(dto);
         
-        // Obtener la categoría
         Category category = categoryRepository.findById(dto.getCategoryId())
             .orElseThrow(() -> new NotFoundException("Categoría no encontrada: " + dto.getCategoryId()));
         
-        // Mapear DTO a entidad
         Transaction transaction = transactionMapper.toEntity(dto);
         transaction.setCategory(category);
         
-        // Guardar en base de datos
         Transaction savedTransaction = transactionRepository.save(transaction);
         
         log.info("Transacción creada exitosamente con ID: {}", savedTransaction.getId());
         
-        // Mapear a DTO de respuesta
         return transactionMapper.toDto(savedTransaction);
     }
     
@@ -108,12 +97,10 @@ public class TransactionServiceImpl implements TransactionService {
      * Valida los datos de creación de transacción
      */
     private void validateCreateTransaction(CreateTransactionDto dto) {
-        // Validar que la fecha no sea futura
         if (dto.getDate().isAfter(LocalDateTime.now())) {
             throw new ValidationException("La fecha de la transacción no puede ser futura");
         }
         
-        // Validar que el monto no sea cero
         if (dto.getAmount().compareTo(java.math.BigDecimal.ZERO) == 0) {
             throw new ValidationException("El monto de la transacción no puede ser cero");
         }
@@ -125,12 +112,10 @@ public class TransactionServiceImpl implements TransactionService {
     private Specification<Transaction> buildSpecification(TransactionFilterDto filter) {
         Specification<Transaction> spec = Specification.where(null);
         
-        // Filtro por categoría
         if (filter.getCategoryId() != null && !filter.getCategoryId().trim().isEmpty()) {
             spec = spec.and(TransactionSpecifications.hasCategory(filter.getCategoryId()));
         }
         
-        // Filtro por rango de fechas
         if (filter.getStartDate() != null) {
             spec = spec.and(TransactionSpecifications.hasDateAfterOrEqual(filter.getStartDate()));
         }
@@ -146,11 +131,9 @@ public class TransactionServiceImpl implements TransactionService {
      * Construye la configuración de paginación
      */
     private Pageable buildPageable(TransactionFilterDto filter) {
-        // Convertir de 1-indexed (DTO) a 0-indexed (Spring Data)
         int pageNumber = Math.max(0, filter.getPage() - 1);
         int pageSize = filter.getLimit();
         
-        // Ordenar por fecha descendente (más recientes primero)
         Sort sort = Sort.by(Sort.Direction.DESC, "date");
         
         return PageRequest.of(pageNumber, pageSize, sort);

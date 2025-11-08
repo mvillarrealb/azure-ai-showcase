@@ -36,7 +36,7 @@ public interface PaginationMapper {
         }
         
         return PaginatedResponseDto.<T>builder()
-            .transactions(page.getContent())
+            .data(page.getContent())
             .pagination(toPaginationDto(page))
             .build();
     }

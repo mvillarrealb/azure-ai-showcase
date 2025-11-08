@@ -39,35 +39,28 @@ public class EvaluationServiceImpl implements EvaluationService {
         log.debug("Starting credit evaluation for customer: {}", request.getIdentityDocument());
 
         try {
-            // Get or create customer profile
             CustomerEntity customer = getOrCreateCustomer(request);
             
-            // Update customer information from request
             updateCustomerFromRequest(customer, request);
             
-            // Calculate risk level and approved amount
             CustomerEntity.RiskLevel riskLevel = calculateRiskLevel(customer);
             customer.setRiskLevel(riskLevel);
             customerRepository.save(customer);
             
             BigDecimal approvedAmount = calculateApprovedAmount(customer, request.getRequestedAmount());
             
-            // Find eligible products
             List<CreditProductEntity> eligibleProducts = creditProductRepository.findEligibleProducts(
                     request.getRequestedAmount(),
                     request.getRequestedCurrency(),
                     request.getCategory()
             );
             
-            // Evaluate each product
             List<EvaluationResponseDTO.EligibleProductDTO> evaluatedProducts = 
                     evaluateProducts(eligibleProducts, customer, approvedAmount);
             
-            // Build client profile
             EvaluationResponseDTO.ClientProfileDTO clientProfile = buildClientProfile(
                     customer, approvedAmount);
             
-            // Build evaluation summary
             EvaluationResponseDTO.EvaluationSummaryDTO summary = buildSummary(
                     evaluatedProducts, LocalDateTime.now());
             
@@ -116,9 +109,8 @@ public class EvaluationServiceImpl implements EvaluationService {
             }
         }
         
-        // Set default values if missing
         if (customer.getCreditScore() == null) {
-            customer.setCreditScore(600); // Default moderate score
+            customer.setCreditScore(600);
         }
         if (customer.getCurrentDebt() == null) {
             customer.setCurrentDebt(BigDecimal.ZERO);
@@ -131,13 +123,11 @@ public class EvaluationServiceImpl implements EvaluationService {
     private CustomerEntity.RiskLevel calculateRiskLevel(CustomerEntity customer) {
         int score = 0;
         
-        // Credit score evaluation (40% weight)
         if (customer.getCreditScore() >= 750) score += 40;
         else if (customer.getCreditScore() >= 650) score += 30;
         else if (customer.getCreditScore() >= 550) score += 20;
         else score += 10;
         
-        // Debt-to-income ratio evaluation (30% weight)
         if (customer.getMonthlyIncome() != null && customer.getMonthlyIncome().compareTo(BigDecimal.ZERO) > 0) {
             BigDecimal debtRatio = customer.getCurrentDebt()
                     .divide(customer.getMonthlyIncome(), 4, RoundingMode.HALF_UP);
@@ -147,17 +137,15 @@ public class EvaluationServiceImpl implements EvaluationService {
             else if (debtRatio.compareTo(BigDecimal.valueOf(0.7)) <= 0) score += 10;
             else score += 0;
         } else {
-            score += 15; // Moderate score if income not available
+            score += 15;
         }
         
-        // Employment type evaluation (30% weight)
         switch (customer.getEmploymentType()) {
             case DEPENDIENTE -> score += 30;
             case EMPRESARIO -> score += 25;
             case INDEPENDIENTE -> score += 20;
         }
         
-        // Determine risk level based on total score
         if (score >= 80) return CustomerEntity.RiskLevel.BAJO;
         else if (score >= 60) return CustomerEntity.RiskLevel.MEDIO;
         else return CustomerEntity.RiskLevel.ALTO;
@@ -166,14 +154,12 @@ public class EvaluationServiceImpl implements EvaluationService {
     private BigDecimal calculateApprovedAmount(CustomerEntity customer, BigDecimal requestedAmount) {
         BigDecimal approvedAmount = requestedAmount;
         
-        // Reduce approved amount based on risk level
         switch (customer.getRiskLevel()) {
             case ALTO -> approvedAmount = approvedAmount.multiply(BigDecimal.valueOf(0.6));
             case MEDIO -> approvedAmount = approvedAmount.multiply(BigDecimal.valueOf(0.8));
             case BAJO -> approvedAmount = approvedAmount.multiply(BigDecimal.valueOf(0.9));
         }
         
-        // Apply income-based limits if available
         if (customer.getMonthlyIncome() != null) {
             BigDecimal maxByIncome = customer.getMonthlyIncome().multiply(BigDecimal.valueOf(5));
             approvedAmount = approvedAmount.min(maxByIncome);
@@ -190,7 +176,7 @@ public class EvaluationServiceImpl implements EvaluationService {
         for (CreditProductEntity product : products) {
             int eligibilityScore = calculateEligibilityScore(product, customer, approvedAmount);
             
-            if (eligibilityScore >= 50) { // Minimum threshold for eligibility
+            if (eligibilityScore >= 50) {
                 String recommendation = getRecommendation(eligibilityScore);
                 BigDecimal approvedRate = calculateRate(product, customer);
                 List<String> conditions = generateConditions(product, customer);
@@ -210,7 +196,6 @@ public class EvaluationServiceImpl implements EvaluationService {
             }
         }
         
-        // Sort by eligibility score descending
         evaluatedProducts.sort(Comparator.comparing(
                 EvaluationResponseDTO.EligibleProductDTO::getEligibilityScore).reversed());
         
@@ -221,19 +206,17 @@ public class EvaluationServiceImpl implements EvaluationService {
                                         BigDecimal approvedAmount) {
         int score = 0;
         
-        // Amount fit score (30%)
         BigDecimal maxAmount = product.getMaximumAmount();
         BigDecimal minAmount = product.getMinimumAmount();
         
         if (approvedAmount.compareTo(minAmount) >= 0 && approvedAmount.compareTo(maxAmount) <= 0) {
             score += 30;
         } else if (approvedAmount.compareTo(maxAmount) > 0) {
-            score += 20; // Amount too high
+            score += 20;
         } else {
-            score += 10; // Amount too low
+            score += 10;
         }
         
-        // Customer profile fit score (70%)
         switch (customer.getRiskLevel()) {
             case BAJO -> score += 70;
             case MEDIO -> score += 50;

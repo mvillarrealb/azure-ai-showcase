@@ -8,7 +8,6 @@ spring:
     enabled: true
     drop-first: false
     default-schema: public
-    liquibase-schema: liquibase  # Schema para metadatos
     database-change-log-table: databasechangelog
     database-change-log-lock-table: databasechangeloglock
     test-rollback-on-update: false
@@ -37,3 +36,6 @@ management:
     web:
       exposure:
         include: health,metrics,info
+document-intelligence:
+  key: ${AZURE_DOCUMENT_INTELLIGENCE_KEY}
+  endpoint: ${AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT}
