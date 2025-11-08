@@ -1,26 +1,25 @@
 spring:
   application:
     name: personal-finance-api
-  
   profiles:
     active: dev
-
----
-# Configuración de desarrollo con PostgreSQL local
-spring:
-  config:
-    activate:
-      on-profile: dev
-      
+  liquibase:
+    change-log: classpath:/db/changelog.yaml
+    enabled: true
+    drop-first: false
+    default-schema: public
+    liquibase-schema: liquibase  # Schema para metadatos
+    database-change-log-table: databasechangelog
+    database-change-log-lock-table: databasechangeloglock
+    test-rollback-on-update: false
   datasource:
-    url: jdbc:postgresql://localhost:5432/personal_finance_dev
+    url: jdbc:postgresql://localhost:5432/personal_finance
     username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
+    password: ${DB_PASSWORD:PutYourPasswordHere}
     driver-class-name: org.postgresql.Driver
-    
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
@@ -28,68 +27,13 @@ spring:
         format_sql: true
         jdbc:
           time_zone: UTC
-
 logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.mavb.azure.ai.demos: DEBUG
-
 management:
   endpoints:
     web:
       exposure:
         include: health,metrics,info
-
----
-# Configuración de testing con H2
-spring:
-  config:
-    activate:
-      on-profile: test
-      
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: 
-    
-  h2:
-    console:
-      enabled: true
-      
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: true
-
----
-# Configuración de producción
-spring:
-  config:
-    activate:
-      on-profile: prod
-      
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 2
-      idle-timeout: 300000
-      
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: false
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        jdbc:
-          time_zone: UTC
-
-logging:
-  level:
-    org.mavb.azure.ai.demos: INFO

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
  * Controlador para operaciones de reportes según tag "Reportes" del OpenAPI
  */
 @RestController
-@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Slf4j
 @Validated

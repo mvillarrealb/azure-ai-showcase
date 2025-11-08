@@ -14,16 +14,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Implementación del servicio de procesamiento de facturas
- * 
- * NOTA: Esta es una implementación de ejemplo/mock.
- * En un entorno real, aquí se integraría con servicios de OCR como:
- * - Azure Computer Vision
- * - Google Cloud Vision API
- * - AWS Textract
- * - Tesseract OCR
- */
 @Service
 @RequiredArgsConstructor
 @Slf4j

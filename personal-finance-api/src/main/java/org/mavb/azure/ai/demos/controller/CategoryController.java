@@ -15,7 +15,6 @@ import java.util.List;
  * Controlador para operaciones de categorías según tag "Categorías" del OpenAPI
  */
 @RestController
-@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Slf4j
 public class CategoryController {

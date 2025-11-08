@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
  * Controlador para operaciones de facturas según tag "Facturas" del OpenAPI
  */
 @RestController
-@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Slf4j
 public class InvoiceController {

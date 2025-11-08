@@ -8,17 +8,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.support.WebExchangeBindException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Manejador global de excepciones siguiendo los esquemas de error del OpenAPI
+ * Manejador global de excepciones siguiendo los esquemas de error del OpenAPI.
+ * Compatible con Spring WebFlux usando @ControllerAdvice + @ResponseBody.
  */
-@RestControllerAdvice
+@ControllerAdvice
+@ResponseBody
 @Slf4j
 public class GlobalExceptionHandler {
     
@@ -40,12 +44,36 @@ public class GlobalExceptionHandler {
     }
     
     /**
-     * Maneja errores de validación de argumentos del método (400)
+     * Maneja errores de validación de argumentos del método (400) - WebMVC
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponseDto> handleValidation(
             MethodArgumentNotValidException ex) {
-        log.warn("Error de validación en request: {}", ex.getMessage());
+        log.warn("Error de validación en request (WebMVC): {}", ex.getMessage());
+        
+        Map<String, String> fieldErrors = new HashMap<>();
+        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+            fieldErrors.put(error.getField(), error.getDefaultMessage());
+        }
+        
+        ValidationErrorResponseDto error = ValidationErrorResponseDto.builder()
+            .error("Datos inválidos")
+            .message("Error en la validación de campos")
+            .code("VALIDATION_ERROR")
+            .fieldErrors(fieldErrors)
+            .timestamp(LocalDateTime.now())
+            .build();
+            
+        return ResponseEntity.badRequest().body(error);
+    }
+    
+    /**
+     * Maneja errores de validación en WebFlux - WebExchangeBindException (400)
+     */
+    @ExceptionHandler(WebExchangeBindException.class)
+    public ResponseEntity<ValidationErrorResponseDto> handleWebExchangeBindException(
+            WebExchangeBindException ex) {
+        log.warn("Error de validación en request (WebFlux): {}", ex.getMessage());
         
         Map<String, String> fieldErrors = new HashMap<>();
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {

@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: v_1_0_0
+      author: "Marco Villarreal"
+      comment: |
+        Changelog inicial de la base de datos incluyendo tablas principales:
+        - claims
+        - claim_status
+        Incluye sus índices comentarios y constraints estandarizados
+      sqlFile:
+        encoding: utf8
+        stripComments: true
+        path: "classpath:/db/v_1_0_0/main.sql"
+        endDelimiter: "$EXECUTE$"
