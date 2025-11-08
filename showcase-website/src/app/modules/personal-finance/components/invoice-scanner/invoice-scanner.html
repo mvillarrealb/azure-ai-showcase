@@ -1,0 +1,234 @@
+<!-- Componente para escaneo de documentos PDF -->
+<div class="max-w-4xl mx-auto">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center mb-4">
+      <div class="w-12 h-12 mr-4 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center shadow-lg">
+        <i class="fas fa-file-pdf text-white text-xl"></i>
+      </div>
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Escaneo de Documentos</h1>
+        <p class="text-gray-600">Sube un PDF para extraer automáticamente los datos de transacción</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Area -->
+  @if (!scanResult() && !isUploading()) {
+    <div class="mb-8">
+      <div 
+        class="border-2 border-dashed border-gray-300 rounded-2xl p-12 text-center transition-all duration-200 hover:border-blue-400 hover:bg-blue-50/50"
+        [class.border-blue-400]="isDragOver()"
+        [class.bg-blue-50]="isDragOver()"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)">
+        
+        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center">
+          <i class="fas fa-cloud-upload-alt text-white text-2xl"></i>
+        </div>
+        
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Arrastra tu archivo PDF aquí</h3>
+        <p class="text-gray-600 mb-6">o</p>
+        
+        <label class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 cursor-pointer shadow-lg hover:shadow-xl">
+          <i class="fas fa-file-upload mr-2"></i>
+          Seleccionar archivo
+          <input 
+            type="file" 
+            class="hidden" 
+            accept=".pdf"
+            (change)="onFileSelected($event)">
+        </label>
+        
+        <p class="text-sm text-gray-500 mt-4">Solo archivos PDF, tamaño máximo 10MB</p>
+      </div>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (isUploading()) {
+    <div class="mb-8">
+      <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-8 border border-white/20 shadow-lg">
+        <div class="text-center">
+          <div class="w-16 h-16 mx-auto mb-4 relative">
+            <div class="w-full h-full rounded-full border-4 border-blue-200"></div>
+            <div class="absolute top-0 left-0 w-full h-full rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Procesando documento...</h3>
+          <p class="text-gray-600">Analizando el contenido del PDF, esto puede tomar unos segundos</p>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Scan Result -->
+  @if (scanResult() && !isUploading()) {
+    <div class="mb-8">
+      <!-- Result Header -->
+      <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg mb-6">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center">
+            <div class="w-12 h-12 mr-4 rounded-xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-lg">
+              <i class="fas fa-check text-white text-xl"></i>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-gray-900">Documento procesado exitosamente</h2>
+              <p class="text-gray-600">Revisa los datos extraídos antes de registrar la transacción</p>
+            </div>
+          </div>
+          <button 
+            (click)="resetScanner()"
+            class="px-4 py-2 bg-gray-100/50 backdrop-blur-sm border border-gray-200/50 text-gray-600 hover:text-gray-800 hover:bg-gray-200/50 rounded-lg transition-all duration-200">
+            <i class="fas fa-times mr-2"></i>
+            Nuevo escaneo
+          </button>
+        </div>
+      </div>
+
+      <!-- Invoice Details -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- Basic Info -->
+        <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Información básica</h3>
+          
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Número de factura</label>
+              <p class="text-gray-900 font-mono bg-gray-50 px-3 py-2 rounded-lg">{{ scanResult()?.invoiceNumber }}</p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Proveedor</label>
+              <p class="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">{{ scanResult()?.vendor }}</p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+              <p class="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">{{ formatDate(scanResult()?.date) }}</p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Total</label>
+              <p class="text-2xl font-bold text-green-600 bg-green-50 px-3 py-2 rounded-lg">
+                S/{{ scanResult()?.totalAmount?.toFixed(2) }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Line Items -->
+        <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Detalle de productos</h3>
+          
+          <div class="space-y-3 max-h-64 overflow-y-auto">
+            @for (item of scanResult()?.lineItems; track $index) {
+              <div class="bg-gray-50 p-3 rounded-lg">
+                <div class="flex justify-between items-start mb-1">
+                  <p class="font-medium text-gray-900 text-sm">{{ item.description }}</p>
+                  <span class="text-green-600 font-semibold">S/{{ item.totalPrice.toFixed(2) }}</span>
+                </div>
+                <p class="text-xs text-gray-600">
+                  {{ item.quantity }} × S/{{ item.unitPrice.toFixed(2) }}
+                </p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-1">¿Registrar esta transacción?</h3>
+            <p class="text-gray-600 text-sm">Se creará un gasto por S/{{ scanResult()?.totalAmount?.toFixed(2) }}</p>
+          </div>
+          
+          <div class="flex space-x-3">
+            <button 
+              (click)="resetScanner()"
+              class="px-6 py-3 bg-gray-100/50 backdrop-blur-sm border border-gray-200/50 text-gray-700 hover:text-gray-900 hover:bg-gray-200/50 rounded-xl transition-all duration-200">
+              <i class="fas fa-times mr-2"></i>
+              Cancelar
+            </button>
+            
+            <button 
+              (click)="registerTransaction()"
+              [disabled]="isCreatingTransaction()"
+              class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed">
+              @if (isCreatingTransaction()) {
+                <i class="fas fa-spinner fa-spin mr-2"></i>
+                Registrando...
+              } @else {
+                <i class="fas fa-plus mr-2"></i>
+                Registrar transacción
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Error Message -->
+  @if (errorMessage()) {
+    <div class="mb-8">
+      <div class="bg-red-50 border border-red-200 rounded-2xl p-6">
+        <div class="flex items-center">
+          <div class="w-10 h-10 mr-3 rounded-full bg-red-100 flex items-center justify-center">
+            <i class="fas fa-exclamation-triangle text-red-600"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-red-900">Error al procesar documento</h3>
+            <p class="text-red-700">{{ errorMessage() }}</p>
+          </div>
+        </div>
+        
+        <div class="mt-4">
+          <button 
+            (click)="resetScanner()"
+            class="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded-lg transition-colors duration-200">
+            <i class="fas fa-redo mr-2"></i>
+            Intentar nuevamente
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Success Message -->
+  @if (successMessage()) {
+    <div class="mb-8">
+      <div class="bg-green-50 border border-green-200 rounded-2xl p-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <div class="w-10 h-10 mr-3 rounded-full bg-green-100 flex items-center justify-center">
+              <i class="fas fa-check text-green-600"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-green-900">¡Transacción registrada exitosamente!</h3>
+              <p class="text-green-700">{{ successMessage() }}</p>
+            </div>
+          </div>
+          
+          <div class="flex space-x-2">
+            <button 
+              (click)="resetScanner()"
+              class="px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 rounded-lg transition-colors duration-200">
+              <i class="fas fa-file-upload mr-2"></i>
+              Escanear otro
+            </button>
+            
+            <a 
+              routerLink="/personal-finance/transacciones"
+              class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors duration-200">
+              <i class="fas fa-list mr-2"></i>
+              Ver transacciones
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

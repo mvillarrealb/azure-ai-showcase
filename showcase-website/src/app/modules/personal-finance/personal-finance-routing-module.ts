@@ -1,9 +1,10 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 import { PersonalFinance } from './personal-finance/personal-finance';
 import { PersonalFinanceCrudComponent } from './components/personal-finance-crud/personal-finance-crud';
+import { InvoiceScannerComponent } from './components/invoice-scanner/invoice-scanner';
+import { MonthlyReportsComponent } from './components/monthly-reports/monthly-reports';
 
-const routes: Routes = [
+export const personalFinanceRoutes: Routes = [
   {
     path: '',
     component: PersonalFinance,
@@ -16,13 +17,15 @@ const routes: Routes = [
       {
         path: 'transacciones',
         component: PersonalFinanceCrudComponent
+      },
+      {
+        path: 'escaneo',
+        component: InvoiceScannerComponent
+      },
+      {
+        path: 'reportes',
+        component: MonthlyReportsComponent
       }
     ]
   }
 ];
-
-@NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
-})
-export class PersonalFinanceRoutingModule { }

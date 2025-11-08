@@ -8,7 +8,7 @@ export const routes: Routes = [
   },
   {
     path: 'personal-finance',
-    loadChildren: () => import('./modules/personal-finance/personal-finance-module').then(m => m.PersonalFinanceModule)
+    loadChildren: () => import('./modules/personal-finance/personal-finance-routing-module').then(m => m.personalFinanceRoutes)
   },
   {
     path: 'credit-management',

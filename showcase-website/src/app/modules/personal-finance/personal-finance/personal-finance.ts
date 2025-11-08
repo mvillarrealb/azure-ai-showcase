@@ -24,14 +24,14 @@ export class PersonalFinance {
       icon: 'fas fa-list'
     },
     {
-      label: 'Reportes',
-      route: '/personal-finance/reportes',
-      icon: 'fas fa-chart-bar'
+      label: 'Escaneo PDF',
+      route: '/personal-finance/escaneo',
+      icon: 'fas fa-file-upload'
     },
     {
-      label: 'Importar PDF',
-      route: '/personal-finance/importar',
-      icon: 'fas fa-file-upload'
+      label: 'Reportes',
+      route: '/personal-finance/reportes',
+      icon: 'fas fa-chart-pie'
     }
   ];
 

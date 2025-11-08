@@ -20,6 +20,7 @@ export class SidenavNavigation {
   @Input() headerClasses: string = 'bg-white border-gray-200';
   @Input() showBackButton: boolean = false;
   @Input() backButtonIcon: string = 'fas fa-arrow-left';
+  @Input() backButtonRoute: string = ''; // Nueva propiedad para la ruta de back
   @Input() sidebarIcon: string = 'fas fa-wallet';
   @Input() sidebarIconClasses: string = 'bg-gradient-to-br from-blue-500 to-purple-600';
 
@@ -41,6 +42,10 @@ export class SidenavNavigation {
   }
 
   goBack(): void {
-    window.history.back();
+    if (this.backButtonRoute) {
+      this.router.navigate([this.backButtonRoute]);
+    } else {
+      window.history.back();
+    }
   }
 }
