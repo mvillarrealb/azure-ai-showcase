@@ -1,18 +1,14 @@
 spring:
   application:
     name: claim-management-api
-  
-  # Configuración de base de datos PostgreSQL
   datasource:
-    url: jdbc:postgresql://localhost:5432/claimdb
-    username: ${DB_USERNAME:claimuser}
-    password: ${DB_PASSWORD:claimpass}
+    url: jdbc:postgresql://localhost:5432/claim_management
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:PutYourPasswordHere}
     driver-class-name: org.postgresql.Driver
-    
-  # Configuración de JPA/Hibernate
   jpa:
     hibernate:
-      ddl-auto: validate  # En producción usar 'validate' o 'none'
+      ddl-auto: none  # OBLIGATORIO: Desactivar DDL automático de Hibernate, usar Liquibase
     show-sql: false
     properties:
       hibernate:
@@ -21,108 +17,23 @@ spring:
         jdbc:
           time_zone: UTC
     open-in-view: false
-    
-  # Configuración de SQL initialization
-  sql:
-    init:
-      mode: always  # En producción usar 'never'
-      schema-locations: classpath:schema.sql
-      
-  # Configuración de multipart para upload de archivos
+  liquibase:
+    change-log: classpath:/db/changelog.yaml
+    enabled: true
+    drop-first: false
+    default-schema: public
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
       enabled: true
-
-# Configuración de logging
 logging:
   level:
     root: INFO
-    org.mavb.azure.ai.demos: DEBUG
-    org.springframework.web: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-  file:
-    name: logs/claim-management-api.log
-
-# Configuración de Actuator para métricas y health checks
 management:
   endpoints:
     web:
       exposure:
         include: health,info,metrics,prometheus
-  endpoint:
-    health:
-      show-details: when-authorized
-  info:
-    env:
-      enabled: true
-
-# Información de la aplicación
-info:
-  app:
-    name: ${spring.application.name}
-    description: API REST para la gestión integral de reclamos de clientes bancarios
-    version: 1.0.0
-    contact:
-      name: Equipo de Desarrollo
-      email: dev-team@banco.com
-
-# Configuración para diferentes perfiles
----
-spring:
-  config:
-    activate:
-      on-profile: development
-  datasource:
-    url: jdbc:postgresql://localhost:5432/claimdb_dev
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: create-drop
-  sql:
-    init:
-      mode: always
-
----
-spring:
-  config:
-    activate:
-      on-profile: test
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: 
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: true
-  h2:
-    console:
-      enabled: true
-
----
-spring:
-  config:
-    activate:
-      on-profile: production
-  datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:claimdb}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: false
-  sql:
-    init:
-      mode: never
-logging:
-  level:
-    root: WARN
-    org.mavb.azure.ai.demos: INFO

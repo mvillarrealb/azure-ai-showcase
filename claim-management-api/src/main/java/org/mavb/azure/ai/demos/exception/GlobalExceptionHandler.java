@@ -1,7 +1,7 @@
 package org.mavb.azure.ai.demos.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import org.mavb.azure.ai.demos.dto.ErrorResponseDto;
+import org.mavb.azure.ai.demos.dto.response.ErrorResponseDto;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

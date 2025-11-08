@@ -30,8 +30,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	
-	// PostgreSQL
+	// Database dependencies
 	runtimeOnly 'org.postgresql:postgresql'
+	implementation 'org.liquibase:liquibase-core'
 	
 	// MapStruct for mapping
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'

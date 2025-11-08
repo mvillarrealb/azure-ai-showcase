@@ -30,9 +30,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	
-	// Database
+	// Database dependencies
 	runtimeOnly 'org.postgresql:postgresql'
-	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.liquibase:liquibase-core'
 	
 	// MapStruct
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
@@ -43,7 +43,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	
 	// Hibernate types for JSON support
-	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.6.0'
+	implementation 'io.hypersistence:hypersistence-utils-hibernate-60:3.6.0'
 	
 	// Monitoring
 	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'

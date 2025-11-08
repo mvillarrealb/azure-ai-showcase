@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: v_1_0_0
+      author: "Marco Villarreal"
+      comment: "Estructura inicial del sistema de gestión de créditos - tablas, índices y constraints básicos"
+      sqlFile:
+        encoding: utf8
+        stripComments: true
+        path: "classpath:/db/v_1_0_0/main.sql"
+        endDelimiter: "$EXECUTE$"
+  
+  - changeSet:
+      id: v_1_0_0_data
+      author: "Marco Villarreal"
+      comment: "Datos iniciales de productos financieros de crédito"
+      contexts: dev,data-load
+      sqlFile:
+        encoding: utf8
+        stripComments: true
+        path: "classpath:/db/v_1_0_0/data.sql"
+      rollback:
+        sql: "DELETE FROM credit_products; DELETE FROM customers WHERE identity_document LIKE 'TEST%';"

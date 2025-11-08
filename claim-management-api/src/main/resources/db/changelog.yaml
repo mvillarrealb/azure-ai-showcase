@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: v_1_0_0
+      author: "Marco Villarreal"
+      comment: |
+        Estructura inicial del sistema de gestión de reclamos v1.0.0
+        - Tabla claims con todas las columnas requeridas
+        - Índices para optimización de consultas frecuentes
+        - Constraints de integridad y validación
+      sqlFile:
+        encoding: utf8
+        stripComments: true
+        path: "classpath:/db/v_1_0_0/main.sql"
+        endDelimiter: "$EXECUTE$"
+  
+  # Changeset para datos iniciales de ejemplo
+  - changeSet:
+      id: v_1_0_0_data
+      author: "Marco Villarreal"
+      comment: "Carga de datos iniciales de ejemplo para testing y demostración"
+      contexts: dev,data-load
+      sqlFile:
+        encoding: utf8
+        stripComments: true
+        path: "classpath:/db/v_1_0_0/data.sql"
+      rollback:
+        sql: "DELETE FROM claims WHERE id LIKE 'CLM-2024-%';"

@@ -1,7 +1,8 @@
 package org.mavb.azure.ai.demos.mapper;
 
 import org.mapstruct.*;
-import org.mavb.azure.ai.demos.dto.*;
+import org.mavb.azure.ai.demos.dto.request.*;
+import org.mavb.azure.ai.demos.dto.response.*;
 import org.mavb.azure.ai.demos.model.Claim;
 
 import java.util.List;

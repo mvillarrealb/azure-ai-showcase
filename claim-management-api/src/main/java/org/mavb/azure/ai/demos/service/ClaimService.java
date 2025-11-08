@@ -1,6 +1,7 @@
 package org.mavb.azure.ai.demos.service;
 
-import org.mavb.azure.ai.demos.dto.*;
+import org.mavb.azure.ai.demos.dto.request.*;
+import org.mavb.azure.ai.demos.dto.response.*;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
