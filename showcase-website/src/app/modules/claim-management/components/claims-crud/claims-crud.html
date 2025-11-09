@@ -1,7 +1,7 @@
 <!-- Contenedor principal único siguiendo estándar CRUD_SPEC -->
 <div class="ios-card">
   <div class="p-6">
-    <!-- Header: Título + Botón principal -->
+    <!-- Header: Título + Botones de acción -->
     <div class="flex items-center justify-between mb-6">
       <div class="flex items-center">
         <!-- Icono del módulo - Paleta roja para reclamos -->
@@ -12,18 +12,39 @@
         <div>
           <h1 class="text-2xl font-bold text-gray-900">Gestión de Reclamos</h1>
           <p class="text-gray-600 text-sm">Lista de reclamos registrados en el sistema</p>
+          @if (selectedClaim()) {
+            <p class="text-sm text-blue-600 mt-1">
+              <i class="fas fa-cursor-pointer mr-1"></i>
+              Reclamo seleccionado: {{ selectedClaim()?.id }}
+            </p>
+          }
         </div>
       </div>
       
-      <!-- Acción principal -->
-      <button 
-        (click)="onCreateClaim()"
-        class="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-200 flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-105">
-        <div class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
-          <i class="fas fa-plus text-xs"></i>
-        </div>
-        <span class="font-medium">Nuevo Reclamo</span>
-      </button>
+      <!-- Botones de acción -->
+      <div class="flex gap-3">
+        <!-- Botón Resolver (solo visible si hay un reclamo seleccionado y no está resuelto) -->
+        @if (selectedClaim() && selectedClaim()?.status !== 'resolved') {
+          <button 
+            (click)="onResolveClaim()"
+            class="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200 flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-105">
+            <div class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
+              <i class="fas fa-check text-xs"></i>
+            </div>
+            <span class="font-medium">Resolver Reclamo</span>
+          </button>
+        }
+        
+        <!-- Botón Nuevo Reclamo -->
+        <button 
+          (click)="onCreateClaim()"
+          class="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-200 flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-105">
+          <div class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
+            <i class="fas fa-plus text-xs"></i>
+          </div>
+          <span class="font-medium">Nuevo Reclamo</span>
+        </button>
+      </div>
     </div>
     
     <!-- Grid de datos -->
@@ -31,8 +52,7 @@
       [adapter]="claimsAdapter"
       [columns]="gridColumns"
       [config]="gridConfig"
-      (rowClick)="onViewDetails($event)"
-      (gridAction)="onGridAction($event)">
+      (rowClick)="onViewDetails($event)">
     </app-pageable-grid>
   </div>
 </div>

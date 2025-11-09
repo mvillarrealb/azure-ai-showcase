@@ -360,14 +360,14 @@ export class PageableGridComponent<T = any> implements OnInit, OnDestroy {
     return div.textContent || div.innerText || '';
   }
 
-  formatCellValue(value: any, column: GridColumn): string {
+  formatCellValue(value: any, column: GridColumn, row?: T): string {
     if (value === null || value === undefined) {
       return '';
     }
 
     // Usar formateador personalizado si está definido
     if (column.format) {
-      return column.format(value);
+      return column.format(value, row);
     }
 
     // Usar formateador del Map según el tipo de columna
@@ -376,6 +376,11 @@ export class PageableGridComponent<T = any> implements OnInit, OnDestroy {
   }
 
   getColumnValue(row: T, columnKey: string): any {
+    // Para columnas especiales como 'actions', retornar un valor por defecto
+    if (columnKey === 'actions') {
+      return 'actions'; // Valor dummy para que el formateador reciba algo
+    }
+    
     return (row as any)[columnKey];
   }
 

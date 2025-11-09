@@ -69,7 +69,7 @@ export interface GridColumn {
   type?: 'text' | 'number' | 'date' | 'currency' | 'status' | 'email';
   width?: string;
   align?: 'left' | 'center' | 'right';
-  format?: (value: any) => string;
+  format?: (value: any, row?: any) => string; // Actualizado para soportar row
   multiline?: boolean; // Permite saltos de línea en el contenido
 }
 

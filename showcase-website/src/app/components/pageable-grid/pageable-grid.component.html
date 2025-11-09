@@ -30,27 +30,25 @@
           <thead class="bg-gradient-to-r from-emerald-500 to-green-600">
             <tr>
               @for (column of columns; track column.key) {
-                @if (column.key !== 'actions' || hasActions()) {
-                  <th 
-                    [class]="getHeaderClasses(column)"
-                    [style.min-width]="column.width || '120px'"
-                    (click)="onSort(column)">
-                    <div class="flex items-center justify-between px-6 py-4">
-                      <span class="text-white font-semibold text-sm uppercase tracking-wide">{{ column.label }}</span>
-                      @if (column.sortable) {
-                        <div class="flex items-center ml-3">
-                          @if (currentSort().field === column.key && currentSort().direction === 'asc') {
-                            <i class="fas fa-sort-up text-white/90 text-sm"></i>
-                          } @else if (currentSort().field === column.key && currentSort().direction === 'desc') {
-                            <i class="fas fa-sort-down text-white/90 text-sm"></i>
-                          } @else {
-                            <i class="fas fa-sort text-white/60 hover:text-white/90 transition-colors text-sm cursor-pointer"></i>
-                          }
-                        </div>
-                      }
-                    </div>
-                  </th>
-                }
+                <th 
+                  [class]="getHeaderClasses(column)"
+                  [style.min-width]="column.width || '120px'"
+                  (click)="onSort(column)">
+                  <div class="flex items-center justify-between px-6 py-4">
+                    <span class="text-white font-semibold text-sm uppercase tracking-wide">{{ column.label }}</span>
+                    @if (column.sortable) {
+                      <div class="flex items-center ml-3">
+                        @if (currentSort().field === column.key && currentSort().direction === 'asc') {
+                          <i class="fas fa-sort-up text-white/90 text-sm"></i>
+                        } @else if (currentSort().field === column.key && currentSort().direction === 'desc') {
+                          <i class="fas fa-sort-down text-white/90 text-sm"></i>
+                        } @else {
+                          <i class="fas fa-sort text-white/60 hover:text-white/90 transition-colors text-sm cursor-pointer"></i>
+                        }
+                      </div>
+                    }
+                  </div>
+                </th>
               }
             </tr>
           </thead>
@@ -62,16 +60,14 @@
                 [class]="getRowClasses(isEven)"
                 (click)="onRowClick(row)">
                 @for (column of columns; track column.key) {
-                  @if (column.key !== 'actions' || hasActions()) {
-                    <td 
-                      [class]="getCellClasses(column)"
-                      [title]="getCellTooltip(getColumnValue(row, column.key), column)">
-                      <div 
-                        [class]="getCellContentClasses(column)"
-                        [innerHTML]="formatCellValue(getColumnValue(row, column.key), column)">
-                      </div>
-                    </td>
-                  }
+                  <td 
+                    [class]="getCellClasses(column)"
+                    [title]="getCellTooltip(getColumnValue(row, column.key), column)">
+                    <div 
+                      [class]="getCellContentClasses(column)"
+                      [innerHTML]="formatCellValue(getColumnValue(row, column.key), column, row)">
+                    </div>
+                  </td>
                 }
               </tr>
             }

@@ -49,8 +49,10 @@ export class ClaimManagement {
   }
 
   onShowResolveModal(claim: Claim) {
+    console.log('onShowResolveModal called with:', claim);
     this.selectedClaim.set(claim);
     this.showResolveModal.set(true);
+    console.log('Modal should be visible now, showResolveModal:', this.showResolveModal());
   }
 
   onHideResolveModal() {
@@ -60,25 +62,46 @@ export class ClaimManagement {
 
   onClaimCreated() {
     this.showCreateModal.set(false);
-    // Aquí se podría emitir un evento para refrescar la lista
+    // Refrescar datos en el componente activo
+    this.refreshActiveComponent();
   }
 
   onClaimResolved() {
     this.showResolveModal.set(false);
     this.selectedClaim.set(null);
-    // Aquí se podría emitir un evento para refrescar la lista
+    // Refrescar datos en el componente activo
+    this.refreshActiveComponent();
+  }
+
+  private refreshActiveComponent() {
+    // Buscar el componente activo y refrescar sus datos si tiene el método
+    const activeComponent = this.getActiveComponent();
+    if (activeComponent && typeof activeComponent.refreshData === 'function') {
+      activeComponent.refreshData();
+    }
+  }
+
+  private getActiveComponent(): any {
+    // En una implementación más robusta, se podría mantener una referencia al componente activo
+    // Por simplicidad, haremos un setTimeout para permitir que el modal se cierre primero
+    return null; // Se puede mejorar implementando ViewChild en los componentes de ruta
   }
 
   onRouteActivated(component: any) {
+    console.log('Route activated with component:', component);
+    
     // Suscribirse a eventos de los componentes hijos
     if (component && component.showCreateForm) {
+      console.log('Subscribing to showCreateForm');
       component.showCreateForm.subscribe(() => {
         this.onShowCreateModal();
       });
     }
     
     if (component && component.showResolveForm) {
+      console.log('Subscribing to showResolveForm');
       component.showResolveForm.subscribe((claim: Claim) => {
+        console.log('showResolveForm event received with claim:', claim);
         this.onShowResolveModal(claim);
       });
     }

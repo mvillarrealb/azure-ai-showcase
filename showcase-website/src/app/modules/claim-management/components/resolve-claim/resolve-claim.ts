@@ -2,6 +2,7 @@ import { Component, inject, signal, Output, EventEmitter, Input } from '@angular
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ClaimService } from '../../services/claim.service';
+import { ClaimEventsService } from '../../services/claim-events.service';
 import { Claim, ResolveClaimRequest, ClaimStatusLabels } from '../../interfaces/claim.interface';
 
 @Component({
@@ -13,6 +14,7 @@ import { Claim, ResolveClaimRequest, ClaimStatusLabels } from '../../interfaces/
 })
 export class ResolveClaimComponent {
   private claimService = inject(ClaimService);
+  private claimEventsService = inject(ClaimEventsService);
 
   @Input() show = signal<boolean>(false);
   @Input() claim = signal<Claim | null>(null);
@@ -70,6 +72,7 @@ export class ResolveClaimComponent {
         next: (resolvedClaim) => {
           console.log('Reclamo resuelto exitosamente:', resolvedClaim);
           this.claimResolved.emit();
+          this.claimEventsService.emitRefresh(); // Emite evento para refrescar el grid
           this.resetForm();
           this.onClose();
         },

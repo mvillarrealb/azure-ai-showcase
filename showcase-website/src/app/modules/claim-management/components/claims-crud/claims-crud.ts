@@ -1,7 +1,9 @@
-import { Component, OnInit, inject, signal, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, inject, signal, Output, EventEmitter, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { ClaimsPageableAdapter } from '../../adapters/claims-pageable.adapter';
+import { ClaimEventsService } from '../../services/claim-events.service';
 import { Claim, ClaimStatusLabels } from '../../interfaces/claim.interface';
 import { 
   PageableGridConfig, 
@@ -17,13 +19,25 @@ import { PageableGridComponent } from '../../../../components/pageable-grid/page
   styleUrls: ['./claims-crud.scss'],
   providers: [ClaimsPageableAdapter]
 })
-export class ClaimsCrudComponent implements OnInit {
+export class ClaimsCrudComponent implements OnInit, OnDestroy {
   // Adaptador para el grid
   claimsAdapter = inject(ClaimsPageableAdapter);
+  
+  // Service para eventos de refresh
+  private claimEventsService = inject(ClaimEventsService);
+  
+  // Subscription para el refresh
+  private refreshSubscription?: Subscription;
 
   // Outputs para comunicar eventos al componente padre
   @Output() showCreateForm = new EventEmitter<void>();
   @Output() showResolveForm = new EventEmitter<Claim>();
+
+  // Signal para el claim seleccionado
+  selectedClaim = signal<Claim | null>(null);
+
+  // Datos actuales para manejar acciones
+  private currentData: Claim[] = [];
 
   // Configuración del grid siguiendo estándares CRUD_SPEC
   gridConfig: PageableGridConfig = {
@@ -80,51 +94,68 @@ export class ClaimsCrudComponent implements OnInit {
       sortable: false, 
       type: 'date', 
       width: '12%'
-    },
-    // Columna de acciones removida temporalmente hasta implementar correctamente
-    // Se manejará con row clicks por ahora
+    }
   ];
 
   async ngOnInit() {
     // El adapter manejará la carga inicial automáticamente
+    // Suscribirse a cambios de datos para mantener referencia local
+    this.claimsAdapter.loadData().subscribe({
+      next: (result) => {
+        this.currentData = result.data;
+      },
+      error: (error) => {
+        console.error('Error loading claims:', error);
+      }
+    });
+    
+    // Suscribirse a eventos de refresh
+    this.refreshSubscription = this.claimEventsService.refresh$.subscribe(() => {
+      this.refreshGrid();
+    });
+  }
+
+  ngOnDestroy() {
+    // Limpiar subscription
+    this.refreshSubscription?.unsubscribe();
+  }
+  
+  /**
+   * Refresca los datos del grid
+   */
+  private refreshGrid() {
+    this.claimsAdapter.loadData().subscribe({
+      next: (result) => {
+        this.currentData = result.data;
+      },
+      error: (error) => {
+        console.error('Error refreshing claims:', error);
+      }
+    });
   }
 
   /**
-   * Maneja el click en una fila para mostrar detalles
+   * Maneja el click en una fila para seleccionar el claim
    */
   onViewDetails(claim: Claim) {
-    console.log('Ver detalles de reclamo:', claim);
-    // Aquí se puede implementar un modal de detalles si es necesario
+    this.selectedClaim.set(claim);
   }
 
   /**
-   * Maneja clicks en acciones del grid
+   * Maneja el click del botón resolver (ahora será llamado desde el botón externo)
    */
-  onGridAction(event: any) {
-    const target = event.target as HTMLElement;
-    
-    if (target.closest('.resolve-btn')) {
-      const claimId = target.closest('.resolve-btn')?.getAttribute('data-id');
-      if (claimId) {
-        // Buscar el claim completo para pasar al modal
-        // En una implementación real, esto se optimizaría
-        console.log('Resolver reclamo:', claimId);
-        // this.showResolveForm.emit(claim);
-      }
+  onResolveClaim() {
+    const claim = this.selectedClaim();
+    if (claim && claim.status !== 'resolved') {
+      this.showResolveForm.emit(claim);
     }
   }
 
   /**
-   * Emite evento para mostrar modal de creación
+   * Maneja el click del botón crear nuevo reclamo
    */
   onCreateClaim() {
     this.showCreateForm.emit();
   }
 
-  /**
-   * Refresca los datos del grid
-   */
-  refreshData() {
-    this.claimsAdapter.refresh().subscribe();
-  }
 }
