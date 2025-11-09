@@ -58,10 +58,8 @@ public class ProductSearchService {
         log.debug("Searching products by rank: {} and needs: {}", customerRank, customerNeeds);
 
         try {
-            // Generate embeddings for customer needs
             List<Float> needsEmbedding = generateEmbeddings(customerNeeds);
             
-            // Build hybrid search with vector query and filters
             VectorizedQuery vectorQuery = new VectorizedQuery(needsEmbedding)
                     .setKNearestNeighborsCount(10)
                     .setFields("embedding");
@@ -94,13 +92,11 @@ public class ProductSearchService {
                 .setTop(10)
                 .setIncludeTotalCount(true);
 
-        // Build filter for rank, amount, and currency
         String filter = buildComprehensiveFilter(customerRank, requestedAmount, currency);
         if (!filter.isEmpty()) {
             options.setFilter(filter);
         }
 
-        // Add vector search if search text is provided
         if (searchText != null && !searchText.trim().isEmpty()) {
             List<Float> searchEmbedding = generateEmbeddings(searchText);
             VectorizedQuery vectorQuery = new VectorizedQuery(searchEmbedding)
@@ -119,21 +115,17 @@ public class ProductSearchService {
     private String buildComprehensiveFilter(String customerRank, BigDecimal requestedAmount, String currency) {
         StringBuilder filter = new StringBuilder();
 
-        // Filter by active products
         filter.append("active eq true");
 
-        // Filter by allowed ranks
         if (customerRank != null && !customerRank.trim().isEmpty()) {
             filter.append(" and allowedRanks/any(r: r eq '").append(customerRank).append("')");
         }
 
-        // Filter by amount range
         if (requestedAmount != null) {
             filter.append(" and minimumAmount le ").append(requestedAmount);
             filter.append(" and maximumAmount ge ").append(requestedAmount);
         }
 
-        // Filter by currency
         if (currency != null && !currency.trim().isEmpty()) {
             filter.append(" and currency eq '").append(currency).append("'");
         }

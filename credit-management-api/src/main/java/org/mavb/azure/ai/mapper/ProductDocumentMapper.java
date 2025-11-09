@@ -37,13 +37,10 @@ public class ProductDocumentMapper {
         log.debug("Mapping CreditProductEntity to ProductDocument: {}", entity.getId());
 
         try {
-            // Generate allowed ranks based on product characteristics
             List<String> allowedRanks = generateAllowedRanks(entity);
 
-            // Generate search text for embeddings
             String searchText = buildSearchText(entity);
             
-            // Generate embeddings
             List<Float> embeddings = generateEmbeddings(searchText);
 
             return ProductDocument.builder()
@@ -68,7 +65,6 @@ public class ProductDocumentMapper {
 
         } catch (Exception e) {
             log.error("Error mapping CreditProductEntity to ProductDocument: {}", e.getMessage(), e);
-            // Return basic document without embeddings in case of error
             return createBasicDocument(entity);
         }
     }
@@ -78,17 +74,11 @@ public class ProductDocumentMapper {
      * Uses business rules to determine which customer ranks can access the product.
      */
     private List<String> generateAllowedRanks(CreditProductEntity entity) {
-        // Business logic to determine allowed ranks based on product characteristics
-        // This is a simplified implementation - in production this would be more sophisticated
-        
         if (entity.getMaximumAmount().doubleValue() >= 100000) {
-            // High-value products for premium customers
             return Arrays.asList("ORO", "PLATINO", "PREMIUM");
         } else if (entity.getMaximumAmount().doubleValue() >= 50000) {
-            // Mid-range products
             return Arrays.asList("PLATA", "ORO", "PLATINO", "PREMIUM");
         } else {
-            // Entry-level products for all ranks
             return Arrays.asList("BRONCE", "PLATA", "ORO", "PLATINO", "PREMIUM");
         }
     }
@@ -99,7 +89,6 @@ public class ProductDocumentMapper {
     private String buildSearchText(CreditProductEntity entity) {
         StringBuilder searchText = new StringBuilder();
         
-        // Add basic product info
         searchText.append(entity.getName()).append(" ");
         searchText.append(entity.getDescription()).append(" ");
         searchText.append("Categoría: ").append(entity.getCategory()).append(" ");
@@ -113,7 +102,6 @@ public class ProductDocumentMapper {
         searchText.append("Monto mínimo: ").append(entity.getMinimumAmount()).append(" ");
         searchText.append("Monto máximo: ").append(entity.getMaximumAmount()).append(" ");
         
-        // Add requirements, features, and benefits
         if (entity.getRequirements() != null && !entity.getRequirements().isEmpty()) {
             searchText.append("Requisitos: ").append(String.join(", ", entity.getRequirements())).append(" ");
         }
@@ -146,7 +134,7 @@ public class ProductDocumentMapper {
 
         } catch (Exception e) {
             log.error("Error generating embeddings for product {}: {}", text, e.getMessage());
-            return List.of(); // Return empty embeddings on error
+            return List.of();
         }
     }
 
@@ -173,7 +161,7 @@ public class ProductDocumentMapper {
                 .benefits(entity.getBenefits())
                 .active(entity.getActive())
                 .allowedRanks(allowedRanks)
-                .embedding(List.of()) // Empty embeddings
+                .embedding(List.of())
                 .build();
     }
 }

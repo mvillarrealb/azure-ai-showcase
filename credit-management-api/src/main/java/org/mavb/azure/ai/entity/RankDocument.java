@@ -15,10 +15,10 @@ public class RankDocument {
     private String id;
 
     @SearchableField
-    private String name; // BRONCE, PLATA, ORO, PLATINO, PREMIUM
-
+    private String name;
+    
     @SearchableField
-    private String description; // texto en español, semántico
+    private String description;
 
     @SearchableField(vectorSearchDimensions = 1536, vectorSearchProfileName = "vector-config")
     private List<Float> embedding;

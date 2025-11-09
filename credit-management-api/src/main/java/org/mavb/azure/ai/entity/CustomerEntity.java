@@ -83,24 +83,20 @@ public class CustomerEntity {
             return 0;
         }
 
-        // Sort employment history by start date (ascending)
         List<EmploymentHistoryEntity> sortedHistory = employmentHistory.stream()
                 .sorted((e1, e2) -> e1.getStartDate().compareTo(e2.getStartDate()))
                 .toList();
 
         long totalUnemploymentMonths = 0;
 
-        // Calculate gaps between consecutive employments
         for (int i = 0; i < sortedHistory.size() - 1; i++) {
             EmploymentHistoryEntity currentJob = sortedHistory.get(i);
             EmploymentHistoryEntity nextJob = sortedHistory.get(i + 1);
 
-            // Skip if current job has no end date (still current)
             if (currentJob.getEndDate() == null) {
                 continue;
             }
 
-            // Calculate gap between end of current job and start of next job
             LocalDate gapStart = currentJob.getEndDate().plusDays(1);
             LocalDate gapEnd = nextJob.getStartDate().minusDays(1);
 
@@ -126,16 +122,13 @@ public class CustomerEntity {
 
         return employmentHistory.stream()
                 .sorted((e1, e2) -> {
-                    // Current jobs (no end date) come first
                     if (e1.getEndDate() == null && e2.getEndDate() != null) return -1;
                     if (e1.getEndDate() != null && e2.getEndDate() == null) return 1;
                     
-                    // For jobs with end dates, sort by end date descending
                     if (e1.getEndDate() != null && e2.getEndDate() != null) {
                         return e2.getEndDate().compareTo(e1.getEndDate());
                     }
                     
-                    // For current jobs, sort by start date descending
                     return e2.getStartDate().compareTo(e1.getStartDate());
                 })
                 .limit(limit)

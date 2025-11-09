@@ -79,7 +79,6 @@ public class ProductServiceImpl implements ProductService {
     public ProductDTO createProduct(CreateProductDTO createProductDTO) {
         log.debug("Creating new product with ID: {}", createProductDTO.getId());
 
-        // Check if product already exists
         if (creditProductRepository.existsById(createProductDTO.getId())) {
             log.warn("Product with ID {} already exists", createProductDTO.getId());
             throw new ProductAlreadyExistsException(
@@ -87,7 +86,6 @@ public class ProductServiceImpl implements ProductService {
             );
         }
 
-        // Create entity from DTO
         CreditProductEntity product = CreditProductEntity.builder()
                 .id(createProductDTO.getId())
                 .name(createProductDTO.getName())
@@ -108,10 +106,8 @@ public class ProductServiceImpl implements ProductService {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
-        // Save the product (will trigger ProductSyncListener automatically)
         CreditProductEntity savedProduct = creditProductRepository.save(product);
 
-        // Convert to DTO and return
         ProductDTO productDTO = creditProductMapper.toDto(savedProduct);
         
         log.info("Successfully created product: {} with ID: {}", savedProduct.getName(), savedProduct.getId());

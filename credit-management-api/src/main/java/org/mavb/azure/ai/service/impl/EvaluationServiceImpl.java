@@ -100,11 +100,9 @@ public class EvaluationServiceImpl implements EvaluationService {
     private SemanticRankResult classifyCustomerRank(CustomerEntity customer) {
         log.debug("Classifying customer rank for: {}", customer.getIdentityDocument());
         
-        // Generate semantic description
         String semanticDescription = generateSemanticProfile(customer);
         log.debug("Generated semantic profile: {}", semanticDescription);
         
-        // Classify using AI Search
         RankDocument rankDocument = rankService.resolveRank(semanticDescription);
         
         if (rankDocument == null) {
@@ -113,8 +111,7 @@ public class EvaluationServiceImpl implements EvaluationService {
             return new SemanticRankResult("BRONCE", 0.5, semanticDescription);
         }
         
-        // Calculate confidence score (simplified)
-        double confidence = 0.85; // In production, this would come from the AI Search score
+        double confidence = 0.85;
         
         log.info("Customer {} classified as rank {} with confidence {}", 
                 customer.getIdentityDocument(), rankDocument.getName(), confidence);
@@ -128,11 +125,9 @@ public class EvaluationServiceImpl implements EvaluationService {
     private String generateSemanticProfile(CustomerEntity customer) {
         StringBuilder profile = new StringBuilder();
         
-        // Add basic customer info
         profile.append("Cliente con ingresos mensuales de S/")
                 .append(customer.getMonthlyIncome() != null ? customer.getMonthlyIncome() : 0);
         
-        // Add employment history
         List<EmploymentHistoryEntity> employmentHistory = customer.getEmploymentHistory();
         if (!employmentHistory.isEmpty()) {
             EmploymentHistoryEntity currentJob = customer.getCurrentEmployment();
@@ -148,7 +143,6 @@ public class EvaluationServiceImpl implements EvaluationService {
                 profile.append(" (").append(monthsInCurrentJob).append(" meses de experiencia)");
             }
             
-            // Add total employment experience
             long totalExperienceMonths = employmentHistory.stream()
                     .mapToLong(EmploymentHistoryEntity::getEmploymentDurationInMonths)
                     .sum();
@@ -158,7 +152,6 @@ public class EvaluationServiceImpl implements EvaluationService {
                     .append(" meses");
         }
         
-        // Add debt information
         if (customer.getCurrentDebt() != null && customer.getCurrentDebt().compareTo(BigDecimal.ZERO) > 0) {
             profile.append(". Deuda actual: S/").append(customer.getCurrentDebt());
         }
@@ -170,17 +163,14 @@ public class EvaluationServiceImpl implements EvaluationService {
      * Calculates basic credit metrics for the customer.
      */
     private CreditMetrics calculateCreditMetrics(CustomerEntity customer, BigDecimal requestedAmount) {
-        // Calculate debt-to-income ratio
         BigDecimal monthlyIncome = customer.getMonthlyIncome() != null ? customer.getMonthlyIncome() : BigDecimal.ZERO;
         BigDecimal currentDebt = customer.getCurrentDebt() != null ? customer.getCurrentDebt() : BigDecimal.ZERO;
         
         double debtToIncomeRatio = monthlyIncome.compareTo(BigDecimal.ZERO) > 0 ? 
                 currentDebt.divide(monthlyIncome, 4, RoundingMode.HALF_UP).doubleValue() : 1.0;
         
-        // Calculate basic credit score (simplified)
         int creditScore = calculateBasicCreditScore(customer, debtToIncomeRatio);
         
-        // Calculate approved amount (80% of requested if good metrics)
         BigDecimal approvedAmount = debtToIncomeRatio < 0.4 && creditScore > 600 ?
                 requestedAmount.multiply(new BigDecimal("0.8")) : 
                 requestedAmount.multiply(new BigDecimal("0.6"));
