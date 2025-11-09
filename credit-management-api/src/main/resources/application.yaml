@@ -2,7 +2,7 @@ spring:
   application:
     name: credit-management-api
   datasource:
-    url: jdbc:postgresql://localhost:5432/credit_management_db
+    url: jdbc:postgresql://localhost:5432/credit_management
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:PutYourPasswordHere}
     driver-class-name: org.postgresql.Driver
@@ -41,3 +41,14 @@ management:
     export:
       prometheus:
         enabled: true
+azure:
+  openai:
+    endpoint: ${OPEN_API_ENDPOINT}
+    key: ${OPEN_API_KEY}
+    embedding-model: text-embedding-3-small
+  search:
+    endpoint: ${AI_SEARCH_ENDPOINT}
+    key: ${AI_SEARCH_KEY}
+    indices:
+      ranks: ranks
+      products: products

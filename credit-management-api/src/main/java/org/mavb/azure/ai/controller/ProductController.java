@@ -58,7 +58,6 @@ public class ProductController {
         log.debug("GET /products - category: {}, currency: {}, minAmount: {}, maxAmount: {}, page: {}, size: {}",
                 category, currency, minAmount, maxAmount, page, size);
 
-        // Crear filtro para productos
         ProductFilterDTO filter = ProductFilterDTO.builder()
                 .category(category)
                 .currency(currency)
@@ -66,10 +65,8 @@ public class ProductController {
                 .maxAmount(maxAmount)
                 .build();
 
-        // Crear objeto de paginación
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
 
-        // Llamar al servicio
         ProductListResponseDTO response = productService.getProducts(filter, pageable);
 
         log.info("Retrieved {} products out of {} total", 

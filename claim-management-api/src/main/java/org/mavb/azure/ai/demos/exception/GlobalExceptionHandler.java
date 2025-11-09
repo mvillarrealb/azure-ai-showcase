@@ -20,19 +20,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Manejador global de excepciones para la aplicación WebFlux.
- * Captura y formatea todas las excepciones de forma centralizada.
- * Compatible con Spring WebFlux usando @ControllerAdvice.
+ * Manejador global de excepciones para la aplicación.
  */
 @ControllerAdvice
 @Order(-1)
 @Slf4j
 public class GlobalExceptionHandler {
 
-    /**
-     * Maneja excepciones de reclamo no encontrado.
-     * Retorna HTTP 404 Not Found.
-     */
     @ExceptionHandler(ClaimNotFoundException.class)
     @ResponseBody
     public ResponseEntity<ErrorResponseDto> handleClaimNotFound(ClaimNotFoundException ex) {
@@ -47,10 +41,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
-    /**
-     * Maneja excepciones de archivo inválido.
-     * Retorna HTTP 400 Bad Request.
-     */
     @ExceptionHandler(InvalidFileException.class)
     @ResponseBody
     public ResponseEntity<ErrorResponseDto> handleInvalidFile(InvalidFileException ex) {
@@ -65,10 +55,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    /**
-     * Maneja excepciones de reclamo duplicado.
-     * Retorna HTTP 409 Conflict.
-     */
     @ExceptionHandler(DuplicateClaimException.class)
     @ResponseBody
     public ResponseEntity<ErrorResponseDto> handleDuplicateClaim(DuplicateClaimException ex) {
@@ -83,10 +69,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
-    /**
-     * Maneja errores de validación de Bean Validation en request body (@Valid).
-     * Retorna HTTP 400 Bad Request con detalles de los campos inválidos.
-     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
     public ResponseEntity<ErrorResponseDto> handleValidationErrors(MethodArgumentNotValidException ex) {
@@ -111,10 +93,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    /**
-     * Maneja errores de validación de constraint violations.
-     * Retorna HTTP 400 Bad Request.
-     */
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseBody
     public ResponseEntity<ErrorResponseDto> handleConstraintViolation(ConstraintViolationException ex) {
@@ -138,10 +116,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    /**
-     * Maneja excepciones de archivo demasiado grande.
-     * Retorna HTTP 400 Bad Request.
-     */
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     @ResponseBody
     public ResponseEntity<ErrorResponseDto> handleMaxUploadSize(MaxUploadSizeExceededException ex) {
@@ -156,10 +130,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    /**
-     * Maneja argumentos ilegales.
-     * Retorna HTTP 400 Bad Request.
-     */
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseBody
     public ResponseEntity<ErrorResponseDto> handleIllegalArgument(IllegalArgumentException ex) {
@@ -174,10 +144,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    /**
-     * Maneja cualquier excepción no controlada específicamente.
-     * Retorna HTTP 500 Internal Server Error.
-     */
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ResponseEntity<ErrorResponseDto> handleGenericException(Exception ex) {
@@ -192,9 +158,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 
-    /**
-     * Extrae el nombre del campo desde el path de la constraint violation.
-     */
     private String getFieldNameFromPath(ConstraintViolation<?> violation) {
         String propertyPath = violation.getPropertyPath().toString();
         String[] parts = propertyPath.split("\\.");

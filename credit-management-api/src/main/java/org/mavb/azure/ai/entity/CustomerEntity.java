@@ -5,6 +5,10 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Entity representing a customer in the banking system.
@@ -47,17 +51,6 @@ public class CustomerEntity {
     @Builder.Default
     private BigDecimal currentDebt = BigDecimal.ZERO;
 
-    @Column(name = "credit_score")
-    private Integer creditScore;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "employment_type", length = 20)
-    private EmploymentType employmentType;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "risk_level", length = 20)
-    private RiskLevel riskLevel;
-
     @Column(name = "active", nullable = false)
     @Builder.Default
     private Boolean active = true;
@@ -70,26 +63,98 @@ public class CustomerEntity {
     @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
 
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<EmploymentHistoryEntity> employmentHistory = new ArrayList<>();
+
     @PreUpdate
     public void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
 
     /**
-     * Enum representing employment types for risk assessment
+     * Calculates the total months of unemployment until the current employment.
+     * Analyzes gaps between employment periods to determine unemployment duration.
+     * 
+     * @return Total months of unemployment between jobs
      */
-    public enum EmploymentType {
-        DEPENDIENTE,    // Employee
-        INDEPENDIENTE,  // Freelancer
-        EMPRESARIO      // Business Owner
+    public long calculateUnemploymentMonthsUntilCurrent() {
+        if (employmentHistory == null || employmentHistory.isEmpty()) {
+            return 0;
+        }
+
+        // Sort employment history by start date (ascending)
+        List<EmploymentHistoryEntity> sortedHistory = employmentHistory.stream()
+                .sorted((e1, e2) -> e1.getStartDate().compareTo(e2.getStartDate()))
+                .toList();
+
+        long totalUnemploymentMonths = 0;
+
+        // Calculate gaps between consecutive employments
+        for (int i = 0; i < sortedHistory.size() - 1; i++) {
+            EmploymentHistoryEntity currentJob = sortedHistory.get(i);
+            EmploymentHistoryEntity nextJob = sortedHistory.get(i + 1);
+
+            // Skip if current job has no end date (still current)
+            if (currentJob.getEndDate() == null) {
+                continue;
+            }
+
+            // Calculate gap between end of current job and start of next job
+            LocalDate gapStart = currentJob.getEndDate().plusDays(1);
+            LocalDate gapEnd = nextJob.getStartDate().minusDays(1);
+
+            if (gapEnd.isAfter(gapStart) || gapEnd.isEqual(gapStart)) {
+                long gapMonths = ChronoUnit.MONTHS.between(gapStart, gapEnd.plusDays(1));
+                totalUnemploymentMonths += gapMonths;
+            }
+        }
+
+        return totalUnemploymentMonths;
     }
 
     /**
-     * Enum representing risk levels based on credit evaluation
+     * Gets the most recent employment records.
+     * 
+     * @param limit Maximum number of records to return
+     * @return List of most recent employment records
      */
-    public enum RiskLevel {
-        BAJO,   // Low Risk
-        MEDIO,  // Medium Risk
-        ALTO    // High Risk
+    public List<EmploymentHistoryEntity> getMostRecentEmployments(int limit) {
+        if (employmentHistory == null || employmentHistory.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return employmentHistory.stream()
+                .sorted((e1, e2) -> {
+                    // Current jobs (no end date) come first
+                    if (e1.getEndDate() == null && e2.getEndDate() != null) return -1;
+                    if (e1.getEndDate() != null && e2.getEndDate() == null) return 1;
+                    
+                    // For jobs with end dates, sort by end date descending
+                    if (e1.getEndDate() != null && e2.getEndDate() != null) {
+                        return e2.getEndDate().compareTo(e1.getEndDate());
+                    }
+                    
+                    // For current jobs, sort by start date descending
+                    return e2.getStartDate().compareTo(e1.getStartDate());
+                })
+                .limit(limit)
+                .toList();
+    }
+
+    /**
+     * Gets the current employment (job with no end date).
+     * 
+     * @return Current employment or null if none exists
+     */
+    public EmploymentHistoryEntity getCurrentEmployment() {
+        if (employmentHistory == null || employmentHistory.isEmpty()) {
+            return null;
+        }
+
+        return employmentHistory.stream()
+                .filter(EmploymentHistoryEntity::isCurrentEmployment)
+                .findFirst()
+                .orElse(null);
     }
 }

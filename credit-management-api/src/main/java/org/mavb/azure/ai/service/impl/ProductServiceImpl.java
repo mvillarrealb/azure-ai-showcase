@@ -48,7 +48,7 @@ public class ProductServiceImpl implements ProductService {
                 .data(productDTOs)
                 .total((int) productPage.getTotalElements())
                 .totalPages(productPage.getTotalPages())
-                .currentPage(productPage.getNumber() + 1) // Convert from 0-based to 1-based
+                .currentPage(productPage.getNumber() + 1)
                 .build();
 
         log.debug("Found {} products, total pages: {}", productDTOs.size(), productPage.getTotalPages());

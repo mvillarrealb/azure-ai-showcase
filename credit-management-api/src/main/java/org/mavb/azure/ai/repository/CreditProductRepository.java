@@ -19,25 +19,8 @@ import java.util.Optional;
 @Repository
 public interface CreditProductRepository extends JpaRepository<CreditProductEntity, String> {
 
-    /**
-     * Find all active products.
-     */
-    Page<CreditProductEntity> findByActiveTrue(Pageable pageable);
-
-    /**
-     * Find active product by ID.
-     */
     Optional<CreditProductEntity> findByIdAndActiveTrue(String id);
 
-    /**
-     * Find products by category with pagination.
-     */
-    Page<CreditProductEntity> findByCategoryAndActiveTrue(String category, Pageable pageable);
-
-    /**
-     * Find products by currency with pagination.
-     */
-    Page<CreditProductEntity> findByCurrencyAndActiveTrue(String currency, Pageable pageable);
 
     /**
      * Custom query to find products with complex filtering.
@@ -70,20 +53,4 @@ public interface CreditProductRepository extends JpaRepository<CreditProductEnti
             @Param("category") String category
     );
 
-    /**
-     * Find all distinct categories.
-     */
-    @Query("SELECT DISTINCT p.category FROM CreditProductEntity p WHERE p.active = true")
-    List<String> findDistinctCategories();
-
-    /**
-     * Find all distinct currencies.
-     */
-    @Query("SELECT DISTINCT p.currency FROM CreditProductEntity p WHERE p.active = true")
-    List<String> findDistinctCurrencies();
-
-    /**
-     * Count products by category.
-     */
-    long countByCategoryAndActiveTrue(String category);
 }

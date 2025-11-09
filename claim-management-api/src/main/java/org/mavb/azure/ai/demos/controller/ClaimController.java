@@ -16,14 +16,6 @@ import reactor.core.publisher.Mono;
 
 /**
  * Controlador REST para la gestión de reclamos.
- * Maneja todos los endpoints definidos en la especificación OpenAPI.
- * 
- * Endpoints disponibles:
- * - POST /claims: Crear un nuevo reclamo
- * - GET /claims: Obtener lista de reclamos con filtros y paginación
- * - GET /claims/{id}: Obtener detalles de un reclamo específico
- * - POST /claims/{id}/resolve: Resolver un reclamo
- * - POST /claims/import: Importar reclamos desde Excel
  */
 @RestController
 @RequestMapping("/claims")
@@ -36,9 +28,6 @@ public class ClaimController {
 
     /**
      * Crea un nuevo reclamo.
-     * 
-     * @param createClaimDto DTO con los datos del reclamo a crear
-     * @return ResponseEntity con el reclamo creado (HTTP 201) o error de validación (HTTP 400)
      */
     @PostMapping
     public ResponseEntity<ClaimDto> createClaim(@Valid @RequestBody CreateClaimDto createClaimDto) {
@@ -51,13 +40,7 @@ public class ClaimController {
     }
 
     /**
-     * Obtiene una lista paginada de reclamos con filtros opcionales.
-     * 
-     * @param identityDocument filtro opcional por documento de identidad
-     * @param page número de página (por defecto 1)
-     * @param limit elementos por página (por defecto 20, máximo 100)
-     * @param status filtro opcional por estado (open, inProgress, resolved)
-     * @return ResponseEntity con la lista de reclamos y información de paginación
+     * Obtiene lista paginada de reclamos con filtros opcionales.
      */
     @GetMapping
     public ResponseEntity<ClaimListResponseDto> getClaims(
@@ -84,10 +67,7 @@ public class ClaimController {
     }
 
     /**
-     * Obtiene los detalles de un reclamo específico por su ID.
-     * 
-     * @param id ID único del reclamo
-     * @return ResponseEntity con el reclamo (HTTP 200) o error si no existe (HTTP 404)
+     * Obtiene un reclamo específico por su ID.
      */
     @GetMapping("/{id}")
     public ResponseEntity<ClaimDto> getClaimById(@PathVariable String id) {
@@ -101,10 +81,6 @@ public class ClaimController {
 
     /**
      * Resuelve un reclamo cambiando su estado a 'resolved'.
-     * 
-     * @param id ID único del reclamo a resolver
-     * @param resolveClaimDto DTO con los comentarios de resolución
-     * @return ResponseEntity con el reclamo actualizado (HTTP 200) o error si no existe (HTTP 404)
      */
     @PostMapping("/{id}/resolve")
     public ResponseEntity<ClaimDto> resolveClaim(
@@ -120,10 +96,7 @@ public class ClaimController {
     }
 
     /**
-     * Importa reclamos desde un archivo Excel usando WebFlux.
-     * 
-     * @param filePartMono archivo Excel reactivo con los datos de reclamos
-     * @return Mono<ResponseEntity> con el resultado de la importación (HTTP 201) o error (HTTP 400)
+     * Importa reclamos desde archivo Excel usando WebFlux.
      */
     @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Mono<ResponseEntity<ImportResponseDto>> importClaims(@RequestPart("file") Mono<FilePart> filePartMono) {

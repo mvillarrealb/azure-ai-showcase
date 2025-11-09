@@ -22,33 +22,18 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
     Optional<CustomerEntity> findByIdentityDocumentAndActiveTrue(String identityDocument);
 
     /**
-     * Check if customer exists by identity document.
+     * Find customer with their 2 most recent employment records by identity document.
+     * Returns customer with employment history limited to 2 most recent jobs.
      */
-    boolean existsByIdentityDocumentAndActiveTrue(String identityDocument);
-
-    /**
-     * Find customers by risk level.
-     */
-    List<CustomerEntity> findByRiskLevelAndActiveTrue(CustomerEntity.RiskLevel riskLevel);
-
-    /**
-     * Find customers by employment type.
-     */
-    List<CustomerEntity> findByEmploymentTypeAndActiveTrue(CustomerEntity.EmploymentType employmentType);
-
-    /**
-     * Find customers with credit score in range.
-     */
-    @Query("SELECT c FROM CustomerEntity c WHERE c.active = true " +
-           "AND c.creditScore >= :minScore " +
-           "AND c.creditScore <= :maxScore")
-    List<CustomerEntity> findByCreditScoreRange(
-            @Param("minScore") Integer minScore,
-            @Param("maxScore") Integer maxScore
-    );
-
-    /**
-     * Find customers by email.
-     */
-    Optional<CustomerEntity> findByEmailAndActiveTrue(String email);
+    @Query("SELECT DISTINCT c FROM CustomerEntity c " +
+           "LEFT JOIN FETCH c.employmentHistory eh " +
+           "WHERE c.identityDocument = :identityDocument " +
+           "AND c.active = true " +
+           "AND (eh IS NULL OR eh.id IN (" +
+           "  SELECT eh2.id FROM EmploymentHistoryEntity eh2 " +
+           "  WHERE eh2.customer.id = c.id " +
+           "  ORDER BY eh2.endDate DESC NULLS FIRST, eh2.startDate DESC " +
+           "  LIMIT 2" +
+           "))")
+    Optional<CustomerEntity> findByIdentityDocumentWithRecentEmployments(@Param("identityDocument") String identityDocument);
 }

@@ -55,5 +55,3 @@ VALUES
      '["DNI vigente", "Título de propiedad de la vivienda", "Cotización técnica del sistema", "Estudio de factibilidad técnica", "Constancia laboral", "Recibos de ingresos de los últimos 6 meses", "Historial crediticio bueno", "Ingresos mínimos S/ 3,500", "Certificación de instalador autorizado"]',
      '["Energía renovable", "Beneficios ambientales", "Ahorro energético"]',
      '["Deducción fiscal", "Ahorro en factura eléctrica", "Contribución ambiental"]', true);
-
-$EXECUTE$

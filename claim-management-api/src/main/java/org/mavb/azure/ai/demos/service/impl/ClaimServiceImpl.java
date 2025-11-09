@@ -51,10 +51,7 @@ public class ClaimServiceImpl implements ClaimService {
     public ClaimDto createClaim(CreateClaimDto createClaimDto) {
         log.info("Creando nuevo reclamo para documento: {}", createClaimDto.getIdentityDocument());
         
-        // Convertir DTO a entidad
         Claim claim = claimMapper.toEntity(createClaimDto);
-        
-        // Guardar la entidad
         Claim savedClaim = claimRepository.save(claim);
         
         log.info("Reclamo creado exitosamente con ID: {}", savedClaim.getId());
@@ -66,18 +63,14 @@ public class ClaimServiceImpl implements ClaimService {
     public ClaimListResponseDto getClaims(ClaimFilterDto filterDto) {
         log.info("Obteniendo lista de reclamos con filtros: {}", filterDto);
         
-        // Crear Pageable
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         Pageable pageable = PageRequest.of(filterDto.getPage() - 1, filterDto.getLimit(), sort);
         
-        // Aplicar filtros usando Specification
         Specification<Claim> spec = buildSpecification(filterDto);
         Page<Claim> claimsPage = claimRepository.findAll(spec, pageable);
         
-        // Mapear resultados
         List<ClaimDto> claimDtos = claimMapper.toDtoList(claimsPage.getContent());
         
-        // Crear información de paginación
         PaginationDto pagination = PaginationDto.builder()
                 .page(filterDto.getPage())
                 .limit(filterDto.getLimit())
@@ -110,7 +103,6 @@ public class ClaimServiceImpl implements ClaimService {
         Claim claim = claimRepository.findById(id)
                 .orElseThrow(() -> new ClaimNotFoundException("El reclamo con ID " + id + " no existe"));
         
-        // Actualizar estado y comentarios
         claim.setStatus(Claim.ClaimStatus.resolved);
         claim.setComments(resolveClaimDto.getComments());
         
@@ -158,7 +150,6 @@ public class ClaimServiceImpl implements ClaimService {
             }
         }
         
-        // Si no hay filtros, devolver null (que significa "todos los elementos")
         return spec;
     }
 
@@ -206,7 +197,6 @@ public class ClaimServiceImpl implements ClaimService {
                                 continue;
                             }
                             
-                            // Crear y guardar entidad
                             Claim claim = claimMapper.toEntity(importClaimDto);
                             Claim savedClaim = claimRepository.save(claim);
                             successfulClaims.add(savedClaim);

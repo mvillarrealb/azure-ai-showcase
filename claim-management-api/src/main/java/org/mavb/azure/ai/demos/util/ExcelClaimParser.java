@@ -45,7 +45,6 @@ public class ExcelClaimParser {
             Sheet sheet = workbook.getSheetAt(0);
             log.info("Parseando Excel con {} filas", sheet.getLastRowNum());
             
-            // Iterar desde la fila 1 (saltando el header en fila 0)
             for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
                 Row row = sheet.getRow(rowIndex);
                 if (row == null) continue;
@@ -57,7 +56,6 @@ public class ExcelClaimParser {
                     }
                 } catch (Exception e) {
                     log.error("Error parseando fila {}: {}", rowIndex + 1, e.getMessage());
-                    // No lanzamos excepción aquí, permitimos que el servicio maneje los errores por fila
                 }
             }
             
@@ -95,7 +93,7 @@ public class ExcelClaimParser {
      * Verifica si una fila está completamente vacía.
      */
     private boolean isRowEmpty(Row row) {
-        for (int cellIndex = 0; cellIndex < 4; cellIndex++) { // Solo 4 columnas esperadas
+        for (int cellIndex = 0; cellIndex < 4; cellIndex++) {
             Cell cell = row.getCell(cellIndex);
             if (cell != null && cell.getCellType() != CellType.BLANK) {
                 String value = getCellValueAsString(cell);
@@ -164,13 +162,11 @@ public class ExcelClaimParser {
     private LocalDateTime getCellValueAsDateTime(Cell cell) {
         if (cell == null) return null;
         
-        // Manejo de fechas numéricas (Excel nativo)
         if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
             Date date = cell.getDateCellValue();
             return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
         
-        // Manejo de fechas en formato STRING (ISO)
         if (cell.getCellType() == CellType.STRING) {
             String cellValue = cell.getStringCellValue().trim();
             if (cellValue.isEmpty()) {
@@ -178,14 +174,11 @@ public class ExcelClaimParser {
             }
             
             try {
-                // Verificar si es fecha ISO (YYYY-MM-DD)
                 if (cellValue.matches("\\d{4}-\\d{2}-\\d{2}")) {
                     return LocalDateTime.parse(cellValue + "T00:00:00");
                 }
                 
-                // Verificar si es datetime ISO (YYYY-MM-DDTHH:mm:ss o similar)
                 if (cellValue.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*")) {
-                    // Remover posibles zonas horarias y milisegundos para simplificar
                     String cleanDateTime = cellValue
                             .replaceAll("\\[.*\\]", "")
                             .replaceAll("\\+.*", "")
@@ -197,7 +190,6 @@ public class ExcelClaimParser {
                     return LocalDateTime.parse(cleanDateTime);
                 }
                 
-                // Si no coincide con ningún formato ISO esperado
                 throw new RuntimeException("Formato de fecha no soportado. Use formato ISO: YYYY-MM-DD o YYYY-MM-DDTHH:mm:ss");
                 
             } catch (Exception e) {

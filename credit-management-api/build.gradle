@@ -29,23 +29,18 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-	
-	// Database dependencies
-	runtimeOnly 'org.postgresql:postgresql'
+
 	implementation 'org.liquibase:liquibase-core'
-	
-	// MapStruct
-	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-	
-	// Lombok
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
-	
-	// Hibernate types for JSON support
+	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 	implementation 'io.hypersistence:hypersistence-utils-hibernate-60:3.6.0'
-	
-	// Monitoring
+    implementation("com.azure:azure-search-documents:11.6.0")
+    implementation("com.azure:azure-ai-openai:1.0.0-beta.7")
+
+    runtimeOnly 'org.postgresql:postgresql'
 	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 	
 	// Testing

@@ -58,9 +58,9 @@ public class OpenAIClaimService {
             var rawJsonAnswer = chatCompletions.getChoices().getFirst().getMessage().getContent();
             return parseOpenAIResponse(rawJsonAnswer);
         })
-        .subscribeOn(Schedulers.boundedElastic()) // Ejecutar en un scheduler que soporta operaciones bloqueantes
+        .subscribeOn(Schedulers.boundedElastic())
         .doOnError(error -> log.error("Error en llamada reactiva a OpenAI: {}", error.getMessage(), error))
-        .onErrorReturn(Collections.emptyList()); // Retornar lista vacía en caso de error
+        .onErrorReturn(Collections.emptyList());
     }
 
     private List<ClaimImportReason> parseOpenAIResponse(String rawJsonAnswer) {
