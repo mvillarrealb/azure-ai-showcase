@@ -1,0 +1,130 @@
+<!-- Modal para crear rangos de crédito -->
+@if (isVisible()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center">
+    <!-- Overlay -->
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" 
+         (click)="close()">
+    </div>
+    
+    <!-- Modal content -->
+    <div class="relative w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between p-6 border-b border-gray-200/50">
+          <div class="flex items-center">
+            <div class="w-8 h-8 mr-3 rounded-lg bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center">
+              <i class="fas fa-medal text-white text-sm"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-900">Nuevo Rango de Crédito</h2>
+          </div>
+          <button 
+            (click)="close()"
+            class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors duration-200">
+            <i class="fas fa-times text-gray-600 text-sm"></i>
+          </button>
+        </div>
+
+        <!-- Form -->
+        <form (ngSubmit)="onSubmit()" class="p-6">
+          <div class="space-y-6">
+            
+            <!-- ID del rango -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                ID del Rango <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                [(ngModel)]="formData.id"
+                name="id"
+                required
+                maxlength="20"
+                placeholder="ej: ORO, PLATA, PREMIUM"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+              <p class="text-sm text-gray-500 mt-1">
+                Identificador único para el rango (se usará en Azure AI Search)
+              </p>
+            </div>
+
+            <!-- Nombre del rango -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Nombre del Rango <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                [(ngModel)]="formData.name"
+                name="name"
+                required
+                maxlength="50"
+                placeholder="ej: ORO, PLATA, PREMIUM"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+              <p class="text-sm text-gray-500 mt-1">
+                Nombre descriptivo del rango
+              </p>
+            </div>
+
+            <!-- Descripción -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Descripción <span class="text-red-500">*</span>
+              </label>
+              <textarea
+                [(ngModel)]="formData.description"
+                name="description"
+                required
+                maxlength="1000"
+                rows="6"
+                placeholder="Describe el perfil de cliente, ingresos, características y criterios de elegibilidad..."
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none">
+              </textarea>
+              <p class="text-sm text-gray-500 mt-1">
+                Descripción detallada que será utilizada por el sistema de IA para clasificación automática
+              </p>
+            </div>
+
+            <!-- Ejemplos de rangos -->
+            <div class="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200/50 rounded-xl p-4">
+              <h3 class="text-sm font-semibold text-blue-700 mb-3">💡 Ejemplos de Rangos</h3>
+              <div class="space-y-3 text-sm">
+                <div>
+                  <span class="font-medium text-blue-600">PREMIUM:</span>
+                  <span class="text-gray-700"> Cliente VIP con ingresos superiores a S/12,000 mensuales. Alto ejecutivo, empresario consolidado.</span>
+                </div>
+                <div>
+                  <span class="font-medium text-blue-600">ORO:</span>
+                  <span class="text-gray-700"> Cliente premium con ingresos entre S/6,000 - S/12,000 mensuales. Profesional universitario, ejecutivo medio.</span>
+                </div>
+                <div>
+                  <span class="font-medium text-blue-600">PLATA:</span>
+                  <span class="text-gray-700"> Cliente con perfil medio-alto, ingresos entre S/3,000 - S/6,000 mensuales. Profesional técnico, empleado estable.</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Footer con botones -->
+          <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-200/50 mt-6">
+            <button
+              type="button"
+              (click)="close()"
+              class="px-6 py-2.5 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200">
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              [disabled]="isSubmitting()"
+              class="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-lg hover:from-blue-600 hover:to-cyan-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+              @if (isSubmitting()) {
+                <i class="fas fa-spinner fa-spin text-xs"></i>
+              }
+              {{ isSubmitting() ? 'Guardando...' : 'Crear Rango' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}

@@ -13,34 +13,19 @@ export class CreditManagement {
   
   navigationLinks: NavigationLink[] = [
     {
-      label: 'Dashboard',
-      route: '/credit-management/dashboard',
-      icon: 'fas fa-tachometer-alt'
-    },
-    {
-      label: 'Solicitudes',
-      route: '/credit-management/applications',
-      icon: 'fas fa-file-alt'
-    },
-    {
-      label: 'Créditos Activos',
-      route: '/credit-management/active-credits',
+      label: 'Productos Crediticios',
+      route: '/credit-management/products',
       icon: 'fas fa-credit-card'
     },
     {
-      label: 'Simulador',
-      route: '/credit-management/simulator',
+      label: 'Rangos de Crédito',
+      route: '/credit-management/ranks',
+      icon: 'fas fa-medal'
+    },
+    {
+      label: 'Evaluación Crediticia',
+      route: '/credit-management/evaluation',
       icon: 'fas fa-calculator'
-    },
-    {
-      label: 'Historial',
-      route: '/credit-management/history',
-      icon: 'fas fa-history'
-    },
-    {
-      label: 'Documentos',
-      route: '/credit-management/documents',
-      icon: 'fas fa-folder-open'
     }
   ];
 }

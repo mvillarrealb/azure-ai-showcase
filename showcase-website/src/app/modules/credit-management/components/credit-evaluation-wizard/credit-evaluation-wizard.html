@@ -1,0 +1,258 @@
+<!-- Wizard para evaluaciones crediticias -->
+<div class="ios-card">
+  <div class="p-6">
+    
+    <!-- Header -->
+    <div class="flex items-center mb-6">
+      <div class="w-10 h-10 mr-4 rounded-xl bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center shadow-lg">
+        <i class="fas fa-calculator text-white text-lg"></i>
+      </div>
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Evaluación Crediticia</h1>
+        <p class="text-gray-600 text-sm">Evalúa la elegibilidad con IA semántica</p>
+      </div>
+    </div>
+
+    <!-- Progress indicator -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between text-sm text-gray-600 mb-2">
+        <span>Paso {{ currentStep() }} de 2</span>
+        <span>{{ getStepTitle() }}</span>
+      </div>
+      <div class="w-full bg-gray-200 rounded-full h-2">
+        <div 
+          class="bg-gradient-to-r from-blue-400 to-cyan-500 h-2 rounded-full transition-all duration-300"
+          [style.width.%]="(currentStep() / 2) * 100">
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 1: Formulario de evaluación -->
+    @if (currentStep() === 1) {
+      <form (ngSubmit)="onSubmitEvaluation()" class="space-y-6">
+        <div class="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200/50 rounded-xl p-6">
+          <h2 class="text-lg font-semibold text-blue-700 mb-4 flex items-center">
+            <i class="fas fa-user-check mr-2"></i>
+            Información del Cliente
+          </h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Documento de identidad -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Documento de Identidad <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                [(ngModel)]="evaluationRequest.identityDocument"
+                name="identityDocument"
+                required
+                maxlength="15"
+                placeholder="ej: 10456789012"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+              <p class="text-sm text-gray-500 mt-1">
+                DNI o documento de identificación del cliente
+              </p>
+            </div>
+
+            <!-- Monto solicitado -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Monto Solicitado <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">S/</span>
+                <input
+                  type="number"
+                  [(ngModel)]="evaluationRequest.requestedAmount"
+                  name="requestedAmount"
+                  required
+                  min="1"
+                  step="0.01"
+                  placeholder="50000.00"
+                  class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+              </div>
+              <p class="text-sm text-gray-500 mt-1">
+                Monto que el cliente desea solicitar
+              </p>
+            </div>
+          </div>
+
+          <!-- Información adicional -->
+          <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div class="flex items-start">
+              <i class="fas fa-info-circle text-blue-500 mt-0.5 mr-2"></i>
+              <div>
+                <h3 class="text-sm font-medium text-blue-800">¿Cómo funciona la evaluación?</h3>
+                <p class="text-sm text-blue-700 mt-1">
+                  Nuestro sistema de IA analizará el perfil del cliente utilizando:
+                </p>
+                <ul class="text-sm text-blue-700 mt-2 list-disc list-inside space-y-1">
+                  <li>Información almacenada en base de datos</li>
+                  <li>Análisis semántico con Azure AI Search</li>
+                  <li>Clasificación inteligente por rangos de crédito</li>
+                  <li>Recomendaciones personalizadas de productos</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones del formulario -->
+        <div class="flex justify-end">
+          <button
+            type="submit"
+            [disabled]="isEvaluating()"
+            class="px-8 py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-xl hover:from-blue-600 hover:to-cyan-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3">
+            @if (isEvaluating()) {
+              <i class="fas fa-spinner fa-spin text-sm"></i>
+              <span>Evaluando...</span>
+            } @else {
+              <i class="fas fa-search text-sm"></i>
+              <span>Evaluar Cliente</span>
+            }
+          </button>
+        </div>
+      </form>
+    }
+
+    <!-- Step 2: Resultados de evaluación -->
+    @if (currentStep() === 2 && evaluationResult()) {
+      <div class="space-y-6">
+        
+        <!-- Perfil del cliente -->
+        <div class="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200/50 rounded-xl p-6">
+          <h2 class="text-lg font-semibold text-blue-700 mb-4 flex items-center">
+            <i class="fas fa-user mr-2"></i>
+            Perfil del Cliente
+          </h2>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div>
+              <span class="text-gray-600">Documento:</span>
+              <p class="font-medium">{{ evaluationResult()?.clientProfile?.identityDocument }}</p>
+            </div>
+            @if (evaluationResult()?.clientProfile?.name) {
+              <div>
+                <span class="text-gray-600">Nombre:</span>
+                <p class="font-medium">{{ evaluationResult()?.clientProfile?.name }}</p>
+              </div>
+            }
+            @if (evaluationResult()?.clientProfile?.income) {
+              <div>
+                <span class="text-gray-600">Ingresos:</span>
+                <p class="font-medium">{{ formatCurrency(evaluationResult()!.clientProfile.income!) }}</p>
+              </div>
+            }
+            @if (evaluationResult()?.clientProfile?.rank) {
+              <div>
+                <span class="text-gray-600">Rango:</span>
+                <p class="font-medium text-blue-600">{{ evaluationResult()?.clientProfile?.rank }}</p>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Resumen de evaluación -->
+        <div class="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200/50 rounded-xl p-6">
+          <h2 class="text-lg font-semibold text-blue-700 mb-4 flex items-center">
+            <i class="fas fa-chart-line mr-2"></i>
+            Resumen de Evaluación
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center">
+              <div class="text-2xl font-bold text-blue-600 mb-1">
+                {{ evaluationResult()?.summary?.overallScore }}%
+              </div>
+              <p class="text-sm text-gray-600">Puntuación General</p>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-blue-600 mb-1">
+                {{ evaluationResult()?.summary?.approvalProbability }}%
+              </div>
+              <p class="text-sm text-gray-600">Prob. Aprobación</p>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold mb-1" [class]="getRiskLevelClass()">
+                {{ evaluationResult()?.summary?.riskLevel }}
+              </div>
+              <p class="text-sm text-gray-600">Nivel de Riesgo</p>
+            </div>
+          </div>
+          <div class="mt-4 p-4 bg-white/50 rounded-lg">
+            <p class="text-sm text-gray-700">
+              <strong>Recomendación:</strong> {{ evaluationResult()?.summary?.recommendation }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Productos elegibles -->
+        <div class="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200/50 rounded-xl p-6">
+          <h2 class="text-lg font-semibold text-blue-700 mb-4 flex items-center">
+            <i class="fas fa-star mr-2"></i>
+            Productos Recomendados
+          </h2>
+          
+          @if (evaluationResult()?.eligibleProducts?.length === 0) {
+            <div class="text-center py-8 text-gray-500">
+              <i class="fas fa-exclamation-triangle text-3xl mb-2"></i>
+              <p>No se encontraron productos elegibles para este perfil</p>
+            </div>
+          } @else {
+            <div class="space-y-4">
+              @for (product of evaluationResult()?.eligibleProducts; track product.productId) {
+                <div class="bg-white/70 border border-blue-200/30 rounded-lg p-4">
+                  <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-semibold text-gray-900">{{ product.productName }}</h3>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                      {{ product.eligibilityScore }}% compatibilidad
+                    </span>
+                  </div>
+                  <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm mb-3">
+                    <div>
+                      <span class="text-gray-600">Monto recomendado:</span>
+                      <p class="font-medium text-green-600">{{ formatCurrency(product.recommendedAmount) }}</p>
+                    </div>
+                    <div>
+                      <span class="text-gray-600">Tasa recomendada:</span>
+                      <p class="font-medium text-blue-600">{{ product.recommendedRate.toFixed(2) }}%</p>
+                    </div>
+                  </div>
+                  @if (product.conditions.length > 0) {
+                    <div>
+                      <span class="text-gray-600 text-xs">Condiciones:</span>
+                      <ul class="list-disc list-inside text-xs text-gray-700 mt-1">
+                        @for (condition of product.conditions; track condition) {
+                          <li>{{ condition }}</li>
+                        }
+                      </ul>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Botones de acciones finales -->
+        <div class="flex justify-between">
+          <button
+            type="button"
+            (click)="resetWizard()"
+            class="px-6 py-2.5 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200 flex items-center gap-2">
+            <i class="fas fa-arrow-left text-sm"></i>
+            Nueva Evaluación
+          </button>
+          <button
+            type="button"
+            (click)="exportResults()"
+            class="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-lg hover:from-blue-600 hover:to-cyan-700 transition-all duration-200 flex items-center gap-2">
+            <i class="fas fa-download text-sm"></i>
+            Exportar Resultados
+          </button>
+        </div>
+      </div>
+    }
+
+  </div>
+</div>

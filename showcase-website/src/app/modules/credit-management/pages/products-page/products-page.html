@@ -1,0 +1,9 @@
+<!-- Página de productos con modal -->
+<app-products-crud (showProductForm)="showModal.set(true)"></app-products-crud>
+
+<!-- Modal para crear productos -->
+<app-product-form-modal 
+  [visible]="showModal()"
+  (visibleChange)="showModal.set($event)"
+  (productCreated)="onProductCreated()">
+</app-product-form-modal>

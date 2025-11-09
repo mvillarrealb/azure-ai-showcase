@@ -1,0 +1,9 @@
+<!-- Página de rangos con modal -->
+<app-ranks-crud (showRankForm)="showModal.set(true)"></app-ranks-crud>
+
+<!-- Modal para crear rangos -->
+<app-rank-form-modal 
+  [visible]="showModal()"
+  (visibleChange)="showModal.set($event)"
+  (rankCreated)="onRankCreated()">
+</app-rank-form-modal>
