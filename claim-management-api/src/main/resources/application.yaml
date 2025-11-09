@@ -2,7 +2,7 @@ spring:
   application:
     name: claim-management-api
   datasource:
-    url: jdbc:postgresql://localhost:5432/claim_management
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/claim_management
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:PutYourPasswordHere}
     driver-class-name: org.postgresql.Driver

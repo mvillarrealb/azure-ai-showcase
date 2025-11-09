@@ -1,11 +1,9 @@
 package org.mavb.azure.ai.controller;
 
 import com.azure.search.documents.SearchClient;
-import com.azure.search.documents.models.IndexDocumentsResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mavb.azure.ai.dto.RankUploadDto;
-import org.mavb.azure.ai.entity.RankDocument;
 import org.mavb.azure.ai.mapper.RankDocumentMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -14,8 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import com.azure.search.documents.models.IndexDocumentsResult;
-import com.azure.search.documents.SearchClient;
+
 
 import jakarta.validation.Valid;
 import java.util.List;
