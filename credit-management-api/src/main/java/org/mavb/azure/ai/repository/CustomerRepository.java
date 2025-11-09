@@ -17,11 +17,6 @@ import java.util.Optional;
 public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> {
 
     /**
-     * Find customer by identity document.
-     */
-    Optional<CustomerEntity> findByIdentityDocumentAndActiveTrue(String identityDocument);
-
-    /**
      * Find customer with their 2 most recent employment records by identity document.
      * Returns customer with employment history limited to 2 most recent jobs.
      */

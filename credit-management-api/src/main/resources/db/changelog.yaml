@@ -52,3 +52,25 @@ databaseChangeLog:
         stripComments: true
         path: "classpath:/db/v_1_2_0/main.sql"
         endDelimiter: "$EXECUTE$"
+        
+  - changeSet:
+      id: v_1_3_0
+      author: "Marco Villarreal"
+      comment: "Gestión de Rankings/Clasificaciones - tabla ranks con índices y constraints para análisis semántico"
+      sqlFile:
+        encoding: utf8
+        stripComments: true
+        path: "classpath:/db/v_1_3_0/main.sql"
+        endDelimiter: "$EXECUTE$"
+        
+  - changeSet:
+      id: v_1_3_0_data
+      author: "Marco Villarreal"
+      comment: "Datos iniciales de rangos - clasificaciones BRONCE, PLATA, ORO, PLATINO, DIAMANTE con descripciones detalladas"
+      contexts: dev,data-load
+      sqlFile:
+        encoding: utf8
+        stripComments: true
+        path: "classpath:/db/v_1_3_0/data.sql"
+      rollback:
+        sql: "DELETE FROM ranks WHERE id IN ('BRONCE', 'PLATA', 'ORO', 'PLATINO', 'DIAMANTE');"

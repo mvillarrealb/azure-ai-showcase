@@ -6,16 +6,14 @@ import com.azure.ai.openai.models.EmbeddingsOptions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mavb.azure.ai.config.AzureProperties;
-import org.mavb.azure.ai.dto.RankUploadDto;
 import org.mavb.azure.ai.entity.RankDocument;
+import org.mavb.azure.ai.entity.RankEntity;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
 /**
- * Mapper component for converting rank data to RankDocument.
+ * Mapper component for converting RankEntity to RankDocument.
  * Includes embedding generation for semantic rank classification.
  */
 @Component
@@ -27,86 +25,26 @@ public class RankDocumentMapper {
     private final AzureProperties azureProperties;
 
     /**
-     * Maps rank DTO to a RankDocument with generated embeddings.
-     * Uses a blocking I/O scheduler to avoid blocking reactive threads.
-     *
-     * @param rankDto The complete rank upload DTO
-     * @return Mono<RankDocument> with embeddings
+     * Synchronous version for JPA listeners.
+     * Converts RankEntity to RankDocument with embeddings.
      */
-    public Mono<RankDocument> toRankDocument(RankUploadDto rankDto) {
-        log.debug("Mapping rank DTO to RankDocument: {}", rankDto.getId());
-
-        return generateEmbeddings(rankDto.getDescription())
-                .map(embeddings -> RankDocument.builder()
-                        .id(rankDto.getId())
-                        .name(rankDto.getName())
-                        .description(rankDto.getDescription())
-                        .embedding(embeddings)
-                        .build())
-                .onErrorResume(e -> {
-                    log.error("Error generating embeddings for rank {}: {}", rankDto.getId(), e.getMessage(), e);
-                    return Mono.just(createBasicDocument(rankDto));
-                });
-    }
-
-    /**
-     * Legacy method for backward compatibility - DEPRECATED
-     * @deprecated Use {@link #toRankDocument(RankUploadDto)} instead
-     */
-    @Deprecated
-    public Mono<RankDocument> toRankDocument(String id, String name, String description) {
-        RankUploadDto dto = new RankUploadDto();
-        dto.setId(id);
-        dto.setName(name);
-        dto.setDescription(description);
-        return toRankDocument(dto);
-    }
-
-    /**
-     * Synchronous version for backward compatibility - DEPRECATED
-     * @deprecated Use reactive version instead
-     */
-    @Deprecated
-    public RankDocument toRankDocumentSync(String id, String name, String description) {
-        RankUploadDto dto = new RankUploadDto();
-        dto.setId(id);
-        dto.setName(name);
-        dto.setDescription(description);
-        return toRankDocumentSync(dto);
-    }
-
-    /**
-     * Synchronous version for specific use cases.
-     * Note: This should not be called from reactive threads.
-     */
-    public RankDocument toRankDocumentSync(RankUploadDto rankDto) {
-        log.debug("Mapping rank DTO to RankDocument (sync): {}", rankDto.getId());
+    public RankDocument toRankDocumentSync(RankEntity rankEntity) {
+        log.debug("Mapping rank entity to RankDocument (sync): {}", rankEntity.getId());
 
         try {
-            List<Float> embeddings = generateEmbeddingsSync(rankDto.getDescription());
+            List<Float> embeddings = generateEmbeddingsSync(rankEntity.getDescription());
 
             return RankDocument.builder()
-                    .id(rankDto.getId())
-                    .name(rankDto.getName())
-                    .description(rankDto.getDescription())
+                    .id(rankEntity.getId())
+                    .name(rankEntity.getName())
+                    .description(rankEntity.getDescription())
                     .embedding(embeddings)
                     .build();
 
         } catch (Exception e) {
-            log.error("Error generating embeddings for rank {}: {}", rankDto.getId(), e.getMessage(), e);
-            return createBasicDocument(rankDto);
+            log.error("Error generating embeddings for rank {}: {}", rankEntity.getId(), e.getMessage(), e);
+            return createBasicDocument(rankEntity);
         }
-    }
-
-    /**
-     * Generates embeddings for the rank description using OpenAI (Reactive).
-     * Runs on a blocking I/O scheduler to avoid blocking reactive threads.
-     */
-    private Mono<List<Float>> generateEmbeddings(String description) {
-        return Mono.fromCallable(() -> generateEmbeddingsSync(description))
-                .subscribeOn(Schedulers.boundedElastic())
-                .doOnSubscribe(subscription -> log.debug("Generating embeddings for rank description (reactive)"))
-                .doOnSuccess(result -> log.debug("Generated embeddings vector with {} dimensions", result.size()));
     }
 
     /**
@@ -143,25 +81,12 @@ public class RankDocumentMapper {
     /**
      * Creates a basic document without embeddings in case of errors.
      */
-    private RankDocument createBasicDocument(RankUploadDto rankDto) {
+    private RankDocument createBasicDocument(RankEntity rankEntity) {
         return RankDocument.builder()
-                .id(rankDto.getId())
-                .name(rankDto.getName())
-                .description(rankDto.getDescription())
+                .id(rankEntity.getId())
+                .name(rankEntity.getName())
+                .description(rankEntity.getDescription())
                 .embedding(List.of())
                 .build();
-    }
-
-    /**
-     * Legacy method for creating basic documents - DEPRECATED
-     * @deprecated Use {@link #createBasicDocument(RankUploadDto)} instead
-     */
-    @Deprecated
-    private RankDocument createBasicDocument(String id, String name, String description) {
-        RankUploadDto dto = new RankUploadDto();
-        dto.setId(id);
-        dto.setName(name);
-        dto.setDescription(description);
-        return createBasicDocument(dto);
     }
 }

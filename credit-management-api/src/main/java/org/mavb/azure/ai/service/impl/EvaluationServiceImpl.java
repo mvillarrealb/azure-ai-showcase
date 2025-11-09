@@ -10,7 +10,7 @@ import org.mavb.azure.ai.repository.CreditProductRepository;
 import org.mavb.azure.ai.repository.CustomerRepository;
 import org.mavb.azure.ai.service.EvaluationService;
 import org.mavb.azure.ai.service.ProductSearchService;
-import org.mavb.azure.ai.service.impl.RankService;
+import org.mavb.azure.ai.service.RankService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
