@@ -52,6 +52,7 @@
       [adapter]="claimsAdapter"
       [columns]="gridColumns"
       [config]="gridConfig"
+      [selectedRowIndex]="selectedRowIndex()"
       (rowClick)="onViewDetails($event)">
     </app-pageable-grid>
   </div>

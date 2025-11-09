@@ -35,6 +35,7 @@ export class ClaimsCrudComponent implements OnInit, OnDestroy {
 
   // Signal para el claim seleccionado
   selectedClaim = signal<Claim | null>(null);
+  selectedRowIndex = signal<number | null>(null);
 
   // Datos actuales para manejar acciones
   private currentData: Claim[] = [];
@@ -135,10 +136,39 @@ export class ClaimsCrudComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Maneja el click en una fila para seleccionar el claim
+   * Maneja el click en una fila para seleccionar/deseleccionar el claim
    */
   onViewDetails(claim: Claim) {
-    this.selectedClaim.set(claim);
+    const currentSelected = this.selectedClaim();
+    
+    if (currentSelected && currentSelected.id === claim.id) {
+      // Si es el mismo claim, deseleccionar
+      this.selectedClaim.set(null);
+      this.selectedRowIndex.set(null);
+      console.log('🔄 Deseleccionado claim:', claim.id);
+    } else {
+      // Seleccionar nuevo claim
+      this.selectedClaim.set(claim);
+      const index = this.currentData.findIndex(c => c.id === claim.id);
+      this.selectedRowIndex.set(index);
+      console.log('✅ Seleccionado claim:', claim.id, 'en índice:', index);
+    }
+  }
+
+  /**
+   * Detecta clicks fuera del componente para deseleccionar
+   */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event) {
+    const target = event.target as HTMLElement;
+    const gridElement = target.closest('app-pageable-grid');
+    const buttonElement = target.closest('button');
+    
+    // Si no es click en el grid ni en botones, deseleccionar
+    if (!gridElement && !buttonElement) {
+      this.selectedClaim.set(null);
+      this.selectedRowIndex.set(null);
+    }
   }
 
   /**

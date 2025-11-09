@@ -39,10 +39,6 @@ import { environment } from '../../../environments/environment';
       transform: translateZ(0);
     }
     
-    tbody tr:hover {
-      background-color: rgb(239 246 255 / 0.3) !important;
-    }
-    
     .truncate {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -83,6 +79,7 @@ export class PageableGridComponent<T = any> implements OnInit, OnDestroy {
   @Input({ required: true }) adapter!: PageableAdapter<T>;
   @Input({ required: true }) columns!: GridColumn[];
   @Input() title?: string;
+  @Input() selectedRowIndex: number | null = null; // Índice de fila seleccionada
   @Input() config: PageableGridConfig = {
     pageSize: 10,
     pageSizeOptions: [5, 10, 25, 50, 100],
@@ -299,11 +296,23 @@ export class PageableGridComponent<T = any> implements OnInit, OnDestroy {
     return `${baseClasses} ${sortableClasses} ${sortedClasses}`.trim();
   }
 
-  getRowClasses(isEven: boolean): string {
-    const baseClasses = 'transition-all duration-200 cursor-pointer hover:bg-emerald-50/70 hover:shadow-md border-b border-gray-100/50 backdrop-blur-sm';
-    const zebraClasses = isEven ? 'bg-white/60' : 'bg-white/40';
+  getRowClasses(isEven: boolean, rowIndex?: number): string {
+    const baseClasses = 'transition-all duration-200 cursor-pointer border-b border-gray-100/50 backdrop-blur-sm';
     
-    return `${baseClasses} ${zebraClasses}`.trim();
+    // Fila seleccionada: estilo muy distintivo
+    const isSelected = (rowIndex === this.selectedRowIndex && this.selectedRowIndex !== null);
+    
+    if (isSelected) {
+      // Fila seleccionada: azul intenso con borde, hover solo cambia ligeramente el tono
+      const selectedClasses = 'bg-blue-500/20 border-l-4 border-blue-500 hover:bg-blue-500/25';
+      console.log('🎯 Aplicando estilo selected a fila:', rowIndex);
+      return `${baseClasses} ${selectedClasses}`.trim();
+    }
+    
+    // Filas normales: hover verde suave, zebra pattern normal
+    const zebraClasses = isEven ? 'bg-white/60' : 'bg-white/40';
+    const hoverClasses = 'hover:bg-emerald-50/70 hover:shadow-md';
+    return `${baseClasses} ${zebraClasses} ${hoverClasses}`.trim();
   }
 
   getCellClasses(column: GridColumn): string {

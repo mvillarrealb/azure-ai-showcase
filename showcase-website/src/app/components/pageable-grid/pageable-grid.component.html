@@ -57,7 +57,7 @@
           <tbody>
             @for (row of data(); track $index; let isEven = $even) {
               <tr 
-                [class]="getRowClasses(isEven)"
+                [class]="getRowClasses(isEven, $index)"
                 (click)="onRowClick(row)">
                 @for (column of columns; track column.key) {
                   <td 
