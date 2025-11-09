@@ -23,19 +23,14 @@ export class ClaimManagement {
   // Navigation links actualizados según funcionalidades implementadas
   navigationLinks: NavigationLink[] = [
     {
-      label: 'Reclamos',
+      label: 'Gestión de Reclamos',
       route: '/claim-management/claims',
       icon: 'fas fa-list'
     },
     {
-      label: 'Carga Masiva',
+      label: 'Importación Masiva',
       route: '/claim-management/import',
       icon: 'fas fa-file-upload'
-    },
-    {
-      label: 'Reportes',
-      route: '/claim-management/reports',
-      icon: 'fas fa-chart-bar'
     }
   ];
 

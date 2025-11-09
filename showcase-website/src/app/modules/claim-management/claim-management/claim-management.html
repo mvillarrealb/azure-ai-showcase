@@ -2,6 +2,7 @@
   [title]="title"
   [navigationLinks]="navigationLinks"
   [showBackButton]="true"
+  [backButtonRoute]="'/'"
   backButtonIcon="fas fa-home"
   headerClasses="bg-gradient-to-r from-red-400 to-red-500 text-white border-red-600/30"
   sidebarIcon="fas fa-exclamation-triangle"
@@ -14,15 +15,6 @@
 
   <!-- Main content -->
   <div class="space-y-6">
-    <div class="bg-white/25 backdrop-blur-md rounded-2xl shadow-lg p-6 border border-white/20">
-      <h2 class="text-2xl font-bold text-gray-900 mb-4">
-        Centro de Gestión de Reclamos
-      </h2>
-      <p class="text-gray-700 mb-6">
-        Registra, gestiona y da seguimiento a todos tus reclamos bancarios y financieros.
-      </p>
-    </div>
-    
     <!-- Router outlet para contenido dinámico -->
     <router-outlet (activate)="onRouteActivated($event)"></router-outlet>
   </div>

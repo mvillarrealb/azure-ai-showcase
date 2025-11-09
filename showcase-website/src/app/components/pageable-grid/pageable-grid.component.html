@@ -26,8 +26,8 @@
     <div class="bg-white/40 backdrop-blur-md rounded-2xl border border-white/30 shadow-xl overflow-hidden">
       <div class="overflow-x-auto">
         <table class="min-w-full">
-          <!-- Table Header con gradiente -->
-          <thead class="bg-gradient-to-r from-emerald-500 to-green-600">
+          <!-- Table Header con gradiente dinámico -->
+          <thead [class]="'bg-gradient-to-r ' + headerColors">
             <tr>
               @for (column of columns; track column.key) {
                 <th 
@@ -75,9 +75,9 @@
         </table>
       </div>
 
-      <!-- Pagination Toolbar minimalista -->
+      <!-- Pagination Toolbar minimalista con colores dinámicos -->
       @if (totalElements() > 0) {
-        <div class="bg-gradient-to-r from-emerald-600 to-green-700 px-6 py-4 backdrop-blur-sm border-t border-emerald-500/30">
+        <div [class]="'bg-gradient-to-r px-6 py-4 backdrop-blur-sm border-t border-emerald-500/30 ' + footerColors">
           <div class="flex items-center justify-between">
             
             <!-- Info de resultados simplificada -->

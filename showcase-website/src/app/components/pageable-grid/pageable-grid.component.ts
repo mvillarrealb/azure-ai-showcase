@@ -80,6 +80,8 @@ export class PageableGridComponent<T = any> implements OnInit, OnDestroy {
   @Input({ required: true }) columns!: GridColumn[];
   @Input() title?: string;
   @Input() selectedRowIndex: number | null = null; // Índice de fila seleccionada
+  @Input() headerColors: string = 'from-emerald-500 to-green-600'; // Colores del header
+  @Input() footerColors: string = 'from-emerald-600 to-green-700'; // Colores del footer
   @Input() config: PageableGridConfig = {
     pageSize: 10,
     pageSizeOptions: [5, 10, 25, 50, 100],
