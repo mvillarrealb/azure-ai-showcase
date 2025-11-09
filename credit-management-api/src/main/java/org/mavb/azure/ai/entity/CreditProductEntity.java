@@ -4,6 +4,7 @@ import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Type;
+import org.mavb.azure.ai.listener.ProductSyncListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "credit_products")
+@EntityListeners(ProductSyncListener.class)
 @Data
 @Builder
 @NoArgsConstructor

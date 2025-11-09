@@ -31,10 +31,12 @@ public class ProductService {
         List<Float> vector = emb.getData().get(0).getEmbedding().stream().map(Double::floatValue).toList();
 
         String filter = "search.in(allowedRanks, '" + rank + "')";
-        VectorQuery vq = new VectorQuery(vector, "embedding").setKNearestNeighborsCount(5);
+        VectorizedQuery vectorQuery = new VectorizedQuery(vector)
+                .setKNearestNeighborsCount(5)
+                .setFields("embedding");
 
         SearchOptions opts = new SearchOptions()
-                .setVectorQueries(List.of(vq))
+                .setVectorSearchOptions(new VectorSearchOptions().setQueries(vectorQuery))
                 .setFilter(filter)
                 .setTop(5);
 

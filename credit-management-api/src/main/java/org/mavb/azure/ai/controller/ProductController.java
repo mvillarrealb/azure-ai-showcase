@@ -1,7 +1,9 @@
 package org.mavb.azure.ai.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.mavb.azure.ai.dto.request.CreateProductDTO;
 import org.mavb.azure.ai.dto.request.ProductFilterDTO;
 import org.mavb.azure.ai.dto.response.ProductDTO;
 import org.mavb.azure.ai.dto.response.ProductListResponseDTO;
@@ -9,6 +11,7 @@ import org.mavb.azure.ai.service.ProductService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,13 +19,14 @@ import java.math.BigDecimal;
 
 /**
  * REST Controller for credit product management.
- * Handles HTTP requests for product listing and detailed product information.
+ * Handles HTTP requests for product listing, creation, and detailed product information.
  * 
  * Base path: /products
  * 
  * Endpoints:
  * - GET /products - Lista productos crediticios con filtros opcionales
  * - GET /products/{productId} - Obtiene detalles de un producto específico
+ * - POST /products - Crea un nuevo producto crediticio con sincronización automática a AI Search
  */
 @RestController
 @RequestMapping("/products")
@@ -91,5 +95,24 @@ public class ProductController {
         log.info("Successfully retrieved product: {}", product.getName());
         
         return ResponseEntity.ok(product);
+    }
+
+    /**
+     * Crear un nuevo producto crediticio.
+     * El producto se sincronizará automáticamente con Azure AI Search para habilitar búsquedas semánticas.
+     *
+     * @param createProductDTO Datos del producto a crear
+     * @return Producto crediticio creado
+     */
+    @PostMapping
+    public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody CreateProductDTO createProductDTO) {
+        log.debug("POST /products - Creating new product with ID: {}", createProductDTO.getId());
+
+        ProductDTO createdProduct = productService.createProduct(createProductDTO);
+
+        log.info("Successfully created product: {} with ID: {}", 
+                createdProduct.getName(), createdProduct.getId());
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 }

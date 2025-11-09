@@ -1,0 +1,239 @@
+{
+  "info": {
+    "name": "Credit Management API v1.1.0",
+    "description": "API REST para gestión de productos crediticios con capacidades de IA semántica y Azure AI Search",
+    "version": "1.1.0",
+    "_postman_id": "credit-management-api-v1-1-0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api/v1",
+      "description": "Base URL del servidor de desarrollo local"
+    },
+    {
+      "key": "prodUrl",
+      "value": "https://api.banco.com/v1",
+      "description": "Base URL del servidor de producción"
+    }
+  ],
+  "item": [
+    {
+      "name": "Products",
+      "description": "Gestión de productos crediticios con sincronización automática con Azure AI Search",
+      "item": [
+        {
+          "name": "GET Lista de productos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"]
+            },
+            "description": "Obtiene todos los productos crediticios disponibles"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/products",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "[\n  {\n    \"id\": \"CRV-PEN-001\",\n    \"name\": \"Crédito Revolvente Empresarial\",\n    \"description\": \"Línea de crédito flexible para empresas\",\n    \"category\": \"Crédito Revolvente\",\n    \"minimumAmount\": 20000,\n    \"maximumAmount\": 300000,\n    \"currency\": \"S/\",\n    \"minimumRate\": 9.00,\n    \"maximumRate\": 14.00\n  }\n]"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has products array\", function () {",
+                  "    pm.response.to.be.json;",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Crear producto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"CRP-USD-001\",\n  \"name\": \"Crédito Rotativo Premium\",\n  \"description\": \"Línea de crédito rotativo con condiciones preferenciales para clientes VIP\",\n  \"category\": \"Crédito Revolvente\",\n  \"subcategory\": \"Crédito Revolvente Premium\",\n  \"minimumAmount\": 50000,\n  \"maximumAmount\": 500000,\n  \"currency\": \"USD\",\n  \"term\": \"24 meses renovables\",\n  \"minimumRate\": 8.50,\n  \"maximumRate\": 12.50,\n  \"requirements\": [\n    \"RUC vigente\",\n    \"Estados financieros auditados\",\n    \"Garantías hipotecarias\"\n  ],\n  \"features\": [\n    \"Disposición inmediata\",\n    \"Sin comisión por manejo\",\n    \"Banca privada incluida\"\n  ],\n  \"benefits\": [\n    \"Tasas preferenciales\",\n    \"Asesoría financiera personalizada\",\n    \"Seguros incluidos\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"]
+            },
+            "description": "Crea un nuevo producto crediticio con sincronización automática a Azure AI Search"
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"CRP-USD-001\",\n  \"name\": \"Crédito Rotativo Premium\",\n  \"description\": \"Línea de crédito rotativo con condiciones preferenciales para clientes VIP\",\n  \"category\": \"Crédito Revolvente\"\n}"
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"id\": \"CRP-USD-001\",\n  \"name\": \"Crédito Rotativo Premium\",\n  \"description\": \"Línea de crédito rotativo con condiciones preferenciales para clientes VIP\",\n  \"category\": \"Crédito Revolvente\",\n  \"subcategory\": \"Crédito Revolvente Premium\",\n  \"minimumAmount\": 50000,\n  \"maximumAmount\": 500000,\n  \"currency\": \"USD\",\n  \"term\": \"24 meses renovables\",\n  \"minimumRate\": 8.50,\n  \"maximumRate\": 12.50,\n  \"createdAt\": \"2024-11-08T16:30:00Z\",\n  \"updatedAt\": \"2024-11-08T16:30:00Z\"\n}"
+            },
+            {
+              "name": "409 Conflict - Producto ya existe",
+              "originalRequest": {
+                "method": "POST"
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"error\": \"Product Already Exists\",\n  \"message\": \"El producto con ID CRP-USD-001 ya existe\",\n  \"timestamp\": \"2024-11-08T16:30:00Z\"\n}"
+            },
+            {
+              "name": "400 Bad Request - Validación",
+              "originalRequest": {
+                "method": "POST"
+              },
+              "status": "Bad Request", 
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"error\": \"Validation Error\",\n  \"message\": \"Datos de entrada inválidos\",\n  \"details\": [\n    {\n      \"field\": \"id\",\n      \"message\": \"El ID debe seguir el patrón: 3 letras-3 letras-3 dígitos\"\n    },\n    {\n      \"field\": \"minimumAmount\",\n      \"message\": \"El monto mínimo debe ser mayor a 0\"\n    }\n  ]\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 or error status\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400, 409]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    pm.test(\"Product created successfully\", function () {",
+                  "        pm.response.to.be.json;",
+                  "        const jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('id');",
+                  "        pm.expect(jsonData).to.have.property('createdAt');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Evaluation", 
+      "description": "Evaluación crediticia con capacidades de IA semántica",
+      "item": [
+        {
+          "name": "POST Evaluar cliente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identityDocument\": \"10456789012\",\n  \"requestedAmount\": 50000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/evaluate",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "evaluate"]
+            },
+            "description": "Evalúa la elegibilidad crediticia usando IA semántica para recomendaciones personalizadas"
+          },
+          "response": [
+            {
+              "name": "200 Success - Evaluación con IA",
+              "originalRequest": {
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"identityDocument\": \"10456789012\",\n  \"requestedAmount\": 50000\n}"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"clientProfile\": {\n    \"identityDocument\": \"10456789012\",\n    \"creditScore\": 750,\n    \"riskLevel\": \"Bajo\",\n    \"approvedAmount\": 45000\n  },\n  \"eligibleProducts\": [\n    {\n      \"id\": \"CRV-PEN-001\",\n      \"name\": \"Crédito Revolvente Empresarial\",\n      \"approvedAmount\": 45000,\n      \"approvedRate\": 10.50,\n      \"eligibilityScore\": 85,\n      \"recommendation\": \"Altamente recomendado\",\n      \"semanticRank\": 0.92,\n      \"semanticConfidence\": 0.88,\n      \"semanticDescription\": \"Producto altamente compatible basado en perfil empresarial y flujo de caja proyectado\"\n    }\n  ],\n  \"summary\": {\n    \"totalEligibleProducts\": 1,\n    \"bestOption\": {\n      \"productId\": \"CRV-PEN-001\",\n      \"reason\": \"Mejor match semántico y condiciones favorables\"\n    },\n    \"evaluationDate\": \"2024-11-08T16:30:00Z\"\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has semantic AI fields\", function () {",
+                  "    pm.response.to.be.json;",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('eligibleProducts');",
+                  "    if (jsonData.eligibleProducts.length > 0) {",
+                  "        pm.expect(jsonData.eligibleProducts[0]).to.have.property('semanticRank');",
+                  "        pm.expect(jsonData.eligibleProducts[0]).to.have.property('semanticConfidence');",
+                  "        pm.expect(jsonData.eligibleProducts[0]).to.have.property('semanticDescription');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

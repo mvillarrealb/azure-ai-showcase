@@ -31,11 +31,13 @@ public class RankService {
         );
         List<Float> vector = emb.getData().get(0).getEmbedding().stream().map(Double::floatValue).toList();
 
-        VectorQuery vq =new VectorQuery()
-                .setVector(vector)
-                .setFields("embedding")
-                .setKNearestNeighborsCount(1);
-        SearchOptions opts = new SearchOptions().setVectorQueries(List.of(vq)).setTop(1);
+        VectorizedQuery vectorQuery = new VectorizedQuery(vector)
+                .setKNearestNeighborsCount(1)
+                .setFields("embedding");
+        
+        SearchOptions opts = new SearchOptions()
+                .setVectorSearchOptions(new VectorSearchOptions().setQueries(vectorQuery))
+                .setTop(1);
 
         SearchPagedIterable results = rankSearch.search(null, opts, null);
         return results.stream().findFirst().map(r -> r.getDocument(RankDocument.class)).orElse(null);

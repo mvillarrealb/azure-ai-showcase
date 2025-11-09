@@ -47,6 +47,22 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handle ProductAlreadyExistsException.
+     * Thrown when attempting to create a product with an existing ID.
+     */
+    @ExceptionHandler(ProductAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponseDTO> handleProductAlreadyExists(ProductAlreadyExistsException ex) {
+        log.warn("Product already exists: {}", ex.getMessage());
+
+        ErrorResponseDTO error = ErrorResponseDTO.builder()
+                .error("Product Already Exists")
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    /**
      * Handle EvaluationException.
      * Thrown when credit evaluation process fails.
      */

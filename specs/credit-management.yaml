@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
   title: Credit Management API
-  description: API REST para la gestión y evaluación de productos crediticios bancarios
-  version: 1.0.0
+  description: API REST para la gestión y evaluación de productos crediticios bancarios con capacidades de IA semántica
+  version: 1.1.0
   contact:
     name: Equipo de Desarrollo
     email: dev-team@banco.com
@@ -17,7 +17,7 @@ paths:
     get:
       operationId: getProducts
       summary: Obtener lista de productos crediticios
-      description: Devuelve una lista completa de productos crediticios disponibles
+      description: Devuelve una lista completa de productos crediticios disponibles con filtros opcionales
       tags:
         - Products
       parameters:
@@ -27,7 +27,7 @@ paths:
           required: false
           schema:
             type: string
-          example: "Crédito Revolvente"
+          example: "PRESTAMO_PERSONAL"
         - name: currency
           in: query
           description: Filtrar por moneda
@@ -42,7 +42,7 @@ paths:
           required: false
           schema:
             type: number
-            format: float
+            format: decimal
           example: 10000
         - name: maxAmount
           in: query
@@ -50,8 +50,35 @@ paths:
           required: false
           schema:
             type: number
-            format: float
+            format: decimal
           example: 100000
+        - name: page
+          in: query
+          description: Número de página (basado en 0)
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          example: 0
+        - name: size
+          in: query
+          description: Tamaño de página
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          example: 20
+        - name: sort
+          in: query
+          description: Campo de ordenación
+          required: false
+          schema:
+            type: string
+            default: "name"
+          example: "name"
       responses:
         '200':
           description: Lista de productos crediticios obtenida exitosamente
@@ -59,48 +86,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductListResponse'
-              example:
-                data:
-                  - id: "CRV-PEN-001"
-                    name: "Crédito Revolvente Empresarial"
-                    description: "Línea de crédito revolvente para empresas que necesitan capital de trabajo flexible."
-                    category: "Crédito Revolvente"
-                    subcategory: "Crédito Revolvente Capital Trabajo"
-                    minimumAmount: 20000
-                    maximumAmount: 300000
-                    currency: "S/"
-                    term: "12 meses renovables"
-                    minimumRate: 9.00
-                    maximumRate: 14.00
-                    requirements:
-                      - "RUC vigente"
-                      - "Estados financieros de los últimos 2 años"
-                      - "Flujo de caja mensual"
-                      - "Constitución de la empresa"
-                      - "Historial crediticio empresarial bueno"
-                      - "Ventas anuales mínimas S/ 300,000"
-                      - "Garantías líquidas"
-                  - id: "CHP-PEN-002"
-                    name: "Crédito Hipotecario Premium"
-                    description: "Préstamo hipotecario para adquisición de vivienda con condiciones preferenciales."
-                    category: "Crédito Hipotecario"
-                    subcategory: "Crédito Hipotecario Vivienda"
-                    minimumAmount: 80000
-                    maximumAmount: 800000
-                    currency: "S/"
-                    term: "Hasta 30 años"
-                    minimumRate: 7.50
-                    maximumRate: 12.00
-                    requirements:
-                      - "DNI vigente"
-                      - "Recibos de sueldo últimos 3 meses"
-                      - "Declaración jurada de ingresos"
-                      - "Certificado de trabajo"
-                      - "Tasación de inmueble"
-                      - "Historial crediticio bueno"
-                total: 25
-                totalPages: 3
-                currentPage: 1
         '400':
           description: Parámetros de consulta inválidos
           content:
@@ -113,6 +98,82 @@ paths:
                 details:
                   - field: "minAmount"
                     message: "El monto mínimo debe ser un número positivo"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      operationId: createProduct
+      summary: Crear un nuevo producto crediticio
+      description: |
+        Crea un nuevo producto crediticio que se sincroniza automáticamente con Azure AI Search 
+        para habilitar búsquedas semánticas y recomendaciones inteligentes.
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductRequest'
+            example:
+              id: "PRESTAMO-PERSONAL-001"
+              name: "Préstamo Personal Elite"
+              description: "Préstamo personal diseñado para clientes con alto poder adquisitivo. Ofrece las mejores tasas del mercado y condiciones preferenciales."
+              category: "PRESTAMO_PERSONAL"
+              subcategory: "ELITE"
+              minimumAmount: 5000.00
+              maximumAmount: 150000.00
+              currency: "S/"
+              term: "12 a 60 meses"
+              minimumRate: 8.50
+              maximumRate: 15.50
+              requirements:
+                - "Ingresos mínimos S/ 8,000 mensuales"
+                - "Antigüedad laboral mínima de 1 año"
+                - "Historial crediticio positivo"
+              features:
+                - "Tasa de interés competitiva"
+                - "Sin comisiones por desembolso"
+                - "Cuotas fijas durante todo el plazo"
+              benefits:
+                - "Acceso a seguros preferenciales"
+                - "Línea de crédito adicional después de 6 meses"
+                - "Asesoría financiera gratuita"
+              active: true
+      responses:
+        '201':
+          description: Producto crediticio creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Datos de creación inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Validation Error"
+                message: "Los datos proporcionados no son válidos"
+                details:
+                  - field: "id"
+                    message: "El ID del producto es obligatorio"
+                  - field: "minimumAmount"
+                    message: "El monto mínimo debe ser mayor a 0"
+        '409':
+          description: Producto con ID duplicado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Product Already Exists"
+                message: "El producto con ID PRESTAMO-PERSONAL-001 ya existe"
         '500':
           description: Error interno del servidor
           content:
@@ -193,7 +254,10 @@ paths:
     post:
       operationId: evaluateClientEligibility
       summary: Evaluar elegibilidad del cliente para productos crediticios
-      description: Evalúa la elegibilidad de un cliente para productos crediticios basado en su perfil financiero
+      description: |
+        Evalúa la elegibilidad de un cliente para productos crediticios usando IA semántica.
+        Utiliza información del cliente almacenada en base de datos y análisis semántico 
+        para proporcionar recomendaciones inteligentes.
       tags:
         - Evaluation
       requestBody:
@@ -205,13 +269,6 @@ paths:
             example:
               identityDocument: "10456789012"
               requestedAmount: 50000
-              requestedCurrency: "S/"
-              category: "Crédito Revolvente"
-              additionalInfo:
-                monthlyIncome: 15000
-                currentDebt: 5000
-                creditScore: 750
-                employmentType: "Dependiente"
       responses:
         '200':
           description: Evaluación completada exitosamente
@@ -226,31 +283,34 @@ paths:
                   riskLevel: "Bajo"
                   approvedAmount: 45000
                   recommendedTerm: "12 meses"
+                  semanticRank: "ORO"
+                  semanticConfidence: 0.85
+                  semanticDescription: "Cliente con perfil estable y alta capacidad de pago"
                 eligibleProducts:
-                  - id: "CRV-PEN-001"
-                    name: "Crédito Revolvente Empresarial"
+                  - id: "PRESTAMO-PERSONAL-001"
+                    name: "Préstamo Personal Elite"
                     approvedAmount: 45000
                     approvedRate: 10.50
                     eligibilityScore: 85
                     recommendation: "Altamente recomendado"
                     conditions:
-                      - "Garantía líquida del 20%"
-                      - "Evaluación crediticia mensual"
-                  - id: "CPE-PEN-003"
-                    name: "Crédito Personal Ejecutivo"
+                      - "Débito automático obligatorio"
+                      - "Seguro de desgravamen incluido"
+                  - id: "CRV-PEN-001"
+                    name: "Crédito Revolvente Empresarial"
                     approvedAmount: 40000
                     approvedRate: 12.00
                     eligibilityScore: 78
                     recommendation: "Recomendado"
                     conditions:
-                      - "Débito automático obligatorio"
-                      - "Seguro de desgravamen incluido"
+                      - "Garantía líquida del 20%"
+                      - "Evaluación crediticia mensual"
                 summary:
                   totalEligibleProducts: 2
                   bestOption:
-                    productId: "CRV-PEN-001"
-                    reason: "Mejor tasa de interés y mayor flexibilidad"
-                  evaluationDate: "2024-11-08T16:30:00Z"
+                    productId: "PRESTAMO-PERSONAL-001"
+                    reason: "Mejor tasa de interés y mayor flexibilidad con análisis semántico favorable"
+                  evaluationDate: "2024-11-08T16:30:00"
         '400':
           description: Datos de evaluación inválidos
           content:
@@ -258,11 +318,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
-                error: "Invalid Evaluation Data"
+                error: "Validation Error"
                 message: "Los datos proporcionados para la evaluación son inválidos"
                 details:
                   - field: "identityDocument"
-                    message: "El documento de identidad debe tener 11 dígitos para RUC"
+                    message: "El documento de identidad debe tener entre 8 y 11 caracteres"
                   - field: "requestedAmount"
                     message: "El monto solicitado debe ser mayor a 0"
         '500':
@@ -280,35 +340,42 @@ components:
         id:
           type: string
           description: ID único del producto crediticio
-          example: "CRV-PEN-001"
+          maxLength: 20
+          example: "PRESTAMO-PERSONAL-001"
         name:
           type: string
           description: Nombre comercial del producto
-          example: "Crédito Revolvente Empresarial"
+          maxLength: 100
+          example: "Préstamo Personal Elite"
         description:
           type: string
           description: Descripción detallada del producto
-          example: "Línea de crédito revolvente para empresas que necesitan capital de trabajo flexible."
+          maxLength: 1000
+          example: "Préstamo personal diseñado para clientes con alto poder adquisitivo. Ofrece las mejores tasas del mercado y condiciones preferenciales."
         category:
           type: string
           description: Categoría principal del producto
-          example: "Crédito Revolvente"
+          maxLength: 50
+          example: "PRESTAMO_PERSONAL"
         subcategory:
           type: string
           description: Subcategoría específica del producto
-          example: "Crédito Revolvente Capital Trabajo"
+          maxLength: 100
+          example: "ELITE"
         minimumAmount:
           type: number
-          format: float
+          format: decimal
           description: Monto mínimo del crédito
           minimum: 0
-          example: 20000
+          multipleOf: 0.01
+          example: 5000.00
         maximumAmount:
           type: number
-          format: float
+          format: decimal
           description: Monto máximo del crédito
           minimum: 0
-          example: 300000
+          multipleOf: 0.01
+          example: 150000.00
         currency:
           type: string
           description: Moneda del crédito
@@ -317,43 +384,54 @@ components:
         term:
           type: string
           description: Plazo del crédito
-          example: "12 meses renovables"
+          maxLength: 50
+          example: "12 a 60 meses"
         minimumRate:
           type: number
-          format: float
+          format: decimal
           description: Tasa de interés mínima anual
           minimum: 0
-          example: 9.00
+          maximum: 100
+          multipleOf: 0.01
+          example: 8.50
         maximumRate:
           type: number
-          format: float
+          format: decimal
           description: Tasa de interés máxima anual
           minimum: 0
-          example: 14.00
+          maximum: 100
+          multipleOf: 0.01
+          example: 15.50
         requirements:
           type: array
           items:
             type: string
+          minItems: 1
           description: Lista de requisitos para acceder al producto
           example:
-            - "RUC vigente"
-            - "Estados financieros de los últimos 2 años"
+            - "Ingresos mínimos S/ 8,000 mensuales"
+            - "Antigüedad laboral mínima de 1 año"
+            - "Historial crediticio positivo"
         features:
           type: array
           items:
             type: string
+          minItems: 1
           description: Características principales del producto
           example:
-            - "Disposiciones parciales"
-            - "Pagos flexibles"
+            - "Tasa de interés competitiva"
+            - "Sin comisiones por desembolso"
+            - "Cuotas fijas durante todo el plazo"
         benefits:
           type: array
           items:
             type: string
+          minItems: 1
           description: Beneficios del producto
           example:
-            - "Capital de trabajo inmediato"
-            - "Flexibilidad en el uso de fondos"
+            - "Acceso a seguros preferenciales"
+            - "Línea de crédito adicional después de 6 meses"
+            - "Asesoría financiera gratuita"
       required:
         - id
         - name
@@ -367,6 +445,128 @@ components:
         - minimumRate
         - maximumRate
         - requirements
+        - features
+        - benefits
+
+    CreateProductRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID único del producto crediticio
+          maxLength: 20
+          pattern: '^[A-Za-z0-9_-]+$'
+          example: "PRESTAMO-PERSONAL-001"
+        name:
+          type: string
+          description: Nombre comercial del producto
+          maxLength: 100
+          example: "Préstamo Personal Elite"
+        description:
+          type: string
+          description: Descripción detallada del producto
+          maxLength: 1000
+          example: "Préstamo personal diseñado para clientes con alto poder adquisitivo."
+        category:
+          type: string
+          description: Categoría principal del producto
+          maxLength: 50
+          example: "PRESTAMO_PERSONAL"
+        subcategory:
+          type: string
+          description: Subcategoría específica del producto
+          maxLength: 100
+          example: "ELITE"
+        minimumAmount:
+          type: number
+          format: decimal
+          description: Monto mínimo del crédito
+          minimum: 0.01
+          multipleOf: 0.01
+          example: 5000.00
+        maximumAmount:
+          type: number
+          format: decimal
+          description: Monto máximo del crédito (debe ser mayor al mínimo)
+          minimum: 0.01
+          multipleOf: 0.01
+          example: 150000.00
+        currency:
+          type: string
+          description: Moneda del crédito
+          enum: ["S/", "USD"]
+          example: "S/"
+        term:
+          type: string
+          description: Plazo del crédito
+          maxLength: 50
+          example: "12 a 60 meses"
+        minimumRate:
+          type: number
+          format: decimal
+          description: Tasa de interés mínima anual
+          minimum: 0
+          maximum: 100
+          multipleOf: 0.01
+          example: 8.50
+        maximumRate:
+          type: number
+          format: decimal
+          description: Tasa de interés máxima anual (debe ser mayor o igual al mínimo)
+          minimum: 0
+          maximum: 100
+          multipleOf: 0.01
+          example: 15.50
+        requirements:
+          type: array
+          items:
+            type: string
+            minLength: 1
+          minItems: 1
+          description: Lista de requisitos para acceder al producto
+          example:
+            - "Ingresos mínimos S/ 8,000 mensuales"
+            - "Antigüedad laboral mínima de 1 año"
+        features:
+          type: array
+          items:
+            type: string
+            minLength: 1
+          minItems: 1
+          description: Características principales del producto
+          example:
+            - "Tasa de interés competitiva"
+            - "Sin comisiones por desembolso"
+        benefits:
+          type: array
+          items:
+            type: string
+            minLength: 1
+          minItems: 1
+          description: Beneficios del producto
+          example:
+            - "Acceso a seguros preferenciales"
+            - "Línea de crédito adicional"
+        active:
+          type: boolean
+          description: Estado del producto (activo/inactivo)
+          default: true
+          example: true
+      required:
+        - id
+        - name
+        - description
+        - category
+        - subcategory
+        - minimumAmount
+        - maximumAmount
+        - currency
+        - term
+        - minimumRate
+        - maximumRate
+        - requirements
+        - features
+        - benefits
 
     ProductListResponse:
       type: object
@@ -393,121 +593,123 @@ components:
 
     EvaluationRequest:
       type: object
+      description: |
+        Solicitud simplificada de evaluación crediticia. 
+        Solo requiere identificación del cliente y monto solicitado.
+        La información adicional del cliente se obtiene automáticamente de la base de datos.
       properties:
         identityDocument:
           type: string
           description: Documento de identidad del cliente (DNI o RUC)
           minLength: 8
           maxLength: 11
+          pattern: '^[0-9]+$'
           example: "10456789012"
         requestedAmount:
           type: number
-          format: float
+          format: decimal
           description: Monto solicitado para el crédito
           minimum: 1
-          example: 50000
-        requestedCurrency:
-          type: string
-          description: Moneda solicitada
-          enum: ["S/", "USD"]
-          example: "S/"
-        category:
-          type: string
-          description: Categoría de producto crediticio de interés
-          example: "Crédito Revolvente"
-        additionalInfo:
-          type: object
-          description: Información adicional del cliente para mejor evaluación
-          properties:
-            monthlyIncome:
-              type: number
-              format: float
-              description: Ingreso mensual del cliente
-              example: 15000
-            currentDebt:
-              type: number
-              format: float
-              description: Deuda actual total del cliente
-              example: 5000
-            creditScore:
-              type: integer
-              description: Score crediticio del cliente
-              minimum: 300
-              maximum: 850
-              example: 750
-            employmentType:
-              type: string
-              description: Tipo de empleo del cliente
-              enum: ["Dependiente", "Independiente", "Empresario"]
-              example: "Dependiente"
+          multipleOf: 0.01
+          example: 50000.00
       required:
         - identityDocument
         - requestedAmount
-        - requestedCurrency
 
     EvaluationResponse:
       type: object
+      description: Respuesta de evaluación crediticia con análisis semántico e IA
       properties:
         clientProfile:
           type: object
+          description: Perfil del cliente con análisis semántico
           properties:
             identityDocument:
               type: string
               example: "10456789012"
             creditScore:
               type: integer
+              description: Score crediticio del cliente
+              minimum: 300
+              maximum: 850
               example: 750
             riskLevel:
               type: string
+              description: Nivel de riesgo evaluado
               enum: ["Bajo", "Medio", "Alto"]
               example: "Bajo"
             approvedAmount:
               type: number
-              format: float
-              example: 45000
+              format: decimal
+              description: Monto aprobado basado en capacidad de pago
+              example: 45000.00
             recommendedTerm:
               type: string
+              description: Plazo recomendado para el crédito
               example: "12 meses"
+            semanticRank:
+              type: string
+              description: Clasificación semántica del cliente usando IA
+              enum: ["BRONCE", "PLATA", "ORO", "PLATINO", "PREMIUM"]
+              example: "ORO"
+            semanticConfidence:
+              type: number
+              format: decimal
+              description: Nivel de confianza del análisis semántico (0.0 - 1.0)
+              minimum: 0
+              maximum: 1
+              example: 0.85
+            semanticDescription:
+              type: string
+              description: Descripción generada por IA del perfil del cliente
+              example: "Cliente con perfil estable y alta capacidad de pago"
           required:
             - identityDocument
             - creditScore
             - riskLevel
             - approvedAmount
+            - semanticRank
+            - semanticConfidence
         eligibleProducts:
           type: array
+          description: Productos crediticios elegibles para el cliente
           items:
             type: object
             properties:
               id:
                 type: string
-                example: "CRV-PEN-001"
+                example: "PRESTAMO-PERSONAL-001"
               name:
                 type: string
-                example: "Crédito Revolvente Empresarial"
+                example: "Préstamo Personal Elite"
               approvedAmount:
                 type: number
-                format: float
-                example: 45000
+                format: decimal
+                example: 45000.00
               approvedRate:
                 type: number
-                format: float
+                format: decimal
+                description: Tasa de interés aprobada específica para el cliente
                 example: 10.50
               eligibilityScore:
                 type: integer
+                description: Puntuación de elegibilidad (0-100)
                 minimum: 0
                 maximum: 100
                 example: 85
               recommendation:
                 type: string
+                description: Nivel de recomendación del producto
                 enum: ["Altamente recomendado", "Recomendado", "No recomendado"]
                 example: "Altamente recomendado"
               conditions:
                 type: array
                 items:
                   type: string
+                description: Condiciones específicas para este cliente
                 example:
-                  - "Garantía líquida del 20%"
-                  - "Evaluación crediticia mensual"
+                  - "Débito automático obligatorio"
+                  - "Seguro de desgravamen incluido"
             required:
               - id
               - name
@@ -517,26 +719,31 @@ components:
               - recommendation
         summary:
           type: object
+          description: Resumen de la evaluación
           properties:
             totalEligibleProducts:
               type: integer
+              description: Número total de productos elegibles
               example: 2
             bestOption:
               type: object
+              description: Mejor opción recomendada
               properties:
                 productId:
                   type: string
-                  example: "CRV-PEN-001"
+                  example: "PRESTAMO-PERSONAL-001"
                 reason:
                   type: string
-                  example: "Mejor tasa de interés y mayor flexibilidad"
+                  description: Razón por la cual es la mejor opción (incluye análisis semántico)
+                  example: "Mejor tasa de interés y mayor flexibilidad con análisis semántico favorable"
               required:
                 - productId
                 - reason
             evaluationDate:
               type: string
               format: date-time
-              example: "2024-11-08T16:30:00Z"
+              description: Fecha y hora de la evaluación
+              example: "2024-11-08T16:30:00"
           required:
             - totalEligibleProducts
             - evaluationDate
@@ -547,17 +754,19 @@ components:
 
     ErrorResponse:
       type: object
+      description: Respuesta estructurada de error con detalles específicos
       properties:
         error:
           type: string
-          description: Tipo de error
+          description: Tipo o categoría del error
           example: "Validation Error"
         message:
           type: string
-          description: Mensaje descriptivo del error
+          description: Mensaje descriptivo del error en español
           example: "Los datos proporcionados no son válidos"
         details:
           type: array
+          description: Lista de errores específicos por campo (opcional)
           items:
             type: object
             properties:
@@ -567,13 +776,23 @@ components:
                 example: "requestedAmount"
               message:
                 type: string
-                description: Mensaje específico del campo
+                description: Mensaje específico del error en el campo
                 example: "El monto solicitado debe ser mayor a 0"
+            required:
+              - field
+              - message
       required:
         - error
         - message
+
 tags:
   - name: Products
-    description: Operaciones para la gestión de productos crediticios
+    description: |
+      Operaciones para la gestión completa de productos crediticios.
+      Incluye creación, consulta y sincronización automática con Azure AI Search 
+      para capacidades de búsqueda semántica.
   - name: Evaluation
-    description: Operaciones para la evaluación de elegibilidad crediticia
+    description: |
+      Operaciones para la evaluación inteligente de elegibilidad crediticia.
+      Utiliza IA semántica y análisis de perfil para proporcionar 
+      recomendaciones personalizadas de productos crediticios.

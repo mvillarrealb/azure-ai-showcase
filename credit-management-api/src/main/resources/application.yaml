@@ -43,8 +43,8 @@ management:
         enabled: true
 azure:
   openai:
-    endpoint: ${OPEN_API_ENDPOINT}
-    key: ${OPEN_API_KEY}
+    endpoint: ${OPEN_AI_ENDPOINT}
+    key: ${OPEN_AI_KEY}
     embedding-model: text-embedding-3-small
   search:
     endpoint: ${AI_SEARCH_ENDPOINT}

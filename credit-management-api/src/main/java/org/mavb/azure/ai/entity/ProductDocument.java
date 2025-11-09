@@ -60,6 +60,6 @@ public class ProductDocument {
     @SearchableField
     private List<String> allowedRanks;
 
-    @SearchableField(vectorSearchDimensions = 1536, vectorSearchConfiguration = "vector-config")
+    @SearchableField(vectorSearchDimensions = 1536, vectorSearchProfileName = "vector-config")
     private List<Float> embedding;
 }

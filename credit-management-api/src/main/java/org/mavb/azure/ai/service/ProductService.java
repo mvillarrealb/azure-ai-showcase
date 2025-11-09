@@ -1,5 +1,6 @@
 package org.mavb.azure.ai.service;
 
+import org.mavb.azure.ai.dto.request.CreateProductDTO;
 import org.mavb.azure.ai.dto.request.ProductFilterDTO;
 import org.mavb.azure.ai.dto.response.ProductDTO;
 import org.mavb.azure.ai.dto.response.ProductListResponseDTO;
@@ -28,4 +29,14 @@ public interface ProductService {
      * @throws org.mavb.azure.ai.exception.ProductNotFoundException if product not found
      */
     ProductDTO getProductById(String productId);
+
+    /**
+     * Create a new credit product.
+     * The product will be automatically synchronized with Azure AI Search.
+     *
+     * @param createProductDTO Product creation data
+     * @return Created product details
+     * @throws org.mavb.azure.ai.exception.ProductAlreadyExistsException if product ID already exists
+     */
+    ProductDTO createProduct(CreateProductDTO createProductDTO);
 }

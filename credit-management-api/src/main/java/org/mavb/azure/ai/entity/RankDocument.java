@@ -20,6 +20,6 @@ public class RankDocument {
     @SearchableField
     private String description; // texto en español, semántico
 
-    @SearchableField(vectorSearchDimensions = 1536, vectorSearchConfiguration = "vector-config")
+    @SearchableField(vectorSearchDimensions = 1536, vectorSearchProfileName = "vector-config")
     private List<Float> embedding;
 }

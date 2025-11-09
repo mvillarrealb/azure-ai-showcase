@@ -52,6 +52,15 @@ public class EvaluationResponseDTO {
 
         @JsonProperty("recommendedTerm")
         private String recommendedTerm;
+
+        @JsonProperty("semanticRank")
+        private String semanticRank;
+
+        @JsonProperty("semanticConfidence")
+        private Double semanticConfidence;
+
+        @JsonProperty("semanticDescription")
+        private String semanticDescription;
     }
 
     /**
