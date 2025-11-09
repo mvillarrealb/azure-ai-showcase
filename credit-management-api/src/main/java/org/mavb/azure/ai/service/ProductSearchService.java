@@ -158,18 +158,34 @@ public class ProductSearchService {
      */
     private List<Float> generateEmbeddings(String text) {
         try {
+            log.debug("Generating embeddings for search text");
+            
+            // Validate text input
+            if (text == null || text.trim().isEmpty()) {
+                text = "Financial product search query";
+            }
+            
+            // Create options with proper user field
+            EmbeddingsOptions options = new EmbeddingsOptions(List.of(text.trim()));
+            options.setUser("credit-management-system");
+            
+            log.debug("Calling Azure OpenAI for embeddings with model: {}", azureProperties.getOpenai().getEmbeddingModel());
+            
             Embeddings embeddings = openAIClient.getEmbeddings(
                     azureProperties.getOpenai().getEmbeddingModel(),
-                    new EmbeddingsOptions(List.of(text))
+                    options
             );
 
-            return embeddings.getData().get(0).getEmbedding()
+            List<Float> embeddingVector = embeddings.getData().get(0).getEmbedding()
                     .stream()
                     .map(Double::floatValue)
                     .collect(Collectors.toList());
+            
+            log.debug("Generated embeddings vector with {} dimensions", embeddingVector.size());
+            return embeddingVector;
 
         } catch (Exception e) {
-            log.error("Error generating embeddings for search text: {}", e.getMessage());
+            log.error("Error generating embeddings for search text: {}", e.getMessage(), e);
             return List.of();
         }
     }

@@ -16,13 +16,17 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class RankService {
 
     private final OpenAIClient openAI;
-    @Qualifier("rankSearchClient")
     private final SearchClient rankSearch;
     private final AzureProperties azure;
+
+    public RankService(OpenAIClient openAI, @Qualifier("rankSearchClient") SearchClient rankSearch, AzureProperties azure) {
+        this.openAI = openAI;
+        this.rankSearch = rankSearch;
+        this.azure = azure;
+    }
 
     public RankDocument resolveRank(String clientDescription) {
         Embeddings emb = openAI.getEmbeddings(

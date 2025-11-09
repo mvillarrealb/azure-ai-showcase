@@ -15,13 +15,17 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class ProductService {
 
     private final OpenAIClient openAI;
-    @Qualifier("productSearchClient")
     private final SearchClient productSearch;
     private final AzureProperties azure;
+
+    public ProductService(OpenAIClient openAI, @Qualifier("productSearchClient") SearchClient productSearch, AzureProperties azure) {
+        this.openAI = openAI;
+        this.productSearch = productSearch;
+        this.azure = azure;
+    }
 
     public List<ProductDocument> searchProducts(String rank, String contextText) {
         Embeddings emb = openAI.getEmbeddings(

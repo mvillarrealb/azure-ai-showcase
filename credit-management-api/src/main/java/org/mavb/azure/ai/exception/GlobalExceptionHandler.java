@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.reactive.resource.NoResourceFoundException;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -167,11 +168,30 @@ public class GlobalExceptionHandler {
 
     /**
      * Handle generic exceptions.
-     * Catch-all handler for unexpected exceptions.
+     * Catch-all handler for application-level exceptions only, not Spring framework exceptions.
+     * Spring WebFlux exceptions are excluded to let Spring handle them naturally.
      */
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponseDTO> handleGenericException(Exception ex) {
-        log.error("Unexpected error occurred: {}", ex.getMessage(), ex);
+    @ExceptionHandler({
+        RuntimeException.class,
+        IllegalArgumentException.class,
+        IllegalStateException.class,
+        NullPointerException.class
+    })
+    public ResponseEntity<ErrorResponseDTO> handleApplicationExceptions(Exception ex) {
+        // Skip Spring framework exceptions
+        String className = ex.getClass().getName();
+        if (className.startsWith("org.springframework.web.reactive") ||
+            className.startsWith("org.springframework.web.server") ||
+            ex instanceof NoResourceFoundException) {
+            log.debug("Skipping Spring framework exception: {} - {}", className, ex.getMessage());
+            // Re-throw to let Spring handle it
+            if (ex instanceof RuntimeException) {
+                throw (RuntimeException) ex;
+            }
+            throw new RuntimeException(ex);
+        }
+        
+        log.error("Application error occurred: {}", ex.getMessage(), ex);
 
         ErrorResponseDTO error = ErrorResponseDTO.builder()
                 .error("Internal Server Error")

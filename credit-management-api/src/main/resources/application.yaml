@@ -45,7 +45,7 @@ azure:
   openai:
     endpoint: ${OPEN_AI_ENDPOINT}
     key: ${OPEN_AI_KEY}
-    embedding-model: text-embedding-3-small
+    embedding-model: ${OPEN_AI_EMBEDDING_MODEL:text-embedding-3-small}
   search:
     endpoint: ${AI_SEARCH_ENDPOINT}
     key: ${AI_SEARCH_KEY}

@@ -44,9 +44,9 @@ databaseChangeLog:
         sql: "DELETE FROM employment_history WHERE customer_id IN (SELECT id FROM customers WHERE identity_document LIKE 'EMP%');"
         
   - changeSet:
-      id: v_1_2_0
+      id: v_1_2_0_fixed
       author: "Marco Villarreal"
-      comment: "Limpieza de campos no utilizados - eliminación de credit_score, employment_type, risk_level"
+      comment: "Limpieza de campos no utilizados - eliminación segura de credit_score, employment_type, risk_level"
       sqlFile:
         encoding: utf8
         stripComments: true

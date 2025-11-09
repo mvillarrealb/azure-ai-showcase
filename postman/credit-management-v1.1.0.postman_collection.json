@@ -234,6 +234,197 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Ranks",
+      "description": "Gestión de clasificaciones y rangos en Azure AI Search para análisis semántico",
+      "item": [
+        {
+          "name": "POST Cargar clasificación individual",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"ORO\",\n  \"name\": \"ORO\",\n  \"description\": \"Cliente premium con ingresos sólidos entre S/6,000 - S/12,000 mensuales. Profesional universitario, ejecutivo medio, empresario con negocio establecido 3+ años. Excelente historial crediticio con diversas operaciones exitosas. Antigüedad laboral superior a 3 años o negocio consolidado. Cuenta con ahorros significativos, inversiones, propiedades menores. Ingeniero, médico, abogado, gerente, empresario mediano. Accede a préstamos personales elite, créditos hipotecarios, vehiculares premium, tarjetas platinum, líneas de crédito. Montos hasta S/200,000. Tasas competitivas, sin comisiones, cuotas flexibles. Garantías hipotecarias o patrimoniales. Perfil de bajo riesgo con excelente capacidad de pago y patrimonio en crecimiento.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ranks/upload",
+              "host": ["{{baseUrl}}"],
+              "path": ["ranks", "upload"]
+            },
+            "description": "Carga una clasificación individual directamente al índice de Azure AI Search para análisis semántico.\n\nTipos de ranks disponibles:\n• BASE: Clientes iniciales (S/800-1,500)\n• BRONCE: Clientes estables (S/1,500-3,000)\n• PLATA: Clientes consolidados (S/3,000-6,000)\n• ORO: Clientes premium (S/6,000-12,000)\n• PLATINO: Alto valor (S/12,000-30,000)\n• PREMIUM: Muy alto patrimonio (S/30,000+)\n• EXCLUSIVE: Ultra-high-net-worth\n• BUSINESS: Entidades corporativas"
+          },
+          "response": [
+            {
+              "name": "201 Created - Clasificación cargada",
+              "originalRequest": {
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"RANK-PREMIUM-001\",\n  \"name\": \"Clasificación Premium\",\n  \"description\": \"Clasificación para productos crediticios premium\"\n}"
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"message\": \"Rank uploaded successfully\",\n  \"rankId\": \"ORO\",\n  \"rankName\": \"ORO\"\n}"
+            },
+            {
+              "name": "400 Bad Request - Datos inválidos",
+              "originalRequest": {
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"\",\n  \"name\": \"Clasificación Premium\"\n}"
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": false,\n  \"message\": \"Missing required fields: id, name, description\"\n}"
+            },
+            {
+              "name": "500 Internal Server Error",
+              "originalRequest": {
+                "method": "POST"
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": false,\n  \"message\": \"Error uploading rank: Azure AI Search connection failed\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 or error status\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400, 500]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    pm.test(\"Rank uploaded successfully\", function () {",
+                  "        pm.response.to.be.json;",
+                  "        const jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('success', true);",
+                  "        pm.expect(jsonData).to.have.property('rankId');",
+                  "        pm.expect(jsonData).to.have.property('rankName');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Cargar clasificaciones en lote",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ranks\": [\n    {\n      \"id\": \"BASE\",\n      \"name\": \"BASE\",\n      \"description\": \"Perfil cliente inicial con ingresos limitados entre S/800 - S/1,500 mensuales. Trabajador dependiente con contrato temporal o independiente informal. Historial crediticio inexistente o muy básico. Requiere productos microfinancieros, tarjetas prepago, cuentas básicas. Montos máximos hasta S/5,000.\"\n    },\n    {\n      \"id\": \"PLATA\",\n      \"name\": \"PLATA\",\n      \"description\": \"Cliente consolidado con ingresos estables entre S/3,000 - S/6,000 mensuales. Empleado con antigüedad laboral 1-3 años en empresa formal. Historial crediticio favorable con operaciones diversificadas. Accede a préstamos personales amplios, créditos vehiculares. Montos hasta S/80,000.\"\n    },\n    {\n      \"id\": \"BUSINESS\",\n      \"name\": \"BUSINESS\",\n      \"description\": \"Entidad empresarial corporativa con facturación anual entre S/1,000,000 - S/50,000,000. Empresa establecida con 5+ años operando, estados financieros auditados. Necesidades de capital de trabajo, líneas de crédito revolventes, factoring, confirming, leasing. Montos hasta S/10,000,000.\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ranks/upload-batch",
+              "host": ["{{baseUrl}}"],
+              "path": ["ranks", "upload-batch"]
+            },
+            "description": "Carga múltiples clasificaciones en lote al índice de Azure AI Search para optimizar el análisis semántico.\n\nEste endpoint permite cargar hasta 100 clasificaciones simultáneamente, ideal para:\n• Inicialización masiva del sistema\n• Actualización de múltiples perfiles de cliente\n• Sincronización de datos desde sistemas legacy\n• Migración de clasificaciones existentes\n\nCada clasificación debe incluir id, name y description completos para el análisis semántico."
+          },
+          "response": [
+            {
+              "name": "201 Created - Lote cargado exitosamente",
+              "originalRequest": {
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ranks\": [\n    {\n      \"id\": \"PLATINO\",\n      \"name\": \"PLATINO\",\n      \"description\": \"Cliente de alto valor con ingresos elevados entre S/12,000 - S/30,000 mensuales. Alto ejecutivo, profesional especializado, empresario exitoso con múltiples negocios.\"\n    },\n    {\n      \"id\": \"PREMIUM\",\n      \"name\": \"PREMIUM\",\n      \"description\": \"Cliente de muy alto patrimonio con ingresos excepcionales superiores a S/30,000 mensuales. CEO, empresario multinacional, inversionista profesional.\"\n    }\n  ]\n}"
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"message\": \"Batch upload completed\",\n  \"totalRanks\": 3,\n  \"successfulUploads\": 3,\n  \"failedUploads\": 0\n}"
+            },
+            {
+              "name": "201 Created - Lote parcialmente exitoso",
+              "originalRequest": {
+                "method": "POST"
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"message\": \"Batch upload completed\",\n  \"totalRanks\": 3,\n  \"successfulUploads\": 2,\n  \"failedUploads\": 1\n}"
+            },
+            {
+              "name": "400 Bad Request - Sin clasificaciones",
+              "originalRequest": {
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ranks\": []\n}"
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": false,\n  \"message\": \"No ranks provided\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 or error status\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400, 500]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    pm.test(\"Batch upload response structure\", function () {",
+                  "        pm.response.to.be.json;",
+                  "        const jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('success', true);",
+                  "        pm.expect(jsonData).to.have.property('totalRanks');",
+                  "        pm.expect(jsonData).to.have.property('successfulUploads');",
+                  "        pm.expect(jsonData).to.have.property('failedUploads');",
+                  "        ",
+                  "        // Validate that totalRanks equals successful + failed uploads",
+                  "        const total = jsonData.totalRanks;",
+                  "        const successful = jsonData.successfulUploads;",
+                  "        const failed = jsonData.failedUploads;",
+                  "        pm.expect(total).to.equal(successful + failed);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }

@@ -332,6 +332,93 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /ranks/upload:
+    post:
+      operationId: uploadRank
+      summary: Cargar clasificación individual a Azure AI Search
+      description: |
+        Carga una clasificación individual directamente al índice de Azure AI Search.
+        Este endpoint permite subir información de rangos/clasificaciones que se utilizan
+        para análisis semántico y categorización de productos crediticios.
+      tags:
+        - Ranks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RankUploadRequest'
+            example:
+              id: "PLATA"
+              name: "PLATA"
+              description: "Cliente consolidado con ingresos estables entre S/3,000 - S/6,000 mensuales. Empleado con antigüedad laboral 1-3 años en empresa formal o independiente con negocio registrado. Historial crediticio favorable con operaciones diversificadas. Cuenta con ahorros, posible CTS, algunas inversiones menores. Accede a préstamos personales amplios, créditos vehiculares, tarjetas de crédito gold, financiamiento de vivienda inicial. Montos hasta S/80,000."
+      responses:
+        '201':
+          description: Clasificación cargada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RankUploadResponse'
+        '400':
+          description: Datos de clasificación inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Error interno del servidor durante la carga
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /ranks/upload-batch:
+    post:
+      operationId: uploadRanksBatch
+      summary: Cargar clasificaciones en lote a Azure AI Search
+      description: |
+        Carga múltiples clasificaciones en lote al índice de Azure AI Search.
+        Optimizado para cargas masivas de datos de clasificación que mejoran
+        las capacidades de búsqueda semántica del sistema.
+      tags:
+        - Ranks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RankBatchUploadRequest'
+            example:
+              ranks:
+                - id: "BASE"
+                  name: "BASE"
+                  description: "Perfil cliente inicial con ingresos limitados entre S/800 - S/1,500 mensuales"
+                - id: "BRONCE"
+                  name: "BRONCE"
+                  description: "Cliente estable con ingresos consolidados entre S/1,500 - S/3,000 mensuales"
+                - id: "BUSINESS"
+                  name: "BUSINESS"
+                  description: "Entidad empresarial corporativa con facturación anual entre S/1,000,000 - S/50,000,000"
+      responses:
+        '201':
+          description: Lote de clasificaciones cargado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RankBatchUploadResponse'
+        '400':
+          description: Datos de lote inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Error interno del servidor durante la carga en lote
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   schemas:
     Product:
@@ -785,6 +872,121 @@ components:
         - error
         - message
 
+    RankUploadRequest:
+      type: object
+      description: Solicitud para cargar una clasificación individual a Azure AI Search
+      properties:
+        id:
+          type: string
+          description: ID único de la clasificación
+          maxLength: 20
+          pattern: '^[A-Za-z0-9_-]+$'
+          example: "ORO"
+        name:
+          type: string
+          description: Nombre de la clasificación
+          maxLength: 100
+          example: "ORO"
+        description:
+          type: string
+          description: Descripción detallada de la clasificación
+          maxLength: 500
+          example: "Cliente premium con ingresos sólidos entre S/6,000 - S/12,000 mensuales. Profesional universitario, ejecutivo medio, empresario con negocio establecido 3+ años."
+      required:
+        - id
+        - name
+        - description
+
+    RankBatchUploadRequest:
+      type: object
+      description: Solicitud para cargar múltiples clasificaciones en lote
+      properties:
+        ranks:
+          type: array
+          description: Array de clasificaciones a cargar
+          minItems: 1
+          maxItems: 100
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: ID único de la clasificación
+                maxLength: 20
+                pattern: '^[A-Za-z0-9_-]+$'
+              name:
+                type: string
+                description: Nombre de la clasificación
+                maxLength: 100
+              description:
+                type: string
+                description: Descripción de la clasificación
+                maxLength: 500
+            required:
+              - id
+              - name
+              - description
+      required:
+        - ranks
+
+    RankUploadResponse:
+      type: object
+      description: Respuesta de carga individual de clasificación
+      properties:
+        success:
+          type: boolean
+          description: Indica si la carga fue exitosa
+          example: true
+        message:
+          type: string
+          description: Mensaje descriptivo del resultado
+          example: "Rank uploaded successfully"
+        rankId:
+          type: string
+          description: ID de la clasificación cargada
+          example: "ORO"
+        rankName:
+          type: string
+          description: Nombre de la clasificación cargada
+          example: "ORO"
+      required:
+        - success
+        - message
+
+    RankBatchUploadResponse:
+      type: object
+      description: Respuesta de carga en lote de clasificaciones
+      properties:
+        success:
+          type: boolean
+          description: Indica si el lote fue procesado exitosamente
+          example: true
+        message:
+          type: string
+          description: Mensaje descriptivo del resultado
+          example: "Batch upload completed"
+        totalRanks:
+          type: integer
+          description: Total de clasificaciones en el lote
+          minimum: 0
+          example: 10
+        successfulUploads:
+          type: integer
+          description: Número de cargas exitosas
+          minimum: 0
+          example: 8
+        failedUploads:
+          type: integer
+          description: Número de cargas fallidas
+          minimum: 0
+          example: 2
+      required:
+        - success
+        - message
+        - totalRanks
+        - successfulUploads
+        - failedUploads
+
 tags:
   - name: Products
     description: |
@@ -796,3 +998,8 @@ tags:
       Operaciones para la evaluación inteligente de elegibilidad crediticia.
       Utiliza IA semántica y análisis de perfil para proporcionar 
       recomendaciones personalizadas de productos crediticios.
+  - name: Ranks
+    description: |
+      Operaciones para la gestión de clasificaciones y rangos en Azure AI Search.
+      Permite cargar y sincronizar datos de clasificación que mejoran las capacidades
+      de búsqueda semántica y análisis de productos crediticios.
