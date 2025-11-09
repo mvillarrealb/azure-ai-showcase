@@ -19,13 +19,9 @@ import { environment } from '../../../../environments/environment';
   providedIn: 'root'
 })
 export class CreditManagementService {
-  private readonly baseUrl = `${environment.apiUrl}`;
+  private readonly baseUrl = `${environment.creditManagement}`;
 
   constructor(private http: HttpClient) {}
-
-  // ========================================
-  // PRODUCTOS CREDITICIOS
-  // ========================================
 
   /**
    * Obtener lista de productos crediticios con filtros opcionales
@@ -64,20 +60,12 @@ export class CreditManagementService {
     return this.http.post<Product>(`${this.baseUrl}/products`, product);
   }
 
-  // ========================================
-  // EVALUACIÓN CREDITICIA
-  // ========================================
-
   /**
    * Evaluar elegibilidad del cliente para productos crediticios
    */
   evaluateClientEligibility(request: EvaluationRequest): Observable<EvaluationResponse> {
     return this.http.post<EvaluationResponse>(`${this.baseUrl}/products/evaluate`, request);
   }
-
-  // ========================================
-  // GESTIÓN DE RANGOS
-  // ========================================
 
   /**
    * Cargar una clasificación individual a Azure AI Search
@@ -92,10 +80,6 @@ export class CreditManagementService {
   uploadRanksBatch(request: RankBatchUploadRequest): Observable<RankBatchUploadResponse> {
     return this.http.post<RankBatchUploadResponse>(`${this.baseUrl}/ranks/upload-batch`, request);
   }
-
-  // ========================================
-  // MÉTODOS AUXILIARES PARA EL FRONTEND
-  // ========================================
 
   /**
    * Obtener categorías de productos disponibles

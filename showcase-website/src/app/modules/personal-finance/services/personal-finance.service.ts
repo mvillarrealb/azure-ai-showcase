@@ -16,7 +16,7 @@ import {
 })
 export class PersonalFinanceService {
   private http = inject(HttpClient);
-  private baseUrl = `${environment.apiUrl}`;
+  private baseUrl = `${environment.personalFinance}`;
 
   /**
    * GET /categories
@@ -53,7 +53,27 @@ export class PersonalFinanceService {
    * Crear una nueva transacción
    */
   createTransaction(transaction: TransactionCreate): Observable<Transaction> {
-    return this.http.post<Transaction>(`${this.baseUrl}/transactions`, transaction);
+    // Procesar la fecha para asegurar formato ISO con timestamp
+    const processedTransaction = { ...transaction };
+    
+    if (processedTransaction.date) {
+      // Si la fecha no incluye hora, agregar hora arbitraria (12:00:00)
+      const date = new Date(processedTransaction.date);
+      
+      // Verificar si la fecha ya incluye hora específica
+      const dateString = processedTransaction.date;
+      const hasTime = dateString.includes('T') && dateString.includes(':');
+      
+      if (!hasTime) {
+        // Si solo es fecha (YYYY-MM-DD), agregar hora arbitraria
+        date.setHours(12, 0, 0, 0); // 12:00:00 PM
+      }
+      
+      // Convertir a ISO string con zona horaria
+      processedTransaction.date = date.toISOString();
+    }
+    
+    return this.http.post<Transaction>(`${this.baseUrl}/transactions`, processedTransaction);
   }
 
   /**

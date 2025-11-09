@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
  * Controlador para operaciones de transacciones según tag "Transacciones" del OpenAPI
  */
 @RestController
-@RequestMapping("/transactions")
 @RequiredArgsConstructor
 @Slf4j
 @Validated

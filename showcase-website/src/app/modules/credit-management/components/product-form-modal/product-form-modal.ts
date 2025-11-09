@@ -176,10 +176,6 @@ export class ProductFormModalComponent {
     this.availableSubcategories = [];
   }
 
-  // ========================================
-  // MÉTODOS PARA MANEJAR LISTAS DINÁMICAS
-  // ========================================
-
   addRequirement(): void {
     this.formData.requirements.push('');
   }

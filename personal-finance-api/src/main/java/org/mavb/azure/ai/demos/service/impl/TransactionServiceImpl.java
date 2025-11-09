@@ -110,7 +110,7 @@ public class TransactionServiceImpl implements TransactionService {
      * Construye la especificación de consulta basada en los filtros
      */
     private Specification<Transaction> buildSpecification(TransactionFilterDto filter) {
-        Specification<Transaction> spec = Specification.where(null);
+        Specification<Transaction> spec = Specification.where(TransactionSpecifications.fetchCategory());
         
         if (filter.getCategoryId() != null && !filter.getCategoryId().trim().isEmpty()) {
             spec = spec.and(TransactionSpecifications.hasCategory(filter.getCategoryId()));

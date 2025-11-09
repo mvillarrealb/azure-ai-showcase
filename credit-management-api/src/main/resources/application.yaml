@@ -1,3 +1,9 @@
+server:
+  port: ${SERVER_PORT}
+  address: 0.0.0.0
+logging:
+  level:
+    root: INFO
 spring:
   application:
     name: credit-management-api
@@ -24,11 +30,6 @@ spring:
     enabled: true
     drop-first: false
     default-schema: public
-logging:
-  level:
-    root: INFO
-server:
-  port: 8080
 management:
   endpoints:
     web:

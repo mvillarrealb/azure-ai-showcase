@@ -1,4 +1,3 @@
-<!-- Grid de datos con glassmorphism siguiendo el estándar CRUD -->
 <div class="ios-card">
   <div class="p-6">
     <div class="flex items-center justify-between mb-6">
@@ -21,11 +20,12 @@
       </button>
     </div>
     
-    <!-- Grid de rangos -->
     <app-pageable-grid
       [adapter]="ranksAdapter"
       [columns]="gridColumns"
       [config]="gridConfig"
+      [headerColors]="'from-blue-500 to-cyan-600'"
+      [footerColors]="'from-blue-600 to-cyan-700'"
       (rowClick)="onViewDetails($event)">
     </app-pageable-grid>
   </div>

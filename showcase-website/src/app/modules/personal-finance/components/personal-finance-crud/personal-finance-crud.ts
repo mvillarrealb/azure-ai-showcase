@@ -38,8 +38,16 @@ export class PersonalFinanceCrudComponent implements OnInit {
   // Definición de columnas para el grid basado en el OpenAPI
   gridColumns: GridColumn[] = [
     { key: 'description', label: 'Descripción', sortable: false, width: '35%' },
-    { key: 'amount', label: 'Monto', sortable: false, type: 'currency', align: 'right', width: '20%' },
-    { key: 'categoryId', label: 'Categoría', sortable: false, width: '25%' },
+    { 
+      key: 'amount', 
+      label: 'Monto', 
+      sortable: false, 
+      type: 'currency', 
+      align: 'right', 
+      width: '20%',
+      format: (value: number, row: Transaction) => this.formatAmount(value, row)
+    },
+    { key: 'categoryName', label: 'Categoría', sortable: false, width: '25%' },
     { key: 'date', label: 'Fecha', sortable: false, type: 'date', width: '20%' }
   ];
 
@@ -51,5 +59,28 @@ export class PersonalFinanceCrudComponent implements OnInit {
   onViewDetails(transaction: Transaction) {
     // Mostrar detalles de la transacción (solo lectura)
     console.log('Ver detalles de transacción:', transaction);
+  }
+
+  /**
+   * Formatea el monto con color según el tipo de categoría
+   */
+  formatAmount(value: number, transaction: Transaction): string {
+    const formattedValue = `S/${Math.abs(value).toFixed(2)}`;
+    
+    // Verificar si categoryType está disponible
+    if (!transaction || !transaction.categoryType) {
+      // Fallback: usar el signo del valor para determinar el color
+      if (value >= 0) {
+        return `<span class="text-green-600 font-semibold">+${formattedValue}</span>`;
+      } else {
+        return `<span class="text-red-600 font-semibold">-${formattedValue}</span>`;
+      }
+    }
+    
+    if (transaction.categoryType === 'income') {
+      return `<span class="text-green-600 font-semibold">+${formattedValue}</span>`;
+    } else {
+      return `<span class="text-red-600 font-semibold">-${formattedValue}</span>`;
+    }
   }
 }

@@ -1,11 +1,10 @@
 import { Component, signal, inject, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PersonalFinanceService } from '../../services/personal-finance.service';
-import { MonthlyReport, Category } from '../../interfaces/personal-finance.interface';
+import { MonthlyReport, CategoryBreakdown } from '../../interfaces/personal-finance.interface';
 import { format } from 'date-fns';
 import { 
   Chart, 
-  ChartConfiguration, 
   ChartData, 
   ChartOptions,
   registerables 
@@ -13,15 +12,6 @@ import {
 
 // Register Chart.js components
 Chart.register(...registerables);
-
-interface CategoryBreakdownWithNames {
-  categoryId: string;
-  categoryName: string;
-  type: 'income' | 'expense';
-  totalAmount: number;
-  percentage: number;
-  color: string;
-}
 
 @Component({
   selector: 'app-monthly-reports',
@@ -40,23 +30,13 @@ export class MonthlyReportsComponent implements AfterViewInit, OnDestroy {
   isLoading = signal<boolean>(false);
   monthlyReport = signal<MonthlyReport | null>(null);
   errorMessage = signal<string>('');
-  categories = signal<Category[]>([]);
   selectedMonth = signal<string>(format(new Date(), 'yyyy-MM'));
-  categoryBreakdownWithNames = signal<CategoryBreakdownWithNames[]>([]);
 
   // Chart instances
   private expenseChart?: Chart;
   private incomeExpenseChart?: Chart;
 
-  // Color palettes
-  private expenseColors = [
-    '#EF4444', '#F97316', '#EAB308', '#22C55E', 
-    '#3B82F6', '#8B5CF6', '#EC4899', '#6B7280',
-    '#F59E0B', '#10B981', '#6366F1', '#84CC16'
-  ];
-
   constructor() {
-    this.loadCategories();
     this.loadReport();
   }
 
@@ -71,18 +51,6 @@ export class MonthlyReportsComponent implements AfterViewInit, OnDestroy {
     this.destroyCharts();
   }
 
-  private loadCategories() {
-    this.personalFinanceService.getCategories().subscribe({
-      next: (categories) => {
-        this.categories.set(categories);
-        this.updateCategoryBreakdown();
-      },
-      error: (error) => {
-        console.error('Error loading categories:', error);
-      }
-    });
-  }
-
   loadReport() {
     this.isLoading.set(true);
     this.errorMessage.set('');
@@ -90,8 +58,12 @@ export class MonthlyReportsComponent implements AfterViewInit, OnDestroy {
     this.personalFinanceService.getMonthlyReport(this.selectedMonth()).subscribe({
       next: (report) => {
         this.isLoading.set(false);
+        
+        // Debug: Log the data received
+        console.log('Monthly Report Data:', report);
+        console.log('Category Breakdown:', report.categoryBreakdown);
+        
         this.monthlyReport.set(report);
-        this.updateCategoryBreakdown();
         
         // Recreate charts with new data
         setTimeout(() => {
@@ -118,42 +90,18 @@ export class MonthlyReportsComponent implements AfterViewInit, OnDestroy {
     this.loadReport();
   }
 
-  private updateCategoryBreakdown() {
+  private getExpenseBreakdown(): CategoryBreakdown[] {
     const report = this.monthlyReport();
-    const categories = this.categories();
+    if (!report) return [];
     
-    if (!report || !categories.length) {
-      this.categoryBreakdownWithNames.set([]);
-      return;
-    }
-
-    const totalAmount = report.totalIncome + report.totalExpense;
+    // Debug log to see all data
+    console.log('All category breakdown:', report.categoryBreakdown);
     
-    const breakdown: CategoryBreakdownWithNames[] = report.categoryBreakdown.map((item, index) => {
-      const category = categories.find(cat => cat.id === item.categoryId);
-      const percentage = totalAmount > 0 ? (Math.abs(item.totalAmount) / totalAmount) * 100 : 0;
-      
-      return {
-        categoryId: item.categoryId,
-        categoryName: category?.name || 'Categoría desconocida',
-        type: category?.type || 'expense',
-        totalAmount: item.totalAmount,
-        percentage: percentage,
-        color: this.getColorForCategory(index, category?.type || 'expense')
-      };
-    });
-
-    // Sort by amount (descending)
-    breakdown.sort((a, b) => Math.abs(b.totalAmount) - Math.abs(a.totalAmount));
+    // Filter for expense categories using categoryType
+    const expenses = report.categoryBreakdown.filter(item => item.categoryType === 'expense');
     
-    this.categoryBreakdownWithNames.set(breakdown);
-  }
-
-  private getColorForCategory(index: number, type: 'income' | 'expense'): string {
-    if (type === 'income') {
-      return '#22C55E'; // Green for income
-    }
-    return this.expenseColors[index % this.expenseColors.length];
+    console.log('Filtered expenses:', expenses);
+    return expenses;
   }
 
   private createCharts() {
@@ -164,10 +112,22 @@ export class MonthlyReportsComponent implements AfterViewInit, OnDestroy {
   }
 
   private createExpenseChart() {
-    const expenseBreakdown = this.categoryBreakdownWithNames()
-      .filter(item => item.type === 'expense' && item.totalAmount < 0);
+    const expenseBreakdown = this.getExpenseBreakdown();
 
-    if (!expenseBreakdown.length || !this.expenseChartRef) return;
+    if (!expenseBreakdown.length || !this.expenseChartRef) {
+      // Si no hay datos de gastos, mostrar un mensaje en el canvas
+      if (this.expenseChartRef) {
+        const ctx = this.expenseChartRef.nativeElement.getContext('2d');
+        if (ctx) {
+          ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+          ctx.font = '16px Arial';
+          ctx.fillStyle = '#6B7280';
+          ctx.textAlign = 'center';
+          ctx.fillText('No hay gastos para mostrar', ctx.canvas.width / 2, ctx.canvas.height / 2);
+        }
+      }
+      return;
+    }
 
     const ctx = this.expenseChartRef.nativeElement.getContext('2d');
     if (!ctx) return;
@@ -175,8 +135,8 @@ export class MonthlyReportsComponent implements AfterViewInit, OnDestroy {
     const data: ChartData<'pie'> = {
       labels: expenseBreakdown.map(item => item.categoryName),
       datasets: [{
-        data: expenseBreakdown.map(item => Math.abs(item.totalAmount)),
-        backgroundColor: expenseBreakdown.map(item => item.color),
+        data: expenseBreakdown.map(item => item.totalAmount), // Los montos ya son positivos
+        backgroundColor: expenseBreakdown.map((item, index) => this.getColorForCategory(index)),
         borderWidth: 2,
         borderColor: '#ffffff'
       }]
@@ -200,7 +160,8 @@ export class MonthlyReportsComponent implements AfterViewInit, OnDestroy {
           callbacks: {
             label: (context) => {
               const value = context.parsed;
-              const percentage = ((value / expenseBreakdown.reduce((sum, item) => sum + Math.abs(item.totalAmount), 0)) * 100).toFixed(1);
+              const total = expenseBreakdown.reduce((sum, item) => sum + item.totalAmount, 0);
+              const percentage = ((value / total) * 100).toFixed(1);
               return `${context.label}: S/${value.toFixed(2)} (${percentage}%)`;
             }
           }
@@ -298,7 +259,6 @@ export class MonthlyReportsComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  // Utility method for template
   Math = Math;
 
   isPositiveSavings(): boolean {
@@ -307,5 +267,28 @@ export class MonthlyReportsComponent implements AfterViewInit, OnDestroy {
 
   isNegativeSavings(): boolean {
     return (this.monthlyReport()?.netSavings ?? 0) < 0;
+  }
+
+  hasExpenseData(): boolean {
+    return this.getExpenseBreakdown().length > 0;
+  }
+
+  getColorForCategory(index: number): string {
+    const colors = [
+      '#EF4444', '#F97316', '#EAB308', '#22C55E', 
+      '#3B82F6', '#8B5CF6', '#EC4899', '#6B7280',
+      '#F59E0B', '#10B981', '#6366F1', '#84CC16'
+    ];
+    return colors[index % colors.length];
+  }
+
+  getPercentage(amount: number): number {
+    const report = this.monthlyReport();
+    if (!report) return 0;
+    
+    const totalAmount = report.totalIncome + report.totalExpense;
+    if (totalAmount === 0) return 0;
+    
+    return (amount / totalAmount) * 100;
   }
 }

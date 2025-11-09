@@ -23,6 +23,7 @@ export class InvoiceScannerComponent {
   errorMessage = signal<string>('');
   successMessage = signal<string>('');
   isCreatingTransaction = signal<boolean>(false);
+  selectedCategoryId = signal<string>('');
   
   // Categories for transaction creation
   categories = signal<Category[]>([]);
@@ -35,11 +36,32 @@ export class InvoiceScannerComponent {
     this.personalFinanceService.getCategories().subscribe({
       next: (categories) => {
         this.categories.set(categories);
+        // Pre-seleccionar la primera categoría de gasto disponible
+        const expenseCategories = this.getExpenseCategories();
+        if (expenseCategories.length > 0) {
+          this.selectedCategoryId.set(expenseCategories[0].id);
+        }
       },
       error: (error) => {
         console.error('Error loading categories:', error);
       }
     });
+  }
+
+  getExpenseCategories(): Category[] {
+    return this.categories().filter(cat => cat.type === 'expense');
+  }
+
+  getSelectedCategoryName(): string {
+    const selectedId = this.selectedCategoryId();
+    if (!selectedId) return '';
+    const category = this.categories().find(cat => cat.id === selectedId);
+    return category?.name || '';
+  }
+
+  onCategoryChange(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    this.selectedCategoryId.set(select.value);
   }
 
   onDragOver(event: DragEvent) {
@@ -118,14 +140,12 @@ export class InvoiceScannerComponent {
 
   registerTransaction() {
     const result = this.scanResult();
+    const categoryId = this.selectedCategoryId();
+    
     if (!result) return;
 
-    // Use first available expense category - backend will handle categorization logic
-    const expenseCategories = this.categories().filter(cat => cat.type === 'expense');
-    const categoryId = expenseCategories[0]?.id;
-
     if (!categoryId) {
-      this.errorMessage.set('No hay categorías de gasto disponibles. Crea una categoría primero.');
+      this.errorMessage.set('Por favor selecciona una categoría de gasto.');
       return;
     }
 
@@ -141,9 +161,10 @@ export class InvoiceScannerComponent {
     this.personalFinanceService.createTransaction(transaction).subscribe({
       next: (createdTransaction) => {
         this.isCreatingTransaction.set(false);
+        const categoryName = this.getSelectedCategoryName();
         this.scanResult.set(null);
         this.successMessage.set(
-          `Transacción registrada por S/${Math.abs(createdTransaction.amount).toFixed(2)}`
+          `Transacción registrada por S/${Math.abs(createdTransaction.amount).toFixed(2)} en categoría "${categoryName}"`
         );
       },
       error: (error) => {
@@ -160,6 +181,13 @@ export class InvoiceScannerComponent {
     this.successMessage.set('');
     this.isUploading.set(false);
     this.isDragOver.set(false);
+    this.selectedCategoryId.set('');
+    
+    // Re-establecer la primera categoría de gasto disponible
+    const expenseCategories = this.getExpenseCategories();
+    if (expenseCategories.length > 0) {
+      this.selectedCategoryId.set(expenseCategories[0].id);
+    }
   }
 
   formatDate(dateString?: string): string {

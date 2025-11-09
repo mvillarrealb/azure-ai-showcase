@@ -11,6 +11,16 @@ import java.time.LocalDateTime;
 public class TransactionSpecifications {
     
     /**
+     * Agrega JOIN FETCH para cargar la categoría de manera eagerly
+     */
+    public static Specification<Transaction> fetchCategory() {
+        return (root, query, criteriaBuilder) -> {
+            root.fetch("category", jakarta.persistence.criteria.JoinType.LEFT);
+            return null;
+        };
+    }
+    
+    /**
      * Filtra transacciones por categoría
      */
     public static Specification<Transaction> hasCategory(String categoryId) {

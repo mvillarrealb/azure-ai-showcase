@@ -142,7 +142,6 @@ export class CreditEvaluationWizardComponent {
     const result = this.evaluationResult();
     if (!result) return;
 
-    // Crear objeto para exportar
     const exportData = {
       evaluacion: {
         fecha: new Date().toISOString().split('T')[0],
@@ -154,7 +153,6 @@ export class CreditEvaluationWizardComponent {
       productosRecomendados: result.eligibleProducts
     };
 
-    // Crear y descargar archivo JSON
     const dataStr = JSON.stringify(exportData, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(dataBlob);

@@ -16,7 +16,7 @@ import { environment } from '../../../../environments/environment';
 })
 export class ClaimService {
   private http = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiUrl}/claims`;
+  private readonly baseUrl = `${environment.claimManagement}/claims`;
 
   /**
    * Obtiene lista paginada de reclamos con filtros opcionales

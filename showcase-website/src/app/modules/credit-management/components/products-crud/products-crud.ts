@@ -53,7 +53,7 @@ export class ProductsCrudComponent implements OnInit {
       type: 'currency', 
       align: 'right', 
       width: '12%',
-      format: (value: number, item: Product) => this.formatAmount(value, item.currency)
+      format: (value: number, item?: Product) => item ? this.formatAmount(value, item.currency) : this.formatAmountFallback(value)
     },
     { 
       key: 'maximumAmount', 
@@ -62,7 +62,7 @@ export class ProductsCrudComponent implements OnInit {
       type: 'currency', 
       align: 'right', 
       width: '12%',
-      format: (value: number, item: Product) => this.formatAmount(value, item.currency)
+      format: (value: number, item?: Product) => item ? this.formatAmount(value, item.currency) : this.formatAmountFallback(value)
     },
     { 
       key: 'minimumRate', 
@@ -70,7 +70,7 @@ export class ProductsCrudComponent implements OnInit {
       sortable: true, 
       align: 'center', 
       width: '11%',
-      format: (value: number, item: Product) => this.formatRateRange(item.minimumRate, item.maximumRate)
+      format: (value: number, item?: Product) => item ? this.formatRateRange(item.minimumRate, item.maximumRate) : this.formatSingleRate(value)
     }
   ];
 
@@ -91,6 +91,13 @@ export class ProductsCrudComponent implements OnInit {
   }
 
   /**
+   * Formatear monto sin moneda específica (fallback para tooltips)
+   */
+  private formatAmountFallback(amount: number): string {
+    return this.creditManagementService.formatCurrency(amount, 'S/');
+  }
+
+  /**
    * Formatear rango de tasas
    */
   private formatRateRange(minRate: number, maxRate: number): string {
@@ -98,5 +105,12 @@ export class ProductsCrudComponent implements OnInit {
       return this.creditManagementService.formatPercentage(minRate);
     }
     return `${this.creditManagementService.formatPercentage(minRate)} - ${this.creditManagementService.formatPercentage(maxRate)}`;
+  }
+
+  /**
+   * Formatear una sola tasa (fallback para tooltips)
+   */
+  private formatSingleRate(rate: number): string {
+    return this.creditManagementService.formatPercentage(rate);
   }
 }

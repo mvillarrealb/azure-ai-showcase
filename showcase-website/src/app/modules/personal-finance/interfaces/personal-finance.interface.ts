@@ -14,6 +14,8 @@ export interface Transaction {
   amount: number;
   date: string; // ISO 8601 format
   categoryId: string;
+  categoryName: string;
+  categoryType: 'income' | 'expense';
   description: string;
 }
 
@@ -39,7 +41,7 @@ export interface TransactionsResponse {
 export interface InvoiceLineItem {
   description: string;
   quantity: number;
-  unitPrice: number;
+  unitPrice: number | null;
   totalPrice: number;
 }
 
@@ -53,6 +55,8 @@ export interface InvoiceAnalysis {
 
 export interface CategoryBreakdown {
   categoryId: string;
+  categoryName: string;
+  categoryType: 'income' | 'expense';
   totalAmount: number;
 }
 

@@ -157,10 +157,8 @@ export class ClaimsImportComponent {
    * Descarga archivo de plantilla Excel
    */
   onDownloadTemplate() {
-    // En una implementación real, esto descargaría un archivo template del servidor
     console.log('Descargar plantilla Excel');
     
-    // Por ahora, mostrar información sobre el formato requerido
     const templateInfo = `
 Formato de archivo Excel requerido:
 

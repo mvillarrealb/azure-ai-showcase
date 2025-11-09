@@ -24,7 +24,7 @@ const routes: Routes = [
       },
       {
         path: 'reports',
-        component: ClaimsImportComponent // Temporal - se puede crear componente de reportes después
+        component: ClaimsImportComponent
       }
     ]
   }

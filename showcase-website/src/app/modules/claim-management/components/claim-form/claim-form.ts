@@ -83,8 +83,7 @@ export class ClaimFormComponent implements OnInit {
   currentSubReasons: string[] = [];
 
   ngOnInit() {
-    // Establecer fecha actual por defecto
-    this.claimForm.date = new Date().toISOString().slice(0, 16); // formato datetime-local
+    this.claimForm.date = new Date().toISOString().slice(0, 16);
   }
 
   /**

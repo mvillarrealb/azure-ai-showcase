@@ -1,4 +1,3 @@
-<!-- Grid de datos con glassmorphism -->
 <div class="ios-card">
   <div class="p-6">
     <div class="flex items-center justify-between mb-6">
@@ -21,11 +20,12 @@
       </button>
     </div>
     
-    <!-- Grid de transacciones -->
     <app-pageable-grid
       [adapter]="transactionsAdapter"
       [columns]="gridColumns"
       [config]="gridConfig"
+      [headerColors]="'from-green-500 to-emerald-600'"
+      [footerColors]="'from-green-600 to-emerald-700'"
       (rowClick)="onViewDetails($event)">
     </app-pageable-grid>
   </div>

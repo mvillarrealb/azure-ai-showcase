@@ -1,14 +1,10 @@
-<!-- Contenedor principal único siguiendo estándar CRUD_SPEC -->
 <div class="ios-card">
   <div class="p-6">
-    <!-- Header: Título + Botones de acción -->
     <div class="flex items-center justify-between mb-6">
       <div class="flex items-center">
-        <!-- Icono del módulo - Paleta roja para reclamos -->
         <div class="w-10 h-10 mr-4 rounded-xl bg-gradient-to-br from-red-400 to-red-500 flex items-center justify-center shadow-lg">
           <i class="fas fa-exclamation-triangle text-white text-lg"></i>
         </div>
-        <!-- Título y descripción -->
         <div>
           <h1 class="text-2xl font-bold text-gray-900">Gestión de Reclamos</h1>
           <p class="text-gray-600 text-sm">Lista de reclamos registrados en el sistema</p>
@@ -21,9 +17,7 @@
         </div>
       </div>
       
-      <!-- Botones de acción -->
       <div class="flex gap-3">
-        <!-- Botón Resolver (solo visible si hay un reclamo seleccionado y no está resuelto) -->
         @if (selectedClaim() && selectedClaim()?.status !== 'resolved') {
           <button 
             (click)="onResolveClaim()"
@@ -35,7 +29,6 @@
           </button>
         }
         
-        <!-- Botón Nuevo Reclamo -->
         <button 
           (click)="onCreateClaim()"
           class="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-200 flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-105">
@@ -47,7 +40,6 @@
       </div>
     </div>
     
-    <!-- Grid de datos -->
     <app-pageable-grid
       [adapter]="claimsAdapter"
       [columns]="gridColumns"

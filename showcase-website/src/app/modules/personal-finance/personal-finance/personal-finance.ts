@@ -13,10 +13,8 @@ import { PersonalFinanceFormComponent } from '../components/personal-finance-for
 export class PersonalFinance {
   title = 'Gestión de Finanzas Personales';
   
-  // Modal state
   showModal = signal<boolean>(false);
   
-  // Links simplificados - Nueva Transacción es modal ahora
   navigationLinks: NavigationLink[] = [
     {
       label: 'Transacciones',
@@ -35,7 +33,6 @@ export class PersonalFinance {
     }
   ];
 
-  // Modal event handlers
   onShowModal() {
     this.showModal.set(true);
   }

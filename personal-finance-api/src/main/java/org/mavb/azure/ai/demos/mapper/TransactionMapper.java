@@ -19,6 +19,8 @@ public interface TransactionMapper {
      * Convierte Transaction entity a TransactionDto
      */
     @Mapping(source = "category.id", target = "categoryId")
+    @Mapping(source = "category.name", target = "categoryName")
+    @Mapping(source = "category.type", target = "categoryType", qualifiedByName = "categoryTypeToString")
     TransactionDto toDto(Transaction transaction);
     
     /**

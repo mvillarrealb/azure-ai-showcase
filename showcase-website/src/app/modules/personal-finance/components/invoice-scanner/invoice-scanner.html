@@ -3,7 +3,7 @@
   <!-- Header -->
   <div class="mb-8">
     <div class="flex items-center mb-4">
-      <div class="w-12 h-12 mr-4 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center shadow-lg">
+      <div class="w-12 h-12 mr-4 rounded-xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-lg">
         <i class="fas fa-file-pdf text-white text-xl"></i>
       </div>
       <div>
@@ -17,21 +17,21 @@
   @if (!scanResult() && !isUploading()) {
     <div class="mb-8">
       <div 
-        class="border-2 border-dashed border-gray-300 rounded-2xl p-12 text-center transition-all duration-200 hover:border-blue-400 hover:bg-blue-50/50"
-        [class.border-blue-400]="isDragOver()"
-        [class.bg-blue-50]="isDragOver()"
+        class="border-2 border-dashed border-gray-300 rounded-2xl p-12 text-center transition-all duration-200 hover:border-green-400 hover:bg-green-50/50"
+        [class.border-green-400]="isDragOver()"
+        [class.bg-green-50]="isDragOver()"
         (dragover)="onDragOver($event)"
         (dragleave)="onDragLeave($event)"
         (drop)="onDrop($event)">
         
-        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
           <i class="fas fa-cloud-upload-alt text-white text-2xl"></i>
         </div>
         
         <h3 class="text-lg font-semibold text-gray-900 mb-2">Arrastra tu archivo PDF aquí</h3>
         <p class="text-gray-600 mb-6">o</p>
         
-        <label class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 cursor-pointer shadow-lg hover:shadow-xl">
+        <label class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 cursor-pointer shadow-lg hover:shadow-xl">
           <i class="fas fa-file-upload mr-2"></i>
           Seleccionar archivo
           <input 
@@ -52,8 +52,8 @@
       <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-8 border border-white/20 shadow-lg">
         <div class="text-center">
           <div class="w-16 h-16 mx-auto mb-4 relative">
-            <div class="w-full h-full rounded-full border-4 border-blue-200"></div>
-            <div class="absolute top-0 left-0 w-full h-full rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
+            <div class="w-full h-full rounded-full border-4 border-green-200"></div>
+            <div class="absolute top-0 left-0 w-full h-full rounded-full border-4 border-green-500 border-t-transparent animate-spin"></div>
           </div>
           <h3 class="text-lg font-semibold text-gray-900 mb-2">Procesando documento...</h3>
           <p class="text-gray-600">Analizando el contenido del PDF, esto puede tomar unos segundos</p>
@@ -129,11 +129,40 @@
                   <span class="text-green-600 font-semibold">S/{{ item.totalPrice.toFixed(2) }}</span>
                 </div>
                 <p class="text-xs text-gray-600">
-                  {{ item.quantity }} × S/{{ item.unitPrice.toFixed(2) }}
+                  @if (item.unitPrice !== null) {
+                    {{ item.quantity }} × S/{{ item.unitPrice.toFixed(2) }}
+                  } @else {
+                    Cantidad: {{ item.quantity }} (precio unitario no disponible)
+                  }
                 </p>
               </div>
             }
           </div>
+        </div>
+      </div>
+
+      <!-- Category Selection -->
+      <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Categoría del gasto</h3>
+        <div class="space-y-3">
+          <label class="block text-sm font-medium text-gray-700">
+            Selecciona la categoría que mejor describe este gasto
+          </label>
+          <select 
+            [value]="selectedCategoryId()"
+            (change)="onCategoryChange($event)"
+            class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-green-500 focus:ring-green-500 transition-all duration-200">
+            <option value="">-- Selecciona una categoría --</option>
+            @for (category of getExpenseCategories(); track category.id) {
+              <option [value]="category.id">{{ category.name }}</option>
+            }
+          </select>
+          @if (getExpenseCategories().length === 0) {
+            <p class="text-sm text-amber-600 bg-amber-50 px-3 py-2 rounded-lg border border-amber-200">
+              <i class="fas fa-exclamation-triangle mr-2"></i>
+              No hay categorías de gasto disponibles. Crea una categoría primero.
+            </p>
+          }
         </div>
       </div>
 
@@ -142,7 +171,17 @@
         <div class="flex items-center justify-between">
           <div>
             <h3 class="text-lg font-semibold text-gray-900 mb-1">¿Registrar esta transacción?</h3>
-            <p class="text-gray-600 text-sm">Se creará un gasto por S/{{ scanResult()?.totalAmount?.toFixed(2) }}</p>
+            @if (selectedCategoryId()) {
+              <p class="text-gray-600 text-sm">
+                Se creará un gasto de S/{{ scanResult()?.totalAmount?.toFixed(2) }} 
+                en la categoría "{{ getSelectedCategoryName() }}"
+              </p>
+            } @else {
+              <p class="text-amber-600 text-sm">
+                <i class="fas fa-exclamation-triangle mr-1"></i>
+                Selecciona una categoría antes de continuar
+              </p>
+            }
           </div>
           
           <div class="flex space-x-3">
@@ -155,8 +194,8 @@
             
             <button 
               (click)="registerTransaction()"
-              [disabled]="isCreatingTransaction()"
-              class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed">
+              [disabled]="isCreatingTransaction() || !selectedCategoryId()"
+              class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-500">
               @if (isCreatingTransaction()) {
                 <i class="fas fa-spinner fa-spin mr-2"></i>
                 Registrando...

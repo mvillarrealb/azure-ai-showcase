@@ -39,7 +39,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID>,
     /**
      * Busca transacciones por categoría y rango de fechas
      */
-    @Query("SELECT t FROM Transaction t WHERE t.category.id = :categoryId AND t.date >= :startDate AND t.date <= :endDate ORDER BY t.date DESC")
+    @Query("SELECT t FROM Transaction t " +
+           "JOIN FETCH t.category c " +
+           "WHERE c.id = :categoryId " +
+           "AND t.date >= :startDate " +
+           "AND t.date <= :endDate " +
+           "ORDER BY t.date DESC")
     List<Transaction> findByCategoryAndDateRange(
         @Param("categoryId") String categoryId,
         @Param("startDate") LocalDateTime startDate, 
@@ -49,8 +54,10 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID>,
     /**
      * Calcula el total de transacciones por tipo de categoría en un mes específico
      */
-    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t " +
-           "WHERE t.category.type = :categoryType " +
+    @Query("SELECT COALESCE(SUM(t.amount), 0) " +
+           "FROM Transaction t " +
+           "JOIN t.category c " +
+           "WHERE c.type = :categoryType " +
            "AND YEAR(t.date) = :year " +
            "AND MONTH(t.date) = :month")
     BigDecimal getTotalByCategoryTypeAndMonth(
@@ -62,10 +69,13 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID>,
     /**
      * Obtiene el desglose de montos por categoría para un mes específico
      */
-    @Query("SELECT t.category.id, COALESCE(SUM(t.amount), 0) FROM Transaction t " +
+    @Query("SELECT c.id, c.name, c.type, COALESCE(SUM(t.amount), 0) " +
+           "FROM Transaction t " +
+           "JOIN t.category c " +
            "WHERE YEAR(t.date) = :year " +
            "AND MONTH(t.date) = :month " +
-           "GROUP BY t.category.id")
+           "GROUP BY c.id, c.name, c.type " +
+           "ORDER BY c.name")
     List<Object[]> getCategoryBreakdownByMonth(
         @Param("year") int year,
         @Param("month") int month
@@ -86,11 +96,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID>,
     /**
      * Calcula el total de ingresos y gastos por categoría
      */
-    @Query("SELECT t.category.id, t.category.name, t.category.type, " +
+    @Query("SELECT c.id, c.name, c.type, " +
            "COUNT(t), MIN(t.amount), MAX(t.amount), AVG(t.amount), SUM(t.amount) " +
            "FROM Transaction t " +
-           "GROUP BY t.category.id, t.category.name, t.category.type " +
-           "ORDER BY t.category.type, SUM(t.amount) DESC")
+           "JOIN t.category c " +
+           "GROUP BY c.id, c.name, c.type " +
+           "ORDER BY c.type, SUM(t.amount) DESC")
     List<Object[]> getTransactionStatsByCategory();
     
     /**

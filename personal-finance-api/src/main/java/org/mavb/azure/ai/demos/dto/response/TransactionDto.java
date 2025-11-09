@@ -38,6 +38,18 @@ public class TransactionDto {
     private String categoryId;
     
     /**
+     * Nombre de la categoría asociada a la transacción
+     */
+    @JsonProperty("categoryName")
+    private String categoryName;
+    
+    /**
+     * Tipo de la categoría asociada a la transacción
+     */
+    @JsonProperty("categoryType")
+    private String categoryType;
+    
+    /**
      * Descripción detallada de la transacción
      */
     private String description;

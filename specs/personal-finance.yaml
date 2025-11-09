@@ -303,13 +303,21 @@ paths:
                     netSavings: 749.75
                     categoryBreakdown:
                       - categoryId: "cat-003"
+                        categoryName: "Salario"
+                        categoryType: "income"
                         totalAmount: 3500.00
                       - categoryId: "cat-001"
-                        totalAmount: -890.50
+                        categoryName: "Alimentación"
+                        categoryType: "expense"
+                        totalAmount: 890.50
                       - categoryId: "cat-002"
-                        totalAmount: -450.00
+                        categoryName: "Transporte"
+                        categoryType: "expense"
+                        totalAmount: 450.00
                       - categoryId: "cat-004"
-                        totalAmount: -320.75
+                        categoryName: "Entretenimiento"
+                        categoryType: "expense"
+                        totalAmount: 320.75
         '404':
           description: No se encontraron datos para el mes especificado
           content:
@@ -375,6 +383,15 @@ components:
           type: string
           description: ID de la categoría asociada a la transacción
           example: "cat-001"
+        categoryName:
+          type: string
+          description: Nombre legible de la categoría asociada a la transacción
+          example: "Alimentación"
+        categoryType:
+          type: string
+          description: Tipo de categoría (income o expense)
+          enum: [income, expense]
+          example: "expense"
         description:
           type: string
           description: Descripción detallada de la transacción
@@ -384,6 +401,8 @@ components:
         - amount
         - date
         - categoryId
+        - categoryName
+        - categoryType
         - description
 
     TransactionCreate:
@@ -481,12 +500,23 @@ components:
           type: string
           description: ID de la categoría
           example: "cat-001"
+        categoryName:
+          type: string
+          description: Nombre de la categoría
+          example: "Alimentación"
+        categoryType:
+          type: string
+          description: Tipo de categoría
+          enum: [income, expense]
+          example: "expense"
         totalAmount:
           type: number
-          description: Monto total para esta categoría (positivo para ingresos, negativo para gastos)
-          example: -890.50
+          description: Monto total para esta categoría (siempre positivo)
+          example: 890.50
       required:
         - categoryId
+        - categoryName
+        - categoryType
         - totalAmount
 
     MonthlyReport:

@@ -93,10 +93,12 @@ public class ReportServiceImpl implements ReportService {
         List<Object[]> rawData = transactionRepository.getCategoryBreakdownByMonth(year, month);
         
         return rawData.stream()
-            .map(row -> CategoryBreakdownDto.builder()
-                .categoryId((String) row[0])
-                .totalAmount((BigDecimal) row[1])
-                .build())
+            .map(row -> CategoryBreakdownDto.from(
+                (String) row[0],        // categoryId
+                (String) row[1],        // categoryName
+                (CategoryType) row[2],  // categoryType
+                (BigDecimal) row[3]     // totalAmount
+            ))
             .collect(Collectors.toList());
     }
 }

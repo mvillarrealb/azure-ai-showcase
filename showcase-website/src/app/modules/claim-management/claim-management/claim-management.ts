@@ -15,12 +15,10 @@ import { Claim } from '../interfaces/claim.interface';
 export class ClaimManagement {
   title = 'Gestión de Reclamos';
   
-  // Modal states siguiendo patrón de personal-finance
   showCreateModal = signal<boolean>(false);
   showResolveModal = signal<boolean>(false);
   selectedClaim = signal<Claim | null>(null);
   
-  // Navigation links actualizados según funcionalidades implementadas
   navigationLinks: NavigationLink[] = [
     {
       label: 'Gestión de Reclamos',
@@ -34,7 +32,6 @@ export class ClaimManagement {
     }
   ];
 
-  // Modal event handlers
   onShowCreateModal() {
     this.showCreateModal.set(true);
   }
@@ -64,12 +61,10 @@ export class ClaimManagement {
   onClaimResolved() {
     this.showResolveModal.set(false);
     this.selectedClaim.set(null);
-    // Refrescar datos en el componente activo
     this.refreshActiveComponent();
   }
 
   private refreshActiveComponent() {
-    // Buscar el componente activo y refrescar sus datos si tiene el método
     const activeComponent = this.getActiveComponent();
     if (activeComponent && typeof activeComponent.refreshData === 'function') {
       activeComponent.refreshData();
