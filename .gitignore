@@ -8,3 +8,8 @@ documents
 .env.local
 .env.development
 .env.production
+
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.backup
