@@ -16,11 +16,6 @@ variable "project_name" {
   default     = "mcp-app"
 }
 
-variable "source_code_path" {
-  description = "Path to the source code directory containing Dockerfile"
-  type        = string
-}
-
 variable "tags" {
   description = "Common tags to be applied to all resources"
   type        = map(string)
@@ -47,25 +42,6 @@ variable "external_access" {
   description = "Si la aplicación debe ser accesible externamente"
   type        = bool
   default     = true
-}
-
-variable "environment_variables" {
-  description = "Variables de entorno para el contenedor"
-  type = list(object({
-    name       = string
-    value      = optional(string)
-    secret_ref = optional(string)
-  }))
-  default = [
-    {
-      name  = "NODE_ENV"
-      value = "production"
-    },
-    {
-      name  = "APP_VERSION"
-      value = "1.0.0"
-    }
-  ]
 }
 
 variable "container_cpu" {
@@ -110,4 +86,83 @@ variable "max_replicas" {
     condition     = var.max_replicas >= 1 && var.max_replicas <= 1000
     error_message = "max_replicas debe estar entre 1 y 1000."
   }
+}
+
+# 🆕 VARIABLES PARA POSTGRESQL
+variable "postgres_administrator_login" {
+  description = "Usuario administrador para PostgreSQL"
+  type        = string
+  default     = "pgadmin"
+}
+
+variable "postgres_administrator_password" {
+  description = "Contraseña del administrador para PostgreSQL"
+  type        = string
+  sensitive   = true
+}
+
+# 🆕 VARIABLES PARA AI SERVICES
+variable "document_intelligence_key" {
+  description = "Clave del servicio Azure Document Intelligence"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "document_intelligence_endpoint" {
+  description = "Endpoint del servicio Azure Document Intelligence"
+  type        = string
+  default     = ""
+}
+
+variable "open_ai_endpoint" {
+  description = "Endpoint de Azure OpenAI"
+  type        = string
+  default     = ""
+}
+
+variable "open_ai_key" {
+  description = "Clave de API para OpenAI/Azure OpenAI"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "open_api_embedding_model" {
+  description = "Nombre del modelo de embeddings de OpenAI"
+  type        = string
+  default     = "text-embedding-ada-002"
+}
+
+variable "model_deployment_name" {
+  description = "Nombre del deployment del modelo en Azure OpenAI"
+  type        = string
+  default     = ""
+}
+
+variable "ai_search_endpoint" {
+  description = "Endpoint del servicio Azure AI Search"
+  type        = string
+  default     = ""
+}
+
+variable "ai_search_key" {
+  description = "Clave de API para Azure AI Search"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+# 🆕 VARIABLES PARA COGNITIVE SERVICES
+variable "cognitive_services_endpoint" {
+  description = "Endpoint del servicio Azure Cognitive Services"
+  type        = string
+  default     = ""
+}
+
+variable "cognitive_services_key" {
+  description = "Clave de API para Azure Cognitive Services"
+  type        = string
+  sensitive   = true
+  default     = ""
 }

@@ -61,8 +61,22 @@ module "container_app_environment" {
   depends_on = [module.log_analytics_workspace]
 }
 
+# PostgreSQL Flexible Server Module
+module "postgresql_flexible_server" {
+  source = "./modules/postgresql_flexible_server"
+
+  server_name             = "${local.name_prefix}-postgres"
+  databases               = ["personal_finance", "claim_management", "credit_management"]
+  administrator_login     = var.postgres_administrator_login
+  administrator_password  = var.postgres_administrator_password
+  resource_group_name     = module.resource_group.name
+  location                = var.location
+
+  depends_on = [module.resource_group]
+}
+
 # Container App Instance Module
-module "container_app_instance" {
+module "personal_finance_api" {
   source = "./modules/container_app_instance"
 
   name                         = "personal-finance-api"
@@ -88,8 +102,9 @@ module "container_app_instance" {
     { name  = "APP_VERSION", value = "1.0.0"},
     { name  = "AZURE_DOCUMENT_INTELLIGENCE_KEY", value= var.document_intelligence_key},
     { name  = "AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT", value= var.document_intelligence_endpoint},
-    { name  = "DB_USERNAME", value=},
-    { name  = "DB_PASSWORD", value=},
+    { name  = "DB_HOST", value= module.postgresql_flexible_server.server_fqdn},
+    { name  = "DB_USERNAME", value= module.postgresql_flexible_server.administrator_login},
+    { name  = "DB_PASSWORD", value= module.postgresql_flexible_server.administrator_password},
   ]
   
   # Configuración de recursos
@@ -104,7 +119,7 @@ module "container_app_instance" {
 }
 
 
-module "container_app_instance" {
+module "claim_management_api" {
   source = "./modules/container_app_instance"
 
   name                         = "claim-management-api"
@@ -128,12 +143,13 @@ module "container_app_instance" {
   # 🆕 VARIABLES DE ENTORNO
   environment_variables = [
     { name  = "APP_VERSION", value = "1.0.0"},
-    { name  = "OPEN_AI_ENDPOINT", value = var.open_api_endpoint },
+    { name  = "OPEN_AI_ENDPOINT", value = var.open_ai_endpoint },
     { name  = "OPEN_AI_DEPLOYMENT_NAME", value = var.model_deployment_name },
     { name  = "OPEN_AI_MODEL_NAME", value = var.open_api_embedding_model },
     { name  = "OPEN_AI_API_KEY", value = var.open_ai_key },
-    { name  = "DB_USERNAME", value=},
-    { name  = "DB_PASSWORD", value=},
+    { name  = "DB_HOST", value= module.postgresql_flexible_server.server_fqdn},
+    { name  = "DB_USERNAME", value= module.postgresql_flexible_server.administrator_login},
+    { name  = "DB_PASSWORD", value= module.postgresql_flexible_server.administrator_password},
   ]
   
   # Configuración de recursos
@@ -147,7 +163,7 @@ module "container_app_instance" {
   depends_on = [module.container_app_environment, module.container_registry]
 }
 
-module "container_app_instance" {
+module "credit_management_api" {
   source = "./modules/container_app_instance"
 
   name                         = "credit-management-api"
@@ -171,13 +187,15 @@ module "container_app_instance" {
   # 🆕 VARIABLES DE ENTORNO
   environment_variables = [
     { name  = "APP_VERSION", value = "1.0.0"},
-    { name  = "OPEN_AI_ENDPOINT", value = var.open_api_endpoint},
-    { name  = "OPEN_AI_KEY", value = var.open_ai_key },
+    #El api de evaluación crediticia accede a cognitive services endpoint para los embeddings
+    { name  = "OPEN_AI_ENDPOINT", value = var.cognitive_services_endpoint},
+    { name  = "OPEN_AI_KEY", value = var.cognitive_services_key },
     { name  = "OPEN_AI_EMBEDDING_MODEL", value = var.open_api_embedding_model},
-    { name  = "AI_SEARCH_ENDPOINT", value = var.ai_searh_endpoint },
+    { name  = "AI_SEARCH_ENDPOINT", value = var.ai_search_endpoint },
     { name  = "AI_SEARCH_KEY", value = var.ai_search_key },
-    { name  = "DB_USERNAME", value=},
-    { name  = "DB_PASSWORD", value=},
+    { name  = "DB_HOST", value= module.postgresql_flexible_server.server_fqdn},
+    { name  = "DB_USERNAME", value= module.postgresql_flexible_server.administrator_login},
+    { name  = "DB_PASSWORD", value= module.postgresql_flexible_server.administrator_password},
   ]
   
   # Configuración de recursos

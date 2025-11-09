@@ -1,224 +1,265 @@
-# Azure Container Apps Infrastructure with Terraform
+# 🏦 GENIA TON IFS - Azure AI Showcase Infrastructure
 
-This repository contains Terraform modules to deploy a complete Azure Container Apps infrastructure including:
+Infraestructura como código (IaC) con Terraform para desplegar un ecosistema completo de APIs de IA financiera en Azure Container Apps, integrado con servicios de Azure AI y base de datos PostgreSQL.
 
-- Resource Group
-- Container Registry
+## 🏗️ Arquitectura del Sistema
 
-## 🚀 Quick Start con Scripts de Despliegue
+```mermaid
+graph TB
+    subgraph "Azure Resource Group"
+        ACR[Container Registry]
+        LAW[Log Analytics Workspace]
+        CAE[Container App Environment]
+        PG[PostgreSQL Flexible Server]
+        
+        subgraph "Container Apps"
+            PFA[Personal Finance API]
+            CMA[Claim Management API] 
+            CRA[Credit Management API]
+        end
+        
+        subgraph "Azure AI Services"
+            DOC[Document Intelligence]
+            OAI[Azure OpenAI]
+            COG[Cognitive Services]
+            AIS[AI Search]
+        end
+    end
+    
+    PFA --> PG
+    CMA --> PG
+    CRA --> PG
+    
+    PFA --> DOC
+    CMA --> OAI
+    CRA --> COG
+    CRA --> AIS
+```
 
-### Scripts Disponibles
+### Componentes Principales
 
-#### `./deploy.sh` - Despliegue Completo
-Ejecuta el flujo completo: init → validate → plan → apply
+- **🌐 3 APIs Microservicios**: Personal Finance, Claim Management, Credit Management
+- **🐘 PostgreSQL Flexible Server**: Base de datos compartida con 3 schemas independientes
+- **🤖 Azure AI Services**: Document Intelligence, OpenAI, Cognitive Services, AI Search
+- **📦 Azure Container Registry**: Almacenamiento seguro de imágenes Docker
+- **🔍 Log Analytics**: Monitoreo centralizado y observabilidad
+
+## 🚀 Despliegue Rápido
+
+### Prerequisitos
+
+1. **Azure CLI**: Autenticado y configurado
+2. **Terraform**: v1.5+ instalado
+3. **Suscripción Azure**: Con permisos de Contributor
+
+### Configuración de Seguridad (REQUERIDO)
 
 ```bash
-# Usar configuración por defecto (dev)
-./deploy.sh
+# 1. Configurar variables de entorno sensibles
+cp main.env.example main.env
 
-# Usar configuración específica
+# 2. Editar main.env con tus valores reales
+vim main.env  # O tu editor preferido
+
+# 3. Cargar variables de entorno
+source main.env
+```
+
+### Despliegue con Script Automatizado
+
+```bash
+# Despliegue completo en dev
+./deploy.sh dev init  # Primera vez
+./deploy.sh dev apply # Despliegue
+
+# O en una sola línea
 ./deploy.sh dev
 ```
 
-#### `./destroy.sh` - Destruir Recursos
+### Verificación del Despliegue
+
 ```bash
-./destroy.sh dev  # Requiere escribir "DESTROY" para confirmar
+# Verificar recursos creados
+az containerapp list --query "[].{Name:name,URL:properties.configuration.ingress.fqdn}" -o table
+
+# Verificar base de datos
+az postgres flexible-server list -o table
 ```
 
-### Configuración
-Edita `environments/dev.tfvars.json` con tus valores:
-
-```json
-{
-  "environment": "dev",
-  "project_name": "mcp-app",
-  "source_code_path": "../ado-demo-mcp",
-  "app_port": 8080,
-  "environment_variables": [
-    {
-      "name": "NODE_ENV", 
-      "value": "production"
-    }
-  ]
-}
-```
-- Log Analytics Workspace
-- Container App Environment
-- Container App Instance with automated build and deployment
-
-## Architecture
-
-```
-Resource Group
-├── Container Registry (ACR)
-├── Log Analytics Workspace
-├── Container App Environment
-└── Container App Instance
-```
-
-## Prerequisites
-
-1. **Azure CLI** - Install and login to Azure
-   ```bash
-   az login
-   ```
-
-2. **Terraform** - Install Terraform
-   ```bash
-   # On macOS using Homebrew
-   brew install terraform
-   
-   # On Windows using winget
-   winget install Hashicorp.Terraform
-   ```
-
-3. **Azure Subscription** - Ensure you have an active Azure subscription
-
-## Project Structure
+## 📁 Estructura del Proyecto
 
 ```
 infra/
-├── main.tf                    # Main configuration
-├── variables.tf               # Variable definitions
-├── outputs.tf                 # Output definitions
-├── providers.tf               # Provider configuration
+├── main.tf                     # 🏗️ Configuración principal
+├── variables.tf                # 📝 Definiciones de variables
+├── outputs.tf                  # 📤 Salidas del deployment
+├── providers.tf                # ⚙️ Configuración de providers
+├── deploy.sh                   # 🚀 Script de despliegue automático
+├── main.env.example           # 🔒 Plantilla de variables sensibles
+├── main.env                   # 🔐 Variables sensibles (gitignored)
 ├── environments/
-│   └── dev.tfvars.json       # Development environment variables
-└── modules/
+│   └── dev.tfvars.json        # 🌍 Configuración por ambiente
+└── modules/                   # 🧩 Módulos reutilizables
     ├── resource_group/
     ├── container_registry/
     ├── log_analytics_workspace/
     ├── container_app_environment/
-    └── container_app_instance/
+    ├── container_app_instance/
+    └── postgresql_flexible_server/
 ```
 
-## Deployment Instructions
+## ⚙️ Configuración Avanzada
 
-### 1. Navigate to the infra directory
-```bash
-cd infra
-```
+### Variables de Ambiente
 
-### 2. Initialize Terraform
-```bash
-terraform init
-```
+| Variable | Descripción | Por Defecto | Requerido |
+|----------|-------------|-------------|-----------|
+| `environment` | Ambiente (dev/staging/prod) | `"dev"` | ✅ |
+| `location` | Región de Azure | `"westus"` | ✅ |
+| `project_name` | Nombre del proyecto | `"mcp-app"` | ✅ |
+| `postgres_administrator_password` | Contraseña PostgreSQL | - | ✅ |
+| `document_intelligence_key` | Azure Document Intelligence | `""` | 🟡 |
+| `open_ai_endpoint` | Azure OpenAI Endpoint | `""` | 🟡 |
+| `cognitive_services_key` | Azure Cognitive Services | `""` | 🟡 |
+| `ai_search_endpoint` | Azure AI Search | `""` | 🟡 |
 
-### 3. Plan the deployment
-```bash
-terraform plan -var-file="environments/dev.tfvars.json"
-```
+> ✅ = Obligatorio | 🟡 = Opcional (según API que uses)
 
-### 4. Validate the configuration
-```bash
-terraform validate
-```
-
-### 5. Apply the configuration
-```bash
-terraform apply -var-file="environments/dev.tfvars.json" -auto-approve
-```
-
-## Key Features
-
-### Automated Container Build and Deployment
-The Container App Instance module includes a `null_resource` that:
-- Automatically builds the Docker image from your source code
-- Pushes the image to Azure Container Registry using `az acr build`
-- Deploys the image to Container Apps
-
-### Security Best Practices
-- Uses managed identity for Container Registry authentication
-- Implements proper resource naming conventions
-- Uses secure default configurations
-
-### Modular Design
-Each Azure resource is defined in its own module for:
-- Reusability
-- Maintainability
-- Separation of concerns
-
-## Configuration
-
-### Environment Variables
-Edit `environments/dev.tfvars.json` to customize your deployment:
+### Configuración de Recursos por Container
 
 ```json
 {
-  "environment": "dev",
-  "location": "westus",
-  "project_name": "mcp-app",
-  "source_code_path": "../ado-demo-mcp",
-  "tags": {
-    "Environment": "dev",
-    "Project": "mcp-app",
-    "ManagedBy": "terraform"
-  }
+  "container_cpu": 0.25,
+  "container_memory": "0.5Gi", 
+  "min_replicas": 1,
+  "max_replicas": 10,
+  "app_port": 8080,
+  "external_access": true
 }
 ```
 
-### Variables Description
+## 🔐 Gestión de Secretos
 
-| Variable | Description | Default | Required |
-|----------|-------------|---------|----------|
-| `environment` | Environment name (dev, staging, prod) | "dev" | No |
-| `location` | Azure region | "westus" | No |
-| `project_name` | Project name for resource naming | "mcp-app" | No |
-| `source_code_path` | Path to source code with Dockerfile | - | Yes |
-| `tags` | Common tags for all resources | {} | No |
+### Variables Sensibles
 
-## Outputs
-
-After successful deployment, you'll get:
-
-- **Container App URL**: The public URL of your deployed application
-- **Container Registry Details**: Login server and registry name
-- **Resource Group Information**: Name and ID
-- **Log Analytics Workspace**: ID for monitoring
-
-## Clean Up
-
-To destroy all created resources:
+Todas las variables sensibles se manejan a través de variables de entorno con el prefijo `TF_VAR_`:
 
 ```bash
-terraform destroy -var-file="environments/dev.tfvars.json" -auto-approve
+# PostgreSQL
+export TF_VAR_postgres_administrator_password="YourSecurePassword123!"
+
+# Azure AI Services
+export TF_VAR_document_intelligence_key="your-doc-intel-key"
+export TF_VAR_open_ai_key="your-openai-key" 
+export TF_VAR_cognitive_services_key="your-cognitive-key"
+export TF_VAR_ai_search_key="your-search-key"
 ```
 
-## Troubleshooting
+### Buenas Prácticas de Seguridad
 
-### Common Issues
+- ✅ Archivo `main.env` está en `.gitignore`
+- ✅ Variables marcadas como `sensitive = true` en Terraform
+- ✅ Contraseñas con validación de complejidad
+- ✅ Firewalls configurados para acceso desde Azure únicamente
 
-1. **Azure CLI not logged in**
+## 🎯 APIs Desplegadas
+
+### 1. Personal Finance API (`/personal-finance`)
+- **Puerto**: 8080
+- **Servicios**: Document Intelligence para procesamiento de documentos
+- **Base de Datos**: `personal_finance` schema
+
+### 2. Claim Management API (`/claim-management`) 
+- **Puerto**: 8080
+- **Servicios**: Azure OpenAI para análisis de claims
+- **Base de Datos**: `claim_management` schema
+
+### 3. Credit Management API (`/credit-management`)
+- **Puerto**: 8080 
+- **Servicios**: Cognitive Services + AI Search para scoring crediticio
+- **Base de Datos**: `credit_management` schema
+
+## 📊 Monitoreo y Observabilidad
+
+### Logs Centralizados
+```bash
+# Ver logs en tiempo real
+az containerapp logs show --name personal-finance-api --resource-group <rg-name> --follow
+
+# Logs de todas las apps
+az containerapp list | jq -r '.[] | .name' | xargs -I {} az containerapp logs show --name {} --resource-group <rg-name>
+```
+
+### Métricas en Azure Portal
+- **Application Insights**: Telemetría automática
+- **Log Analytics**: Queries KQL personalizadas
+- **Container Apps**: Métricas de CPU, memoria, requests
+
+## 🛠️ Operaciones Comunes
+
+### Escalado Manual
+```bash
+# Escalar una app específica
+az containerapp update --name personal-finance-api --resource-group <rg-name> --min-replicas 2 --max-replicas 20
+```
+
+### Actualizar Imagen
+```bash
+# Build y deploy nueva versión
+az acr build --registry <acr-name> --image personal-finance-api:v1.1.0 ../personal-finance-api/
+az containerapp update --name personal-finance-api --image <acr-name>.azurecr.io/personal-finance-api:v1.1.0
+```
+
+### Backup de Base de Datos
+```bash
+# Crear backup automático (ya configurado en PostgreSQL Flexible Server)
+az postgres flexible-server backup list --resource-group <rg-name> --server-name <server-name>
+```
+
+## 🧹 Limpieza de Recursos
+
+```bash
+# Destruir toda la infraestructura
+./deploy.sh dev destroy
+
+# O manualmente
+terraform destroy -var-file="environments/dev.tfvars.json"
+```
+
+## 🚨 Troubleshooting
+
+### Errores Comunes
+
+1. **Container Registry Login Failed**
    ```bash
-   az login
+   az acr login --name <acr-name>
    ```
 
-2. **Insufficient permissions**
-   - Ensure your Azure account has Contributor role on the subscription
+2. **PostgreSQL Connection Issues**
+   - Verificar firewall rules en Azure Portal
+   - Confirmar credenciales en variables de entorno
 
-3. **Container build fails**
-   - Verify the Dockerfile exists in the source code path
-   - Check that the Azure CLI is properly authenticated
+3. **Container Apps No Responden**
+   ```bash
+   # Verificar health status
+   az containerapp show --name <app-name> --resource-group <rg-name> --query "properties.runningStatus"
+   ```
 
-4. **Resource naming conflicts**
-   - Container Registry names must be globally unique
-   - Modify the `project_name` variable if needed
+### Logs de Debug
 
-### Logs and Monitoring
+```bash
+# Habilitar logs detallados
+export TF_LOG=DEBUG
+terraform plan -var-file="environments/dev.tfvars.json"
+```
 
-- Access application logs through Azure Portal > Container Apps > your app > Log stream
-- Monitor performance through Log Analytics Workspace
-- View container metrics in Azure Monitor
+## 📚 Recursos Adicionales
 
-## Best Practices
-
-1. **Version Control**: Keep your Terraform state in a remote backend (Azure Storage)
-2. **Security**: Use Azure Key Vault for sensitive configuration values
-3. **Monitoring**: Set up alerts and dashboards in Azure Monitor
-4. **Cost Management**: Implement auto-scaling and resource optimization
-
-## Additional Resources
-
-- [Azure Container Apps Documentation](https://docs.microsoft.com/en-us/azure/container-apps/)
+- [Azure Container Apps Docs](https://docs.microsoft.com/en-us/azure/container-apps/)
+- [PostgreSQL Flexible Server](https://docs.microsoft.com/en-us/azure/postgresql/flexible-server/)
+- [Azure AI Services](https://docs.microsoft.com/en-us/azure/cognitive-services/)
 - [Terraform Azure Provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs)
-- [Azure CLI Reference](https://docs.microsoft.com/en-us/cli/azure/)
+
+---
+
+**Estado del Proyecto**: ✅ Producción Ready | **Última Actualización**: Noviembre 2024
