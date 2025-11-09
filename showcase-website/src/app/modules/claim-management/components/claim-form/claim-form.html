@@ -1,0 +1,161 @@
+<!-- Modal Container -->
+@if (show()) {
+  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <!-- Modal Content -->
+    <div class="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-white/30">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between p-6 border-b border-gray-200/50">
+        <div class="flex items-center">
+          <div class="w-8 h-8 mr-3 rounded-lg bg-gradient-to-br from-red-400 to-red-500 flex items-center justify-center">
+            <i class="fas fa-plus text-white text-sm"></i>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900">Nuevo Reclamo</h2>
+        </div>
+        <button 
+          (click)="onClose()" 
+          class="w-8 h-8 rounded-lg bg-gray-100/80 hover:bg-gray-200/80 flex items-center justify-center transition-colors">
+          <i class="fas fa-times text-gray-600"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <form #claimFormRef="ngForm" (ngSubmit)="onSubmit(claimFormRef)" class="p-6 space-y-6">
+        
+        <!-- Error Message -->
+        @if (errorMessage()) {
+          <div class="bg-red-50/80 border border-red-200 rounded-lg p-4">
+            <div class="flex items-center">
+              <i class="fas fa-exclamation-circle text-red-600 mr-2"></i>
+              <span class="text-red-800 text-sm">{{ errorMessage() }}</span>
+            </div>
+          </div>
+        }
+
+        <!-- Row 1: Fecha y Documento -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              <i class="fas fa-calendar mr-2 text-gray-500"></i>Fecha del Reclamo
+            </label>
+            <input
+              type="datetime-local"
+              name="date"
+              [(ngModel)]="claimForm.date"
+              required
+              class="w-full px-4 py-3 rounded-xl border border-gray-300/60 bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              <i class="fas fa-id-card mr-2 text-gray-500"></i>Documento de Identidad
+            </label>
+            <input
+              type="text"
+              name="identityDocument"
+              [(ngModel)]="claimForm.identityDocument"
+              placeholder="Ej: 12345678"
+              required
+              minlength="8"
+              maxlength="12"
+              class="w-full px-4 py-3 rounded-xl border border-gray-300/60 bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all">
+          </div>
+        </div>
+
+        <!-- Row 2: Monto -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            <i class="fas fa-dollar-sign mr-2 text-gray-500"></i>Monto del Reclamo
+          </label>
+          <input
+            type="number"
+            name="amount"
+            [(ngModel)]="claimForm.amount"
+            placeholder="0.00"
+            required
+            min="0"
+            step="0.01"
+            class="w-full px-4 py-3 rounded-xl border border-gray-300/60 bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all">
+        </div>
+
+        <!-- Row 3: Motivos -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              <i class="fas fa-tag mr-2 text-gray-500"></i>Motivo Principal
+            </label>
+            <select
+              name="reason"
+              [(ngModel)]="claimForm.reason"
+              (change)="onReasonChange()"
+              required
+              class="w-full px-4 py-3 rounded-xl border border-gray-300/60 bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all">
+              <option value="">Seleccione un motivo</option>
+              @for (reason of reasonOptions; track reason) {
+                <option [value]="reason">{{ reason }}</option>
+              }
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              <i class="fas fa-tags mr-2 text-gray-500"></i>Sub-motivo
+            </label>
+            <select
+              name="subReason"
+              [(ngModel)]="claimForm.subReason"
+              required
+              [disabled]="currentSubReasons.length === 0"
+              class="w-full px-4 py-3 rounded-xl border border-gray-300/60 bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all disabled:bg-gray-100/50 disabled:cursor-not-allowed">
+              <option value="">Seleccione un sub-motivo</option>
+              @for (subReason of currentSubReasons; track subReason) {
+                <option [value]="subReason">{{ subReason }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- Row 4: Descripción -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            <i class="fas fa-comment mr-2 text-gray-500"></i>Descripción Detallada
+          </label>
+          <textarea
+            name="description"
+            [(ngModel)]="claimForm.description"
+            placeholder="Describa detalladamente el motivo de su reclamo..."
+            required
+            minlength="10"
+            maxlength="1000"
+            rows="4"
+            class="w-full px-4 py-3 rounded-xl border border-gray-300/60 bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all resize-none">
+          </textarea>
+          <p class="text-xs text-gray-500 mt-2">{{ claimForm.description.length }}/1000 caracteres</p>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="flex items-center justify-end gap-4 pt-6 border-t border-gray-200/50">
+          <button
+            type="button"
+            (click)="onClose()"
+            class="px-6 py-3 rounded-xl border border-gray-300/60 bg-white/50 text-gray-700 hover:bg-gray-50/80 transition-all font-medium">
+            Cancelar
+          </button>
+          
+          <button
+            type="submit"
+            [disabled]="!claimFormRef.valid || isLoading()"
+            class="px-6 py-3 rounded-xl bg-gradient-to-r from-red-500 to-red-600 text-white font-medium hover:from-red-600 hover:to-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2">
+            @if (isLoading()) {
+              <i class="fas fa-spinner fa-spin"></i>
+              <span>Creando...</span>
+            } @else {
+              <i class="fas fa-save"></i>
+              <span>Crear Reclamo</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

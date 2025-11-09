@@ -1,0 +1,210 @@
+<!-- Contenedor principal único siguiendo estándar CRUD_SPEC -->
+<div class="ios-card">
+  <div class="p-6">
+    <!-- Header: Título + Botón de plantilla -->
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center">
+        <!-- Icono del módulo - Paleta azul para importación -->
+        <div class="w-10 h-10 mr-4 rounded-xl bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center shadow-lg">
+          <i class="fas fa-file-upload text-white text-lg"></i>
+        </div>
+        <!-- Título y descripción -->
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Carga Masiva de Reclamos</h1>
+          <p class="text-gray-600 text-sm">Importar múltiples reclamos desde archivo Excel</p>
+        </div>
+      </div>
+      
+      <!-- Botón de plantilla -->
+      <button 
+        (click)="onDownloadTemplate()"
+        class="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-4 py-2 rounded-lg hover:from-gray-600 hover:to-gray-700 transition-all duration-200 flex items-center gap-2 text-sm">
+        <i class="fas fa-download"></i>
+        <span>Plantilla Excel</span>
+      </button>
+    </div>
+
+    <!-- Área de Upload -->
+    <div class="space-y-6">
+      
+      <!-- File Drop Zone -->
+      @if (!selectedFile() && !importResult()) {
+        <div class="border-2 border-dashed border-blue-300/60 rounded-xl p-8 text-center bg-blue-50/30 hover:bg-blue-50/50 transition-all">
+          <div class="mx-auto w-12 h-12 rounded-full bg-blue-100/80 flex items-center justify-center mb-4">
+            <i class="fas fa-cloud-upload-alt text-blue-600 text-xl"></i>
+          </div>
+          
+          <h3 class="text-lg font-medium text-gray-900 mb-2">Seleccionar archivo Excel</h3>
+          <p class="text-gray-600 text-sm mb-4">Arrastra y suelta tu archivo aquí o haz clic para seleccionar</p>
+          
+          <input 
+            type="file" 
+            (change)="onFileSelected($event)"
+            accept=".xlsx,.xls"
+            class="hidden" 
+            id="fileInput">
+          
+          <label 
+            for="fileInput" 
+            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer">
+            <i class="fas fa-folder-open mr-2"></i>
+            Seleccionar Archivo
+          </label>
+          
+          <p class="text-xs text-gray-500 mt-3">
+            Archivos soportados: .xlsx, .xls (máximo 10MB)
+          </p>
+        </div>
+      }
+
+      <!-- Archivo Seleccionado -->
+      @if (selectedFile() && !importResult()) {
+        <div class="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="w-10 h-10 rounded-lg bg-green-100/80 flex items-center justify-center mr-3">
+                <i class="fas fa-file-excel text-green-600"></i>
+              </div>
+              <div>
+                <p class="font-medium text-gray-900">{{ selectedFile()!.name }}</p>
+                <p class="text-sm text-gray-600">{{ formatFileSize(selectedFile()!.size) }}</p>
+              </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+              <button 
+                (click)="onReset()"
+                class="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 border border-gray-300/60 rounded-lg hover:bg-gray-50/80 transition-all">
+                Cambiar
+              </button>
+              
+              <button 
+                (click)="onImport()"
+                [disabled]="isUploading()"
+                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2">
+                @if (isUploading()) {
+                  <i class="fas fa-spinner fa-spin"></i>
+                  <span>Procesando...</span>
+                } @else {
+                  <i class="fas fa-upload"></i>
+                  <span>Importar</span>
+                }
+              </button>
+            </div>
+          </div>
+          
+          <!-- Progress Bar -->
+          @if (isUploading()) {
+            <div class="mt-4">
+              <div class="flex justify-between text-sm text-gray-600 mb-1">
+                <span>Progreso de importación</span>
+                <span>{{ uploadProgress() }}%</span>
+              </div>
+              <div class="w-full bg-gray-200/60 rounded-full h-2">
+                <div 
+                  class="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  [style.width.%]="uploadProgress()">
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Error Message -->
+      @if (errorMessage()) {
+        <div class="bg-red-50/80 border border-red-200 rounded-lg p-4">
+          <div class="flex items-center">
+            <i class="fas fa-exclamation-circle text-red-600 mr-2"></i>
+            <span class="text-red-800 text-sm">{{ errorMessage() }}</span>
+          </div>
+        </div>
+      }
+
+      <!-- Resultado de Importación -->
+      @if (importResult()) {
+        <div class="bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl p-6">
+          <div class="flex items-center mb-4">
+            <div class="w-10 h-10 rounded-lg bg-green-100/80 flex items-center justify-center mr-3">
+              <i class="fas fa-check-circle text-green-600"></i>
+            </div>
+            <div>
+              <h3 class="font-semibold text-gray-900">Importación Completada</h3>
+              <p class="text-sm text-gray-600">{{ importResult()!.message }}</p>
+            </div>
+          </div>
+          
+          <!-- Estadísticas -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="text-center p-3 bg-blue-50/50 rounded-lg">
+              <div class="text-2xl font-bold text-blue-600">{{ importResult()!.totalProcessed }}</div>
+              <div class="text-xs text-gray-600">Total Procesados</div>
+            </div>
+            
+            <div class="text-center p-3 bg-green-50/50 rounded-lg">
+              <div class="text-2xl font-bold text-green-600">{{ importResult()!.successful }}</div>
+              <div class="text-xs text-gray-600">Exitosos</div>
+            </div>
+            
+            <div class="text-center p-3 bg-red-50/50 rounded-lg">
+              <div class="text-2xl font-bold text-red-600">{{ importResult()!.failed }}</div>
+              <div class="text-xs text-gray-600">Fallidos</div>
+            </div>
+            
+            <div class="text-center p-3 bg-gray-50/50 rounded-lg">
+              <div class="text-2xl font-bold text-gray-600">{{ ((importResult()!.successful / importResult()!.totalProcessed) * 100).toFixed(1) }}%</div>
+              <div class="text-xs text-gray-600">Tasa de Éxito</div>
+            </div>
+          </div>
+
+          <!-- Errores si los hay -->
+          @if (importResult()!.errors && importResult()!.errors.length > 0) {
+            <div class="mb-6">
+              <h4 class="font-medium text-gray-900 mb-2 flex items-center">
+                <i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>
+                Errores Encontrados
+              </h4>
+              <div class="bg-yellow-50/50 border border-yellow-200/60 rounded-lg p-3 max-h-32 overflow-y-auto">
+                @for (error of importResult()!.errors; track $index) {
+                  <div class="text-sm text-yellow-800 py-1">
+                    <span class="font-medium">Fila {{ error.row }}:</span> {{ error.error }}
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Acciones -->
+          <div class="flex items-center justify-end gap-4">
+            <button 
+              (click)="onReset()"
+              class="px-4 py-2 text-gray-600 border border-gray-300/60 rounded-lg hover:bg-gray-50/80 transition-all">
+              Nueva Importación
+            </button>
+            
+            <button 
+              (click)="onViewClaims()"
+              class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all flex items-center gap-2">
+              <i class="fas fa-list"></i>
+              Ver Reclamos
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Instrucciones -->
+      <div class="bg-blue-50/30 border border-blue-200/50 rounded-xl p-4">
+        <h4 class="font-medium text-blue-900 mb-2 flex items-center">
+          <i class="fas fa-info-circle mr-2"></i>
+          Instrucciones
+        </h4>
+        <ul class="text-sm text-blue-800 space-y-1">
+          <li>• El archivo debe contener las columnas: fecha, monto, documento, descripción, motivo y sub-motivo</li>
+          <li>• Use el formato de fecha: YYYY-MM-DD HH:MM:SS</li>
+          <li>• Descargue la plantilla Excel para ver el formato exacto requerido</li>
+          <li>• El archivo no debe exceder 10MB de tamaño</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

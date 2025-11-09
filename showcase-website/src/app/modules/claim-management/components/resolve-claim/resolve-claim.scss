@@ -1,0 +1,84 @@
+/* Estilos específicos para el modal resolve-claim */
+
+/* Animaciones suaves para el modal */
+.fixed {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+  }
+  to { 
+    opacity: 1; 
+  }
+}
+
+/* Efectos de focus mejorados para resolución */
+textarea:focus {
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+/* Estados de validación específicos */
+.ng-invalid.ng-touched {
+  border-color: rgb(239, 68, 68);
+  background-color: rgba(254, 242, 242, 0.5);
+}
+
+.ng-valid.ng-touched {
+  border-color: rgb(34, 197, 94);
+  background-color: rgba(240, 253, 244, 0.5);
+}
+
+/* Estilos para la información del reclamo */
+.claim-info {
+  background: linear-gradient(135deg, rgba(249, 250, 251, 0.8), rgba(243, 244, 246, 0.6));
+}
+
+/* Estados de claim mejorados */
+.status-badge {
+  &.open {
+    background-color: rgba(255, 237, 213, 0.8);
+    color: rgb(194, 65, 12);
+    border: 1px solid rgba(255, 200, 154, 0.5);
+  }
+  
+  &.inProgress {
+    background-color: rgba(219, 234, 254, 0.8);
+    color: rgb(29, 78, 216);
+    border: 1px solid rgba(147, 197, 253, 0.5);
+  }
+  
+  &.resolved {
+    background-color: rgba(220, 252, 231, 0.8);
+    color: rgb(21, 128, 61);
+    border: 1px solid rgba(134, 239, 172, 0.5);
+  }
+}
+
+/* Mejoras visuales para textarea */
+textarea {
+  line-height: 1.6;
+}
+
+/* Estilos para tooltips y hints */
+.hint-text {
+  background: linear-gradient(90deg, rgba(252, 211, 77, 0.1), rgba(251, 191, 36, 0.1));
+  border-left: 3px solid rgb(252, 211, 77);
+}
+
+/* Loading spinner personalizado */
+.fa-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Hover effects para información del reclamo */
+.claim-info:hover {
+  background: linear-gradient(135deg, rgba(249, 250, 251, 0.9), rgba(243, 244, 246, 0.8));
+  transition: background 0.2s ease;
+}

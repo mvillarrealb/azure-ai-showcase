@@ -3,9 +3,9 @@
   [navigationLinks]="navigationLinks"
   [showBackButton]="true"
   backButtonIcon="fas fa-home"
-  headerClasses="bg-gradient-to-r from-orange-400 to-red-500 text-white border-red-600/30"
+  headerClasses="bg-gradient-to-r from-red-400 to-red-500 text-white border-red-600/30"
   sidebarIcon="fas fa-exclamation-triangle"
-  sidebarIconClasses="bg-gradient-to-br from-orange-400 to-red-500">
+  sidebarIconClasses="bg-gradient-to-br from-red-400 to-red-500">
   
   <!-- Header actions -->
   <div slot="header-actions">
@@ -24,6 +24,20 @@
     </div>
     
     <!-- Router outlet para contenido dinámico -->
-    <router-outlet></router-outlet>
+    <router-outlet (activate)="onRouteActivated($event)"></router-outlet>
   </div>
 </app-sidenav-navigation>
+
+<!-- Modales -->
+<app-claim-form
+  [show]="showCreateModal"
+  (closeModal)="onHideCreateModal()"
+  (claimCreated)="onClaimCreated()">
+</app-claim-form>
+
+<app-resolve-claim
+  [show]="showResolveModal"
+  [claim]="selectedClaim"
+  (closeModal)="onHideResolveModal()"
+  (claimResolved)="onClaimResolved()">
+</app-resolve-claim>

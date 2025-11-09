@@ -1,0 +1,25 @@
+/* Estilos específicos para claims-crud siguiendo estándares CRUD_SPEC */
+
+/* Glass morphism base - usando TailwindCSS clases directamente en HTML */
+/* Los estilos @apply requieren configuración especial de TailwindCSS */
+
+/* Estilos personalizados que no se pueden aplicar directamente con Tailwind */
+.resolve-btn:hover {
+  background-color: rgba(34, 197, 94, 0.1);
+}
+
+/* Estados específicos para reclamos si se necesitan clases custom */
+.claim-status-open {
+  color: rgb(234, 88, 12);
+  background-color: rgba(255, 237, 213, 0.5);
+}
+
+.claim-status-in-progress {
+  color: rgb(37, 99, 235);
+  background-color: rgba(219, 234, 254, 0.5);
+}
+
+.claim-status-resolved {
+  color: rgb(34, 197, 94);
+  background-color: rgba(220, 252, 231, 0.5);
+}

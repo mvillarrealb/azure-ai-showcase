@@ -1,0 +1,102 @@
+/* Estilos específicos para claims-import siguiendo estándares CRUD_SPEC */
+
+/* Glass morphism base - usando clases de TailwindCSS directamente en HTML */
+
+/* Animaciones para drag and drop */
+.file-drop-zone {
+  transition: all 0.2s ease;
+}
+
+.file-drop-zone:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Estados de progreso */
+.progress-bar {
+  transition: width 0.3s ease;
+}
+
+/* Animaciones para los resultados */
+.import-result {
+  animation: slideInUp 0.3s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estados de archivo */
+.file-selected {
+  background: linear-gradient(135deg, rgba(240, 253, 244, 0.8), rgba(220, 252, 231, 0.6));
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+/* Estilos para estadísticas */
+.stat-card {
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: scale(1.05);
+}
+
+/* Estados de carga */
+.uploading-state {
+  background: linear-gradient(135deg, rgba(219, 234, 254, 0.8), rgba(191, 219, 254, 0.6));
+}
+
+/* Errores */
+.error-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(251, 191, 36, 0.3) transparent;
+}
+
+.error-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.error-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.error-list::-webkit-scrollbar-thumb {
+  background: rgba(251, 191, 36, 0.3);
+  border-radius: 2px;
+}
+
+/* Loading spinner personalizado */
+.fa-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Hover effects para botones */
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+/* Estilos para el input file oculto */
+input[type="file"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Estados de success */
+.success-state {
+  background: linear-gradient(135deg, rgba(240, 253, 244, 0.8), rgba(220, 252, 231, 0.6));
+}
