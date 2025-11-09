@@ -33,26 +33,20 @@ dependencies {
 	// Database dependencies
 	runtimeOnly 'org.postgresql:postgresql'
 	implementation 'org.liquibase:liquibase-core'
-	
-	// MapStruct for mapping
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-	
-	// Lombok for reducing boilerplate
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
-	
-	// Hibernate Types for special types
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 	implementation 'com.vladmihalcea:hibernate-types-60:2.21.1'
 	
-	// Apache POI for Excel processing
-	implementation 'org.apache.poi:poi:5.2.3'
-	implementation 'org.apache.poi:poi-ooxml:5.2.3'
+	// Apache POI dependencies (misma versión para compatibilidad)
+	implementation 'org.apache.poi:poi:5.4.0'
+	implementation 'org.apache.poi:poi-ooxml:5.4.0'
+	implementation 'org.apache.poi:poi-scratchpad:5.4.0'
 	
-	// Micrometer
-	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
-	
-	// Testing dependencies
+    implementation 'com.azure:azure-ai-openai:1.0.0-beta.7'
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.mockito:mockito-core'
 	testImplementation 'org.assertj:assertj-core'

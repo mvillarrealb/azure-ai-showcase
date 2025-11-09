@@ -2,7 +2,8 @@ package org.mavb.azure.ai.demos.service;
 
 import org.mavb.azure.ai.demos.dto.request.*;
 import org.mavb.azure.ai.demos.dto.response.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.codec.multipart.FilePart;
+import reactor.core.publisher.Mono;
 
 /**
  * Interfaz de servicio para la gestión de reclamos.
@@ -46,11 +47,11 @@ public interface ClaimService {
     ClaimDto resolveClaim(String id, ResolveClaimDto resolveClaimDto);
 
     /**
-     * Importa reclamos desde un archivo Excel.
+     * Importa reclamos desde un archivo Excel usando WebFlux.
      *
-     * @param file Archivo Excel con los datos de reclamos
-     * @return ImportResponseDto con el resultado de la importación
+     * @param filePart FilePart reactivo con el archivo Excel
+     * @return Mono<ImportResponseDto> con el resultado de la importación
      * @throws org.mavb.azure.ai.demos.exception.InvalidFileException si el archivo no es válido
      */
-    ImportResponseDto importClaims(MultipartFile file);
+    Mono<ImportResponseDto> importClaims(FilePart filePart);
 }

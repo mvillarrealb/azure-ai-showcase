@@ -3,6 +3,7 @@ package org.mavb.azure.ai.demos.dto.response;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 /**
@@ -24,6 +25,6 @@ public class ClaimDto {
     private String subReason;
     private String status;
     private String comments;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
 }

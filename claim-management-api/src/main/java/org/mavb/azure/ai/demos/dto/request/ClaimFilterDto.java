@@ -17,10 +17,12 @@ public class ClaimFilterDto {
     private String identityDocument;
 
     @Min(value = 1, message = "La página debe ser mayor a 0")
+    @Builder.Default
     private Integer page = 1;
 
     @Min(value = 1, message = "El límite debe ser al menos 1")
     @Max(value = 100, message = "El límite máximo es 100")
+    @Builder.Default
     private Integer limit = 20;
 
     @Pattern(regexp = "^(open|inProgress|resolved)$", message = "El estado debe ser: open, inProgress o resolved")

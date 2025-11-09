@@ -9,9 +9,10 @@ import org.mavb.azure.ai.demos.service.ClaimService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
 /**
  * Controlador REST para la gestión de reclamos.
@@ -119,21 +120,21 @@ public class ClaimController {
     }
 
     /**
-     * Importa reclamos desde un archivo Excel.
+     * Importa reclamos desde un archivo Excel usando WebFlux.
      * 
-     * @param file archivo Excel con los datos de reclamos
-     * @return ResponseEntity con el resultado de la importación (HTTP 201) o error (HTTP 400)
+     * @param filePartMono archivo Excel reactivo con los datos de reclamos
+     * @return Mono<ResponseEntity> con el resultado de la importación (HTTP 201) o error (HTTP 400)
      */
     @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ImportResponseDto> importClaims(@RequestParam("file") MultipartFile file) {
-        log.info("Solicitud para importar reclamos desde archivo: {}", 
-                file != null ? file.getOriginalFilename() : "null");
+    public Mono<ResponseEntity<ImportResponseDto>> importClaims(@RequestPart("file") Mono<FilePart> filePartMono) {
+        log.info("Solicitud para importar reclamos desde archivo usando WebFlux");
         
-        ImportResponseDto response = claimService.importClaims(file);
-        
-        log.info("Importación completada - Procesados: {}, Exitosos: {}, Errores: {}", 
-                response.getTotalProcessed(), response.getSuccessful(), response.getFailed());
-        
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return filePartMono
+                .doOnNext(filePart -> log.info("Procesando archivo: {}", filePart.filename()))
+                .flatMap(claimService::importClaims)
+                .doOnSuccess(response -> log.info("Importación completada - Procesados: {}, Exitosos: {}, Errores: {}", 
+                        response.getTotalProcessed(), response.getSuccessful(), response.getFailed()))
+                .map(response -> ResponseEntity.status(HttpStatus.CREATED).body(response))
+                .doOnError(error -> log.error("Error durante la importación: {}", error.getMessage()));
     }
 }
