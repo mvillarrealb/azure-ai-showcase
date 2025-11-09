@@ -1,8 +1,8 @@
-# 🏦 GENIA TON IFS - Azure AI Showcase Infrastructure
+# GENIA TON IFS - Azure AI Showcase Infrastructure
 
 Infraestructura como código (IaC) con Terraform para desplegar un ecosistema completo de APIs de IA financiera en Azure Container Apps, integrado con servicios de Azure AI y base de datos PostgreSQL.
 
-## 🏗️ Arquitectura del Sistema
+## Arquitectura del Sistema
 
 ```mermaid
 graph TB
@@ -38,13 +38,13 @@ graph TB
 
 ### Componentes Principales
 
-- **🌐 3 APIs Microservicios**: Personal Finance, Claim Management, Credit Management
-- **🐘 PostgreSQL Flexible Server**: Base de datos compartida con 3 schemas independientes
-- **🤖 Azure AI Services**: Document Intelligence, OpenAI, Cognitive Services, AI Search
-- **📦 Azure Container Registry**: Almacenamiento seguro de imágenes Docker
-- **🔍 Log Analytics**: Monitoreo centralizado y observabilidad
+- **3 APIs Microservicios**: Personal Finance, Claim Management, Credit Management
+- **PostgreSQL Flexible Server**: Base de datos compartida con 3 schemas independientes
+- **Azure AI Services**: Document Intelligence, OpenAI, Cognitive Services, AI Search
+- **Azure Container Registry**: Almacenamiento seguro de imágenes Docker
+- **Log Analytics**: Monitoreo centralizado y observabilidad
 
-## 🚀 Despliegue Rápido
+## Despliegue Rápido
 
 ### Prerequisitos
 
@@ -86,20 +86,20 @@ az containerapp list --query "[].{Name:name,URL:properties.configuration.ingress
 az postgres flexible-server list -o table
 ```
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 infra/
-├── main.tf                     # 🏗️ Configuración principal
-├── variables.tf                # 📝 Definiciones de variables
-├── outputs.tf                  # 📤 Salidas del deployment
-├── providers.tf                # ⚙️ Configuración de providers
-├── deploy.sh                   # 🚀 Script de despliegue automático
-├── main.env.example           # 🔒 Plantilla de variables sensibles
-├── main.env                   # 🔐 Variables sensibles (gitignored)
+├── main.tf                     # Configuración principal
+├── variables.tf                # Definiciones de variables
+├── outputs.tf                  # Salidas del deployment
+├── providers.tf                # Configuración de providers
+├── deploy.sh                   # Script de despliegue automático
+├── main.env.example           # Plantilla de variables sensibles
+├── main.env                   # Variables sensibles (gitignored)
 ├── environments/
-│   └── dev.tfvars.json        # 🌍 Configuración por ambiente
-└── modules/                   # 🧩 Módulos reutilizables
+│   └── dev.tfvars.json        # Configuración por ambiente
+└── modules/                   # Módulos reutilizables
     ├── resource_group/
     ├── container_registry/
     ├── log_analytics_workspace/
@@ -108,22 +108,22 @@ infra/
     └── postgresql_flexible_server/
 ```
 
-## ⚙️ Configuración Avanzada
+## Configuración Avanzada
 
 ### Variables de Ambiente
 
 | Variable | Descripción | Por Defecto | Requerido |
 |----------|-------------|-------------|-----------|
-| `environment` | Ambiente (dev/staging/prod) | `"dev"` | ✅ |
-| `location` | Región de Azure | `"westus"` | ✅ |
-| `project_name` | Nombre del proyecto | `"mcp-app"` | ✅ |
-| `postgres_administrator_password` | Contraseña PostgreSQL | - | ✅ |
-| `document_intelligence_key` | Azure Document Intelligence | `""` | 🟡 |
-| `open_ai_endpoint` | Azure OpenAI Endpoint | `""` | 🟡 |
-| `cognitive_services_key` | Azure Cognitive Services | `""` | 🟡 |
-| `ai_search_endpoint` | Azure AI Search | `""` | 🟡 |
+| `environment` | Ambiente (dev/staging/prod) | `"dev"` | Sí |
+| `location` | Región de Azure | `"westus"` | Sí |
+| `project_name` | Nombre del proyecto | `"mcp-app"` | Sí |
+| `postgres_administrator_password` | Contraseña PostgreSQL | - | Sí |
+| `document_intelligence_key` | Azure Document Intelligence | `""` | Opcional |
+| `open_ai_endpoint` | Azure OpenAI Endpoint | `""` | Opcional |
+| `cognitive_services_key` | Azure Cognitive Services | `""` | Opcional |
+| `ai_search_endpoint` | Azure AI Search | `""` | Opcional |
 
-> ✅ = Obligatorio | 🟡 = Opcional (según API que uses)
+> Sí = Obligatorio | Opcional = Según API que uses
 
 ### Configuración de Recursos por Container
 
@@ -138,7 +138,7 @@ infra/
 }
 ```
 
-## 🔐 Gestión de Secretos
+## Gestión de Secretos
 
 ### Variables Sensibles
 
@@ -157,12 +157,12 @@ export TF_VAR_ai_search_key="your-search-key"
 
 ### Buenas Prácticas de Seguridad
 
-- ✅ Archivo `main.env` está en `.gitignore`
-- ✅ Variables marcadas como `sensitive = true` en Terraform
-- ✅ Contraseñas con validación de complejidad
-- ✅ Firewalls configurados para acceso desde Azure únicamente
+- Archivo `main.env` está en `.gitignore`
+- Variables marcadas como `sensitive = true` en Terraform
+- Contraseñas con validación de complejidad
+- Firewalls configurados para acceso desde Azure únicamente
 
-## 🎯 APIs Desplegadas
+## APIs Desplegadas
 
 ### 1. Personal Finance API (`/personal-finance`)
 - **Puerto**: 8080
@@ -179,7 +179,7 @@ export TF_VAR_ai_search_key="your-search-key"
 - **Servicios**: Cognitive Services + AI Search para scoring crediticio
 - **Base de Datos**: `credit_management` schema
 
-## 📊 Monitoreo y Observabilidad
+## Monitoreo y Observabilidad
 
 ### Logs Centralizados
 ```bash
@@ -195,7 +195,7 @@ az containerapp list | jq -r '.[] | .name' | xargs -I {} az containerapp logs sh
 - **Log Analytics**: Queries KQL personalizadas
 - **Container Apps**: Métricas de CPU, memoria, requests
 
-## 🛠️ Operaciones Comunes
+## Operaciones Comunes
 
 ### Escalado Manual
 ```bash
@@ -216,7 +216,7 @@ az containerapp update --name personal-finance-api --image <acr-name>.azurecr.io
 az postgres flexible-server backup list --resource-group <rg-name> --server-name <server-name>
 ```
 
-## 🧹 Limpieza de Recursos
+## Limpieza de Recursos
 
 ```bash
 # Destruir toda la infraestructura
@@ -226,7 +226,7 @@ az postgres flexible-server backup list --resource-group <rg-name> --server-name
 terraform destroy -var-file="environments/dev.tfvars.json"
 ```
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 ### Errores Comunes
 
@@ -253,13 +253,10 @@ export TF_LOG=DEBUG
 terraform plan -var-file="environments/dev.tfvars.json"
 ```
 
-## 📚 Recursos Adicionales
+## Referencias Adicionales
 
 - [Azure Container Apps Docs](https://docs.microsoft.com/en-us/azure/container-apps/)
 - [PostgreSQL Flexible Server](https://docs.microsoft.com/en-us/azure/postgresql/flexible-server/)
 - [Azure AI Services](https://docs.microsoft.com/en-us/azure/cognitive-services/)
 - [Terraform Azure Provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs)
 
----
-
-**Estado del Proyecto**: ✅ Producción Ready | **Última Actualización**: Noviembre 2024

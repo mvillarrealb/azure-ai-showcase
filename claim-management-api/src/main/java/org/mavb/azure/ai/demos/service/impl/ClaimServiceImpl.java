@@ -184,6 +184,12 @@ public class ClaimServiceImpl implements ClaimService {
                     
                     for (ImportClaimDto importClaimDto : enhancedClaimDtos) {
                         try {
+                            // Log para verificar que los motivos están presentes
+                            log.debug("Processing claim from row {}: reason='{}', subReason='{}'", 
+                                     importClaimDto.getRowNumber(), 
+                                     importClaimDto.getReason(), 
+                                     importClaimDto.getSubReason());
+                            
                             Set<ConstraintViolation<ImportClaimDto>> violations = validator.validate(importClaimDto);
                             if (!violations.isEmpty()) {
                                 String errorMessage = violations.stream()
@@ -199,6 +205,13 @@ public class ClaimServiceImpl implements ClaimService {
                             
                             Claim claim = claimMapper.toEntity(importClaimDto);
                             Claim savedClaim = claimRepository.save(claim);
+                            
+                            // Log para confirmar que se guardó correctamente
+                            log.debug("Successfully saved claim with ID '{}': reason='{}', subReason='{}'", 
+                                     savedClaim.getId(), 
+                                     savedClaim.getReason(), 
+                                     savedClaim.getSubReason());
+                            
                             successfulClaims.add(savedClaim);
                             
                         } catch (Exception e) {

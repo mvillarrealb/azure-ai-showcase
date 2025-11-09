@@ -51,6 +51,8 @@ public interface ClaimMapper {
     @Mapping(target = "id", source = "id")
     @Mapping(target = "identityDocument", source = "identityDocument")
     @Mapping(target = "amount", source = "amount")
+    @Mapping(target = "reason", source = "reason")
+    @Mapping(target = "subReason", source = "subReason")
     ImportResponseDto.ImportedClaimDto toImportedClaimDto(Claim claim);
 
     /**

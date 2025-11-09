@@ -73,8 +73,19 @@ export interface ImportResponse {
   totalProcessed: number;
   successful: number;
   failed: number;
-  claimsCreated: Array<{ id: string; identityDocument: string; }>;
+  claimsCreated: ImportedClaim[];
   errors: Array<{ row: number; error: string; }>;
+}
+
+/**
+ * Reclamo importado con datos básicos y motivos asignados por IA
+ */
+export interface ImportedClaim {
+  id: string;
+  identityDocument: string;
+  amount: number;
+  reason: string;
+  subReason: string;
 }
 
 /**

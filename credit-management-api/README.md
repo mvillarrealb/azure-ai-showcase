@@ -1,14 +1,97 @@
-# Credit Management API - Azure AI Search Integration
+# Introducción
 
-## 🚀 Funcionalidades Implementadas
+Credit Management API es un microservicio REST que proporciona capacidades avanzadas de gestión y evaluación de productos crediticios bancarios integrando servicios de Azure AI para implementar búsqueda semántica inteligente, análisis de perfiles crediticios y recomendaciones personalizadas basadas en similitud vectorial.
 
-### ✅ Sincronización Automática con Azure AI Search
-- **ProductSyncListener**: Listener JPA que sincroniza automáticamente productos con Azure AI Search al crear nuevos productos
-- **Generación de Embeddings**: Usando OpenAI para embeddings semánticos de productos
-- **Procesamiento Asíncrono**: Sincronización no bloqueante con thread pool dedicado
-- **Solo INSERT**: Implementado únicamente para nuevos productos (no update/delete)
+# Tecnologías
 
-## 📁 Estructura del Proyecto
+- Java 21
+- Spring Boot 3.5.7
+- Spring WebFlux
+- Spring Data JPA
+- PostgreSQL
+- Liquibase
+- MapStruct 1.5.5.Final
+- Lombok
+- Azure AI Search SDK 11.6.0
+- Azure OpenAI SDK 1.0.0-beta.7
+- Hypersistence Utils 3.6.0
+
+# Componentes Azure AI
+
+La aplicación utiliza Azure AI Search para búsqueda vectorial semántica de productos crediticios y Azure OpenAI para generar embeddings de alta calidad. El sistema mantiene índices especializados para rangos crediticios y productos financieros, permitiendo búsquedas semánticas que van más allá de coincidencias exactas mediante vectores de similitud.
+
+```mermaid
+graph TB
+    A[Client Profile] --> B[Azure OpenAI Embeddings]
+    B --> C[Vector Generation]
+    C --> D[Azure AI Search]
+    D --> E[Rank Classification]
+    D --> F[Product Matching]
+    E --> G[Eligibility Analysis]
+    F --> G
+    G --> H[Personalized Recommendations]
+    H --> I[PostgreSQL Database]
+    
+    B -.->|text-embedding-ada-002| C
+    D -.->|Vector Search| E
+    D -.->|Semantic Search| F
+    G -.->|Credit Scoring| H
+```
+
+# Funcionalidades
+
+- Gestión completa de productos crediticios con operaciones CRUD y sincronización automática
+- Administración de rangos crediticios con generación de embeddings semánticos
+- Búsqueda vectorial avanzada para matching de productos basado en similitud contextual
+- Evaluación crediticia integral con análisis de perfiles de clientes
+- Recomendaciones personalizadas de productos financieros mediante IA
+- Sincronización automática con Azure AI Search para búsquedas en tiempo real
+- Clasificación automática de perfiles crediticios mediante vectores de similitud
+
+Para detalles específicos de los endpoints y esquemas de datos, consultar la especificación OpenAPI en [specs/credit-management.yaml](../specs/credit-management.yaml).
+
+# Ejecutar Localmente
+
+## Requisitos Previos
+- Java 21
+- PostgreSQL 14+
+- Azure AI Search service
+- Azure OpenAI Service con modelo de embeddings desplegado
+
+## Configuración
+```bash
+# Variables de entorno requeridas
+export AZURE_SEARCH_ENDPOINT=https://your-search-service.search.windows.net
+export AZURE_SEARCH_KEY=your_ai_search_admin_key
+export AZURE_SEARCH_RANKS_INDEX=ranks-index
+export AZURE_SEARCH_PRODUCTS_INDEX=products-index
+export AZURE_OPENAI_ENDPOINT=your_azure_openai_endpoint
+export AZURE_OPENAI_KEY=your_azure_openai_api_key
+export AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-ada-002
+export DB_HOST=localhost
+export DB_USERNAME=postgres
+export DB_PASSWORD=your_password
+```
+
+## Ejecución
+```bash
+cd credit-management-api
+./gradlew bootRun
+```
+
+La aplicación estará disponible en http://localhost:8080
+
+## Colección Postman
+
+Para facilitar las pruebas de la API, se proporciona una colección de Postman con todos los endpoints configurados en [postman/credit-management-v1.1.0.postman_collection.json](../postman/credit-management-v1.1.0.postman_collection.json).
+
+# Referencias
+
+- [Azure AI Search Documentation](https://docs.microsoft.com/en-us/azure/search/)
+- [Azure AI Search REST API](https://docs.microsoft.com/en-us/rest/api/searchservice/)
+- [Azure OpenAI Embeddings Guide](https://docs.microsoft.com/en-us/azure/cognitive-services/openai/how-to/embeddings)
+- [Vector Search in Azure AI Search](https://docs.microsoft.com/en-us/azure/search/vector-search-overview)
+- [Spring Boot Async Configuration](https://spring.io/guides/gs/async-method/)
 
 ```
 credit-management-api/

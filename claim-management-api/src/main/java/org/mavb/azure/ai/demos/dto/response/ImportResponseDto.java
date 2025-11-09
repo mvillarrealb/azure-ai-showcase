@@ -29,6 +29,8 @@ public class ImportResponseDto {
         private String id;
         private String identityDocument;
         private BigDecimal amount;
+        private String reason;
+        private String subReason;
     }
 
     @Data

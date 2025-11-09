@@ -23,6 +23,7 @@ export class ClaimsImportComponent {
   selectedFile = signal<File | null>(null);
   importResult = signal<ImportResponse | null>(null);
   errorMessage = signal<string>('');
+  showDetailedClaims = signal<boolean>(false);
 
   /**
    * Maneja la selección de archivo
@@ -99,6 +100,11 @@ export class ClaimsImportComponent {
         this.importResult.set(result);
         this.isUploading.set(false);
         
+        // Mostrar automáticamente los detalles si hay reclamos creados
+        if (result.claimsCreated && result.claimsCreated.length > 0) {
+          this.showDetailedClaims.set(true);
+        }
+        
         // Emit completion event
         this.importCompleted.emit();
         
@@ -125,6 +131,7 @@ export class ClaimsImportComponent {
     this.errorMessage.set('');
     this.uploadProgress.set(0);
     this.isUploading.set(false);
+    this.showDetailedClaims.set(false);
     
     // Limpiar input file
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -134,9 +141,16 @@ export class ClaimsImportComponent {
   }
 
   /**
-   * Navega a la lista de reclamos
+   * Alterna la vista detallada de reclamos creados
    */
-  onViewClaims() {
+  toggleDetailedView() {
+    this.showDetailedClaims.set(!this.showDetailedClaims());
+  }
+
+  /**
+   * Navega a la lista completa de reclamos
+   */
+  onViewAllClaims() {
     this.router.navigate(['/claim-management/claims']);
   }
 
@@ -163,15 +177,22 @@ export class ClaimsImportComponent {
 Formato de archivo Excel requerido:
 
 Columnas obligatorias (en este orden):
-- A: date (YYYY-MM-DD HH:MM:SS)
+- A: date (YYYY-MM-DD o YYYY-MM-DD HH:MM:SS)
 - B: amount (número decimal)
-- C: identityDocument (texto)
-- D: description (texto, mín 10 caracteres)
-- E: reason (texto)
-- F: subReason (texto)
+- C: identityDocument (texto, 8-12 caracteres)
+- D: description (texto, mínimo 10 caracteres)
+
+NOTA IMPORTANTE:
+• Los campos "motivo" y "submotivo" se asignan automáticamente por IA
+• El sistema analiza la descripción para categorizar el reclamo
+• No es necesario incluir las columnas de motivo y submotivo en el Excel
 
 Ejemplo:
-2024-11-08 10:30:00 | 1500.75 | 12345678 | Cargo no autorizado | Cargo indebido | Transacción no autorizada
+2024-11-08 10:30:00 | 1500.75 | 12345678 | Cargo no autorizado en mi tarjeta de crédito
+
+El sistema automáticamente categorizará como:
+Motivo: "Fraude / Seguridad"
+Submotivo: "Transacción no reconocida"
     `;
     
     alert(templateInfo);

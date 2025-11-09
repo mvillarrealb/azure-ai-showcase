@@ -164,7 +164,7 @@ export class InvoiceScannerComponent {
         const categoryName = this.getSelectedCategoryName();
         this.scanResult.set(null);
         this.successMessage.set(
-          `Transacción registrada por S/${Math.abs(createdTransaction.amount).toFixed(2)} en categoría "${categoryName}"`
+          `Transacción registrada por ${this.formatCurrency(Math.abs(createdTransaction.amount))} en categoría "${categoryName}"`
         );
       },
       error: (error) => {
@@ -197,5 +197,12 @@ export class InvoiceScannerComponent {
     } catch {
       return dateString;
     }
+  }
+
+  formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('es-PE', {
+      style: 'currency',
+      currency: 'PEN'
+    }).format(amount);
   }
 }

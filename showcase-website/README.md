@@ -1,59 +1,151 @@
-# ShowcaseWebsite
+# Introducción
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.2.
+Showcase Website es una aplicación web frontend desarrollada con Angular 20 que sirve como interfaz de usuario para demostrar las capacidades de los servicios de Inteligencia Artificial de Azure a través de casos de uso financieros reales. La aplicación proporciona interfaces modernas e intuitivas para gestión de finanzas personales, evaluación crediticia y manejo de reclamos financieros, integrando servicios de Azure AI como Document Intelligence, OpenAI y AI Search.
 
-## Development server
+# Tecnologías
 
-To start a local development server, run:
+| Tecnología | Versión | Propósito |
+|------------|---------|-----------|
+| Angular | 20.3.0 | Framework principal de desarrollo |
+| TypeScript | 5.9.2 | Lenguaje de programación tipado |
+| TailwindCSS | 4.1.13 | Framework de CSS utility-first |
+| RxJS | 7.8.0 | Manejo de programación reactiva |
+| Chart.js | 4.5.1 | Biblioteca de gráficos |
+| ngx-markdown | 20.1.0 | Procesamiento de contenido Markdown |
+| marked | 16.3.0 | Parser de Markdown |
+| date-fns | 4.1.0 | Utilidades de manipulación de fechas |
+| PostCSS | 8.5.6 | Procesador de CSS |
+| Jasmine | 5.9.0 | Framework de testing |
+| Karma | 6.4.0 | Test runner |
 
-```bash
-ng serve
+# Apis que consume
+
+| API | Puerto Local | Documentación OpenAPI | Código Fuente |
+|-----|-------------|-----------------------|---------------|
+| Personal Finance API | 8080 | [personal-finance.yaml](../specs/personal-finance.yaml) | [personal-finance-api](../personal-finance-api) |
+| Claim Management API | 8081 | [claim-management.yaml](../specs/claim-management.yaml) | [claim-management-api](../claim-management-api) |
+| Credit Management API | 8082 | [credit-management.yaml](../specs/credit-management.yaml) | [credit-management-api](../credit-management-api) |
+
+# Funcionalidades
+
+La aplicación está organizada en tres módulos principales que consumen servicios de Azure AI para casos de uso financieros:
+
+## Módulo Personal Finance
+- Gestión de transacciones financieras personales
+- Escaneo y análisis de facturas PDF mediante Document Intelligence
+- Generación de reportes mensuales con visualización de gráficos
+- Categorización automática de gastos
+
+## Módulo Claim Management
+- Gestión completa de reclamos financieros
+- Importación masiva de reclamos desde archivos Excel
+- Análisis automático de motivos y submotivos mediante Azure OpenAI
+- Sistema de estados para seguimiento de reclamos
+
+## Módulo Credit Management
+- Gestión de catálogo de productos crediticios
+- Administración de rangos de clasificación crediticia
+- Evaluación automática de elegibilidad crediticia usando AI Search
+- Sincronización automática con Azure AI Search para scoring
+
+```mermaid
+graph TB
+    A[Home Page] --> B[Personal Finance Module]
+    A --> C[Credit Management Module]
+    A --> D[Claim Management Module]
+    
+    B --> B1[Transacciones]
+    B --> B2[Escaneo PDF]
+    B --> B3[Reportes]
+    B1 --> B1A[Personal Finance CRUD]
+    B2 --> B2A[Invoice Scanner]
+    B3 --> B3A[Monthly Reports]
+    
+    C --> C1[Productos Crediticios]
+    C --> C2[Rangos de Crédito]
+    C --> C3[Evaluación Crediticia]
+    C1 --> C1A[Products CRUD]
+    C2 --> C2A[Ranks CRUD]
+    C3 --> C3A[Credit Evaluation Wizard]
+    
+    D --> D1[Gestión de Reclamos]
+    D --> D2[Importación Masiva]
+    D1 --> D1A[Claims CRUD]
+    D2 --> D2A[Claims Import]
+    
+    subgraph Services
+        E[Personal Finance Service]
+        F[Credit Management Service]
+        G[Claim Service]
+    end
+    
+    B1A --> E
+    B2A --> E
+    B3A --> E
+    C1A --> F
+    C2A --> F
+    C3A --> F
+    D1A --> G
+    D2A --> G
+    
+    subgraph External APIs
+        H[Personal Finance API<br/>Document Intelligence]
+        I[Credit Management API<br/>AI Search + OpenAI]
+        J[Claim Management API<br/>Azure OpenAI]
+    end
+    
+    E --> H
+    F --> I
+    G --> J
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+# Ejecutar Localmente
 
-## Code scaffolding
+## Requisitos Previos
+- Node.js 18 o superior
+- npm 9 o superior
+- Angular CLI 20 o superior
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Configuración
 
+1. Clonar el repositorio y navegar al directorio del proyecto:
 ```bash
-ng generate component component-name
+cd showcase-website
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
+2. Instalar dependencias:
 ```bash
-ng generate --help
+npm install
 ```
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
+3. Configurar variables de entorno en `src/environments/environment.ts`:
+```typescript
+export const environment = {
+  production: false,
+  personalFinance: 'http://localhost:8080',
+  claimManagement: 'http://localhost:8081', 
+  creditManagement: 'http://localhost:8082',
+  localization: {
+    locale: 'es-PE',
+    currency: 'PEN'
+  }
+};
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+4. Asegurar que las APIs backend estén ejecutándose en sus respectivos puertos antes de iniciar la aplicación.
 
-## Running unit tests
+## Ejecución
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
+Iniciar el servidor de desarrollo:
 ```bash
-ng test
+npm start
 ```
 
-## Running end-to-end tests
+La aplicación estará disponible en `http://localhost:4200`.
 
-For end-to-end (e2e) testing, run:
+## Comandos Adicionales
 
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- Construir para producción: `npm run build`
+- Ejecutar tests: `npm test`
+- Modo de desarrollo con watch: `npm run watch`
+- Servir build de producción: `ng serve --configuration production`

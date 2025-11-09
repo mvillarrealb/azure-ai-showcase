@@ -320,9 +320,13 @@ paths:
                   - id: "CLM-2024-001240"
                     identityDocument: "11111111"
                     amount: 500.00
+                    reason: "Fraude / Seguridad"
+                    subReason: "Transacción no reconocida"
                   - id: "CLM-2024-001241"
                     identityDocument: "22222222"
                     amount: 750.50
+                    reason: "Operaciones bancarias"
+                    subReason: "Transferencia no acreditada"
                 errors:
                   - row: 5
                     error: "Documento de identidad inválido"
@@ -536,6 +540,14 @@ components:
                 type: number
                 format: float
                 example: 500.00
+              reason:
+                type: string
+                description: Motivo principal del reclamo asignado por IA
+                example: "Fraude / Seguridad"
+              subReason:
+                type: string
+                description: Submotivo específico del reclamo asignado por IA
+                example: "Transacción no reconocida"
         errors:
           type: array
           items:

@@ -88,10 +88,18 @@ public class OpenAIClaimService {
                 .stream()
                 .filter(it -> Objects.equals(it.getRowNumber(), importClaim.getRowNumber()))
                 .findFirst();
-        importReasonOptional.ifPresent(reason-> {
+        
+        if (importReasonOptional.isPresent()) {
+            ClaimImportReason reason = importReasonOptional.get();
             importClaim.setReason(reason.getMainCategory());
             importClaim.setSubReason(reason.getSubCategory());
-        });
+            log.debug("Assigned reason '{}' and subReason '{}' to claim from row {}", 
+                     reason.getMainCategory(), reason.getSubCategory(), importClaim.getRowNumber());
+        } else {
+            log.warn("No reason found for claim from row {}, OpenAI may not have processed this row", 
+                     importClaim.getRowNumber());
+        }
+        
         return importClaim;
     }
 }
