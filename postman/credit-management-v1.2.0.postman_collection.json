@@ -1,0 +1,947 @@
+{
+  "info": {
+    "name": "Credit Management API v1.2.0",
+    "description": "API REST para la gestión y evaluación de productos crediticios bancarios con capacidades de IA semántica",
+    "version": "1.2.0",
+    "_postman_id": "credit-management-api-v1-2-0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api/v1",
+      "description": "Base URL del servidor de desarrollo local"
+    },
+    {
+      "key": "prodUrl",
+      "value": "https://api.banco.com/v1",
+      "description": "Base URL del servidor de producción"
+    }
+  ],
+  "item": [
+    {
+      "name": "Products",
+      "description": "Gestión de productos crediticios con sincronización automática con Azure AI Search",
+      "item": [
+        {
+          "name": "GET Lista de productos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products?category=PRESTAMO_PERSONAL&currency=S/&minAmount=10000&maxAmount=100000&page=0&size=20&sort=name",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "PRESTAMO_PERSONAL",
+                  "description": "Filtrar por categoría de producto",
+                  "disabled": true
+                },
+                {
+                  "key": "currency",
+                  "value": "S/",
+                  "description": "Filtrar por moneda (S/ o USD)",
+                  "disabled": true
+                },
+                {
+                  "key": "minAmount",
+                  "value": "10000",
+                  "description": "Monto mínimo requerido",
+                  "disabled": true
+                },
+                {
+                  "key": "maxAmount",
+                  "value": "100000",
+                  "description": "Monto máximo requerido",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Número de página (basado en 0)",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "20",
+                  "description": "Tamaño de página",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "name",
+                  "description": "Campo de ordenación",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Devuelve una lista completa de productos crediticios disponibles con filtros opcionales"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/products",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"CRV-PEN-001\",\n      \"name\": \"Crédito Revolvente Empresarial\",\n      \"description\": \"Línea de crédito flexible para empresas\",\n      \"category\": \"Crédito Revolvente\",\n      \"subcategory\": \"Crédito Revolvente Capital Trabajo\",\n      \"minimumAmount\": 20000,\n      \"maximumAmount\": 300000,\n      \"currency\": \"S/\",\n      \"term\": \"12 meses renovables\",\n      \"minimumRate\": 9.00,\n      \"maximumRate\": 14.00,\n      \"requirements\": [\n        \"RUC vigente\",\n        \"Estados financieros de los últimos 2 años\",\n        \"Flujo de caja mensual\"\n      ],\n      \"features\": [\n        \"Disposiciones parciales\",\n        \"Pagos flexibles\",\n        \"Sin comisión por prepago\"\n      ],\n      \"benefits\": [\n        \"Capital de trabajo inmediato\",\n        \"Flexibilidad en el uso de fondos\",\n        \"Tasas competitivas\"\n      ]\n    }\n  ],\n  \"total\": 25,\n  \"totalPages\": 3,\n  \"currentPage\": 0\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has correct structure\", function () {",
+                  "    pm.response.to.be.json;",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData).to.have.property('total');",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Crear producto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"CRP-USD-001\",\n  \"name\": \"Crédito Rotativo Premium\",\n  \"description\": \"Línea de crédito rotativo con condiciones preferenciales para clientes VIP\",\n  \"category\": \"Crédito Revolvente\",\n  \"subcategory\": \"Crédito Revolvente Premium\",\n  \"minimumAmount\": 50000,\n  \"maximumAmount\": 500000,\n  \"currency\": \"USD\",\n  \"term\": \"24 meses renovables\",\n  \"minimumRate\": 8.50,\n  \"maximumRate\": 12.50,\n  \"requirements\": [\n    \"RUC vigente\",\n    \"Estados financieros auditados\",\n    \"Garantías hipotecarias\"\n  ],\n  \"features\": [\n    \"Disposición inmediata\",\n    \"Sin comisión por manejo\",\n    \"Banca privada incluida\"\n  ],\n  \"benefits\": [\n    \"Tasas preferenciales\",\n    \"Asesoría financiera personalizada\",\n    \"Seguros incluidos\"\n  ],\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"]
+            },
+            "description": "Crea un nuevo producto crediticio con sincronización automática a Azure AI Search"
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"CRP-USD-001\",\n  \"name\": \"Crédito Rotativo Premium\",\n  \"description\": \"Línea de crédito rotativo con condiciones preferenciales para clientes VIP\",\n  \"category\": \"Crédito Revolvente\"\n}"
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"id\": \"CRP-USD-001\",\n  \"name\": \"Crédito Rotativo Premium\",\n  \"description\": \"Línea de crédito rotativo con condiciones preferenciales para clientes VIP\",\n  \"category\": \"Crédito Revolvente\",\n  \"subcategory\": \"Crédito Revolvente Premium\",\n  \"minimumAmount\": 50000,\n  \"maximumAmount\": 500000,\n  \"currency\": \"USD\",\n  \"term\": \"24 meses renovables\",\n  \"minimumRate\": 8.50,\n  \"maximumRate\": 12.50,\n  \"requirements\": [\n    \"RUC vigente\",\n    \"Estados financieros auditados\",\n    \"Garantías hipotecarias\"\n  ],\n  \"features\": [\n    \"Disposición inmediata\",\n    \"Sin comisión por manejo\",\n    \"Banca privada incluida\"\n  ],\n  \"benefits\": [\n    \"Tasas preferenciales\",\n    \"Asesoría financiera personalizada\",\n    \"Seguros incluidos\"\n  ]\n}"
+            },
+            {
+              "name": "409 Conflict - Producto ya existe",
+              "originalRequest": {
+                "method": "POST"
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"error\": \"Product Already Exists\",\n  \"message\": \"El producto con ID CRP-USD-001 ya existe\",\n  \"timestamp\": \"2024-11-08T16:30:00Z\"\n}"
+            },
+            {
+              "name": "400 Bad Request - Validación",
+              "originalRequest": {
+                "method": "POST"
+              },
+              "status": "Bad Request", 
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"error\": \"Validation Error\",\n  \"message\": \"Datos de entrada inválidos\",\n  \"details\": [\n    {\n      \"field\": \"id\",\n      \"message\": \"El ID debe seguir el patrón: 3 letras-3 letras-3 dígitos\"\n    },\n    {\n      \"field\": \"minimumAmount\",\n      \"message\": \"El monto mínimo debe ser mayor a 0\"\n    }\n  ]\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 or error status\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400, 409]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    pm.test(\"Product created successfully\", function () {",
+                  "        pm.response.to.be.json;",
+                  "        const jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('id');",
+                  "        pm.expect(jsonData).to.have.property('createdAt');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Producto por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/CRV-PEN-001",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "CRV-PEN-001"]
+            },
+            "description": "Devuelve información completa de un producto crediticio por su ID"
+          },
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/products/CRV-PEN-001",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "CRV-PEN-001"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"id\": \"CRV-PEN-001\",\n  \"name\": \"Crédito Revolvente Empresarial\",\n  \"description\": \"Línea de crédito revolvente para empresas que necesitan capital de trabajo flexible. Permite disposiciones parciales y pagos variables según el flujo de caja de la empresa.\",\n  \"category\": \"Crédito Revolvente\",\n  \"subcategory\": \"Crédito Revolvente Capital Trabajo\",\n  \"minimumAmount\": 20000,\n  \"maximumAmount\": 300000,\n  \"currency\": \"S/\",\n  \"term\": \"12 meses renovables\",\n  \"minimumRate\": 9.00,\n  \"maximumRate\": 14.00,\n  \"requirements\": [\n    \"RUC vigente\",\n    \"Estados financieros de los últimos 2 años\",\n    \"Flujo de caja mensual\",\n    \"Constitución de la empresa\",\n    \"Historial crediticio empresarial bueno\",\n    \"Ventas anuales mínimas S/ 300,000\",\n    \"Garantías líquidas\"\n  ],\n  \"features\": [\n    \"Disposiciones parciales\",\n    \"Pagos flexibles\",\n    \"Sin comisión por prepago\",\n    \"Renovación automática\",\n    \"Banca digital incluida\"\n  ],\n  \"benefits\": [\n    \"Capital de trabajo inmediato\",\n    \"Flexibilidad en el uso de fondos\",\n    \"Tasas competitivas\",\n    \"Gestión 100% digital\"\n  ]\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/products/INVALID-ID",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "INVALID-ID"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"error\": \"Product Not Found\",\n  \"message\": \"El producto con ID INVALID-ID no existe\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 404\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"Product details returned\", function () {",
+                  "        pm.response.to.be.json;",
+                  "        const jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('id');",
+                  "        pm.expect(jsonData).to.have.property('name');",
+                  "        pm.expect(jsonData).to.have.property('description');",
+                  "        pm.expect(jsonData).to.have.property('requirements');",
+                  "        pm.expect(jsonData).to.have.property('features');",
+                  "        pm.expect(jsonData).to.have.property('benefits');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Evaluation", 
+      "description": "Evaluación crediticia con capacidades de IA semántica",
+      "item": [
+        {
+          "name": "POST Evaluar cliente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identityDocument\": \"10456789012\",\n  \"requestedAmount\": 50000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/evaluate",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "evaluate"]
+            },
+            "description": "Evalúa la elegibilidad crediticia usando IA semántica para recomendaciones personalizadas"
+          },
+          "response": [
+            {
+              "name": "200 Success - Evaluación con IA",
+              "originalRequest": {
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"identityDocument\": \"10456789012\",\n  \"requestedAmount\": 50000\n}"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"clientProfile\": {\n    \"identityDocument\": \"10456789012\",\n    \"creditScore\": 750,\n    \"riskLevel\": \"Bajo\",\n    \"approvedAmount\": 45000\n  },\n  \"eligibleProducts\": [\n    {\n      \"id\": \"CRV-PEN-001\",\n      \"name\": \"Crédito Revolvente Empresarial\",\n      \"approvedAmount\": 45000,\n      \"approvedRate\": 10.50,\n      \"eligibilityScore\": 85,\n      \"recommendation\": \"Altamente recomendado\",\n      \"semanticRank\": 0.92,\n      \"semanticConfidence\": 0.88,\n      \"semanticDescription\": \"Producto altamente compatible basado en perfil empresarial y flujo de caja proyectado\"\n    }\n  ],\n  \"summary\": {\n    \"totalEligibleProducts\": 1,\n    \"bestOption\": {\n      \"productId\": \"CRV-PEN-001\",\n      \"reason\": \"Mejor match semántico y condiciones favorables\"\n    },\n    \"evaluationDate\": \"2024-11-08T16:30:00Z\"\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has semantic AI fields\", function () {",
+                  "    pm.response.to.be.json;",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('eligibleProducts');",
+                  "    if (jsonData.eligibleProducts.length > 0) {",
+                  "        pm.expect(jsonData.eligibleProducts[0]).to.have.property('semanticRank');",
+                  "        pm.expect(jsonData.eligibleProducts[0]).to.have.property('semanticConfidence');",
+                  "        pm.expect(jsonData.eligibleProducts[0]).to.have.property('semanticDescription');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Products Bulk Operations",
+      "description": "Operaciones en lote para productos crediticios usando datos estructurados de products-by-rank.json",
+      "item": [
+        {
+          "name": "POST Crear productos por rango en lote",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"products\": [\n    {\n      \"id\": \"PRESTAMO_BRONCE_001\",\n      \"name\": \"Préstamo Personal Bronce\",\n      \"description\": \"Préstamo personal diseñado para clientes con perfil BRONCE. Montos accesibles con tasas justas para empleados estables que están construyendo su historial crediticio. Ideal para gastos personales, consolidación de deudas menores o inversiones básicas.\",\n      \"category\": \"PRESTAMO_PERSONAL\",\n      \"subcategory\": \"BRONCE\",\n      \"minimumAmount\": 3000.00,\n      \"maximumAmount\": 25000.00,\n      \"currency\": \"S/\",\n      \"term\": \"12 a 36 meses\",\n      \"minimumRate\": 18.50,\n      \"maximumRate\": 24.50,\n      \"requirements\": [\n        \"Ingresos mínimos S/2,500 mensuales\",\n        \"Antigüedad laboral mínima 6 meses\",\n        \"DNI vigente\",\n        \"Recibo de servicios\",\n        \"Boletas de pago últimos 3 meses\"\n      ],\n      \"features\": [\n        \"Cuotas fijas mensuales\",\n        \"Sin penalidad por prepago\",\n        \"Desembolso en 24 horas\",\n        \"Trámite 100% digital\"\n      ],\n      \"benefits\": [\n        \"Construcción de historial crediticio\",\n        \"Acceso a futuras mejoras de línea\",\n        \"Asesoría financiera básica\",\n        \"Sin comisiones por evaluación\"\n      ],\n      \"allowedRanks\": [\"BRONCE\"],\n      \"active\": true\n    },\n    {\n      \"id\": \"PRESTAMO_PLATA_001\",\n      \"name\": \"Préstamo Personal Plata Plus\",\n      \"description\": \"Préstamo personal para clientes PLATA con condiciones mejoradas. Montos más altos y tasas preferenciales para empleados consolidados con buen historial. Perfecto para proyectos personales, educación o inversiones medianas.\",\n      \"category\": \"PRESTAMO_PERSONAL\",\n      \"subcategory\": \"PLATA\",\n      \"minimumAmount\": 8000.00,\n      \"maximumAmount\": 50000.00,\n      \"currency\": \"S/\",\n      \"term\": \"12 a 48 meses\",\n      \"minimumRate\": 15.50,\n      \"maximumRate\": 20.50,\n      \"requirements\": [\n        \"Ingresos mínimos S/4,500 mensuales\",\n        \"Antigüedad laboral mínima 2 años\",\n        \"Buen historial crediticio\",\n        \"Estados de cuenta últimos 6 meses\"\n      ],\n      \"features\": [\n        \"Tasa de interés preferencial\",\n        \"Períodos de gracia disponibles\",\n        \"Renovación automática de línea\",\n        \"Gestión digital avanzada\"\n      ],\n      \"benefits\": [\n        \"Acceso a seguros opcionales\",\n        \"Línea de crédito adicional\",\n        \"Asesoría financiera personalizada\",\n        \"Descuentos en otros productos\"\n      ],\n      \"allowedRanks\": [\"PLATA\", \"ORO\", \"PLATINO\", \"PREMIUM\"],\n      \"active\": true\n    },\n    {\n      \"id\": \"PRESTAMO_ORO_ELITE\",\n      \"name\": \"Préstamo Personal ORO Elite\",\n      \"description\": \"Préstamo premium para clientes ORO con excelente capacidad de pago. Tasas altamente competitivas y montos elevados para profesionales exitosos. Ideal para inversiones importantes, viajes, estudios especializados o consolidación de deudas grandes.\",\n      \"category\": \"PRESTAMO_PERSONAL\",\n      \"subcategory\": \"ORO_ELITE\",\n      \"minimumAmount\": 15000.00,\n      \"maximumAmount\": 120000.00,\n      \"currency\": \"S/\",\n      \"term\": \"12 a 60 meses\",\n      \"minimumRate\": 12.50,\n      \"maximumRate\": 17.50,\n      \"requirements\": [\n        \"Ingresos mínimos S/6,500 mensuales\",\n        \"Antigüedad laboral mínima 3 años\",\n        \"Excelente historial crediticio\",\n        \"Ahorros o inversiones demostrables\"\n      ],\n      \"features\": [\n        \"Tasas ultra competitivas\",\n        \"Cuotas flexibles\",\n        \"Sin comisiones adicionales\",\n        \"Ejecutivo de cuenta asignado\"\n      ],\n      \"benefits\": [\n        \"Acceso prioritario a nuevos productos\",\n        \"Seguros de vida incluidos\",\n        \"Banca por Internet premium\",\n        \"Eventos y beneficios exclusivos\"\n      ],\n      \"allowedRanks\": [\"ORO\", \"PLATINO\", \"PREMIUM\"],\n      \"active\": true\n    },\n    {\n      \"id\": \"CREDITO_PLATINO_VIP\",\n      \"name\": \"Línea de Crédito PLATINO VIP\",\n      \"description\": \"Línea de crédito revolvente exclusiva para clientes PLATINO. Acceso inmediato a capital con las mejores condiciones del mercado. Para ejecutivos y empresarios que requieren liquidez flexible para oportunidades de inversión y gastos ejecutivos.\",\n      \"category\": \"LINEA_CREDITO\",\n      \"subcategory\": \"PLATINO_VIP\",\n      \"minimumAmount\": 50000.00,\n      \"maximumAmount\": 300000.00,\n      \"currency\": \"S/\",\n      \"term\": \"Revolvente 24 meses renovable\",\n      \"minimumRate\": 9.50,\n      \"maximumRate\": 14.50,\n      \"requirements\": [\n        \"Ingresos mínimos S/10,000 mensuales\",\n        \"Patrimonio demostrable\",\n        \"Historial crediticio impecable\",\n        \"Relación bancaria de 2+ años\"\n      ],\n      \"features\": [\n        \"Disposición inmediata 24/7\",\n        \"Pago solo de lo utilizado\",\n        \"Renovación automática\",\n        \"Sin garantías adicionales\"\n      ],\n      \"benefits\": [\n        \"Banca privada básica\",\n        \"Asesor financiero dedicado\",\n        \"Productos de inversión exclusivos\",\n        \"Concierge bancario\"\n      ],\n      \"allowedRanks\": [\"PLATINO\", \"PREMIUM\"],\n      \"active\": true\n    },\n    {\n      \"id\": \"PREMIUM_PRIVATE_001\",\n      \"name\": \"Crédito PREMIUM Private Banking\",\n      \"description\": \"Producto financiero exclusivo para clientes PREMIUM con patrimonio excepcional. Estructuras de crédito sofisticadas, tasas institucionales y servicios de banca privada completos. Para grandes inversiones, adquisiciones empresariales y estructuras patrimoniales complejas.\",\n      \"category\": \"BANCA_PRIVADA\",\n      \"subcategory\": \"PREMIUM_EXCLUSIVE\",\n      \"minimumAmount\": 200000.00,\n      \"maximumAmount\": 1000000.00,\n      \"currency\": \"S/\",\n      \"term\": \"Estructurado según necesidades\",\n      \"minimumRate\": 7.50,\n      \"maximumRate\": 12.50,\n      \"requirements\": [\n        \"Ingresos superiores a S/20,000 mensuales\",\n        \"Patrimonio líquido mínimo S/500,000\",\n        \"Relación patrimonial integral\",\n        \"Evaluación de family office\"\n      ],\n      \"features\": [\n        \"Tasas institucionales negociables\",\n        \"Estructuras financieras a medida\",\n        \"Monedas múltiples disponibles\",\n        \"Productos derivados incluidos\"\n      ],\n      \"benefits\": [\n        \"Banca privada completa\",\n        \"Gestión patrimonial integral\",\n        \"Investment banking access\",\n        \"Servicios fiduciarios\",\n        \"Family office services\"\n      ],\n      \"allowedRanks\": [\"PREMIUM\"],\n      \"active\": true\n    },\n    {\n      \"id\": \"TARJETA_BRONCE_BASIC\",\n      \"name\": \"Tarjeta de Crédito Bronce Basic\",\n      \"description\": \"Tarjeta de crédito básica para clientes BRONCE que inician su historial crediticio. Límites apropiados y funcionalidades esenciales para compras cotidianas y emergencias menores.\",\n      \"category\": \"TARJETA_CREDITO\",\n      \"subcategory\": \"BASIC\",\n      \"minimumAmount\": 1000.00,\n      \"maximumAmount\": 8000.00,\n      \"currency\": \"S/\",\n      \"term\": \"Revolvente\",\n      \"minimumRate\": 36.00,\n      \"maximumRate\": 45.00,\n      \"requirements\": [\n        \"Ingresos mínimos S/2,500 mensuales\",\n        \"Antigüedad laboral 6 meses\",\n        \"Sin antecedentes negativos\"\n      ],\n      \"features\": [\n        \"Compras en comercios afiliados\",\n        \"Disposición de efectivo\",\n        \"Estado de cuenta digital\",\n        \"App móvil incluida\"\n      ],\n      \"benefits\": [\n        \"Sin costo de membresía primer año\",\n        \"Programa de puntos básico\",\n        \"Seguro de compras\",\n        \"Asistencia 24/7\"\n      ],\n      \"allowedRanks\": [\"BRONCE\"],\n      \"active\": true\n    },\n    {\n      \"id\": \"HIPOTECARIO_ORO_CASA\",\n      \"name\": \"Crédito Hipotecario ORO Mi Casa\",\n      \"description\": \"Crédito hipotecario diseñado para clientes ORO que buscan adquirir su primera vivienda o una propiedad de inversión. Condiciones preferenciales y procesos ágiles para profesionales consolidados.\",\n      \"category\": \"CREDITO_HIPOTECARIO\",\n      \"subcategory\": \"VIVIENDA\",\n      \"minimumAmount\": 80000.00,\n      \"maximumAmount\": 500000.00,\n      \"currency\": \"S/\",\n      \"term\": \"8 a 25 años\",\n      \"minimumRate\": 8.50,\n      \"maximumRate\": 12.50,\n      \"requirements\": [\n        \"Ingresos mínimos S/6,500 mensuales\",\n        \"Cuota inicial 20% del valor\",\n        \"Antigüedad laboral 3+ años\",\n        \"Capacidad de pago verificada\"\n      ],\n      \"features\": [\n        \"Cuotas fijas o variables\",\n        \"Seguro de desgravamen incluido\",\n        \"Procesos digitales\",\n        \"Tasación gratuita\"\n      ],\n      \"benefits\": [\n        \"Asesoría inmobiliaria\",\n        \"Descuentos en seguros\",\n        \"Flexibilidad de pagos\",\n        \"Sin penalidad por prepago total\"\n      ],\n      \"allowedRanks\": [\"ORO\", \"PLATINO\", \"PREMIUM\"],\n      \"active\": true\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products/batch",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "batch"]
+            },
+            "description": "Crea múltiples productos crediticios segmentados por rango en una sola operación usando la estructura de products-by-rank.json. Esta operación permite cargar todo el catálogo de productos diferenciados por perfil de cliente (BRONCE, PLATA, ORO, PLATINO, PREMIUM) con sincronización automática a Azure AI Search."
+          },
+          "response": [
+            {
+              "name": "201 Created - Productos creados exitosamente",
+              "originalRequest": {
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"products\": [/* Array completo de products-by-rank.json */]\n}"
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"message\": \"Productos por rango creados exitosamente\",\n  \"totalProducts\": 7,\n  \"createdProducts\": 7,\n  \"failedProducts\": 0,\n  \"createdProductIds\": [\n    \"PRESTAMO_BRONCE_001\",\n    \"PRESTAMO_PLATA_001\",\n    \"PRESTAMO_ORO_ELITE\",\n    \"CREDITO_PLATINO_VIP\",\n    \"PREMIUM_PRIVATE_001\",\n    \"TARJETA_BRONCE_BASIC\",\n    \"HIPOTECARIO_ORO_CASA\"\n  ],\n  \"syncedToAzureAI\": true,\n  \"createdAt\": \"2024-11-09T10:30:00Z\"\n}"
+            },
+            {
+              "name": "207 Multi-Status - Algunos productos creados",
+              "originalRequest": {
+                "method": "POST"
+              },
+              "status": "Multi-Status",
+              "code": 207,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": false,\n  \"message\": \"Algunos productos no pudieron ser creados\",\n  \"totalProducts\": 7,\n  \"createdProducts\": 5,\n  \"failedProducts\": 2,\n  \"createdProductIds\": [\n    \"PRESTAMO_BRONCE_001\",\n    \"PRESTAMO_PLATA_001\",\n    \"PRESTAMO_ORO_ELITE\",\n    \"CREDITO_PLATINO_VIP\",\n    \"PREMIUM_PRIVATE_001\"\n  ],\n  \"failedProductIds\": [\n    \"TARJETA_BRONCE_BASIC\",\n    \"HIPOTECARIO_ORO_CASA\"\n  ],\n  \"errors\": [\n    {\n      \"productId\": \"TARJETA_BRONCE_BASIC\",\n      \"error\": \"Product already exists\"\n    },\n    {\n      \"productId\": \"HIPOTECARIO_ORO_CASA\",\n      \"error\": \"Validation error: Invalid rate range\"\n    }\n  ],\n  \"syncedToAzureAI\": true\n}"
+            },
+            {
+              "name": "400 Bad Request - Validación de lote",
+              "originalRequest": {
+                "method": "POST"
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"error\": \"Batch Validation Error\",\n  \"message\": \"El lote contiene productos con datos inválidos\",\n  \"details\": [\n    {\n      \"productIndex\": 0,\n      \"productId\": \"PRESTAMO_BRONCE_001\",\n      \"field\": \"minimumAmount\",\n      \"message\": \"El monto mínimo debe ser mayor a 0\"\n    },\n    {\n      \"productIndex\": 2,\n      \"productId\": \"PRESTAMO_ORO_ELITE\",\n      \"field\": \"allowedRanks\",\n      \"message\": \"Los rangos permitidos deben incluir al menos un valor válido\"\n    }\n  ]\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is success or partial success\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 207, 400]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    pm.test(\"All products created successfully\", function () {",
+                  "        pm.response.to.be.json;",
+                  "        const jsonData = pm.response.json();",
+                  "        pm.expect(jsonData.success).to.be.true;",
+                  "        pm.expect(jsonData.totalProducts).to.equal(jsonData.createdProducts);",
+                  "        pm.expect(jsonData.failedProducts).to.equal(0);",
+                  "    });",
+                  "}",
+                  "",
+                  "if (pm.response.code === 207) {",
+                  "    pm.test(\"Partial success with some failures\", function () {",
+                  "        pm.response.to.be.json;",
+                  "        const jsonData = pm.response.json();",
+                  "        pm.expect(jsonData.success).to.be.false;",
+                  "        pm.expect(jsonData.createdProducts).to.be.above(0);",
+                  "        pm.expect(jsonData.failedProducts).to.be.above(0);",
+                  "        pm.expect(jsonData.errors).to.be.an('array');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Productos por Rango Individual",
+          "description": "Creación individual de productos organizados por rango de cliente",
+          "item": [
+            {
+              "name": "BRONCE Products",
+              "description": "Productos específicos para clientes con rango BRONCE",
+              "item": [
+                {
+                  "name": "POST Crear Préstamo Personal Bronce",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"id\": \"PRESTAMO_BRONCE_001\",\n  \"name\": \"Préstamo Personal Bronce\",\n  \"description\": \"Préstamo personal diseñado para clientes con perfil BRONCE. Montos accesibles con tasas justas para empleados estables que están construyendo su historial crediticio. Ideal para gastos personales, consolidación de deudas menores o inversiones básicas.\",\n  \"category\": \"PRESTAMO_PERSONAL\",\n  \"subcategory\": \"BRONCE\",\n  \"minimumAmount\": 3000.00,\n  \"maximumAmount\": 25000.00,\n  \"currency\": \"S/\",\n  \"term\": \"12 a 36 meses\",\n  \"minimumRate\": 18.50,\n  \"maximumRate\": 24.50,\n  \"requirements\": [\n    \"Ingresos mínimos S/2,500 mensuales\",\n    \"Antigüedad laboral mínima 6 meses\",\n    \"DNI vigente\",\n    \"Recibo de servicios\",\n    \"Boletas de pago últimos 3 meses\"\n  ],\n  \"features\": [\n    \"Cuotas fijas mensuales\",\n    \"Sin penalidad por prepago\",\n    \"Desembolso en 24 horas\",\n    \"Trámite 100% digital\"\n  ],\n  \"benefits\": [\n    \"Construcción de historial crediticio\",\n    \"Acceso a futuras mejoras de línea\",\n    \"Asesoría financiera básica\",\n    \"Sin comisiones por evaluación\"\n  ],\n  \"allowedRanks\": [\"BRONCE\"],\n  \"active\": true\n}"
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/products",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["products"]
+                    },
+                    "description": "Crea el producto Préstamo Personal específico para clientes rango BRONCE"
+                  }
+                },
+                {
+                  "name": "POST Crear Tarjeta Crédito Bronce Basic",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"id\": \"TARJETA_BRONCE_BASIC\",\n  \"name\": \"Tarjeta de Crédito Bronce Basic\",\n  \"description\": \"Tarjeta de crédito básica para clientes BRONCE que inician su historial crediticio. Límites apropiados y funcionalidades esenciales para compras cotidianas y emergencias menores.\",\n  \"category\": \"TARJETA_CREDITO\",\n  \"subcategory\": \"BASIC\",\n  \"minimumAmount\": 1000.00,\n  \"maximumAmount\": 8000.00,\n  \"currency\": \"S/\",\n  \"term\": \"Revolvente\",\n  \"minimumRate\": 36.00,\n  \"maximumRate\": 45.00,\n  \"requirements\": [\n    \"Ingresos mínimos S/2,500 mensuales\",\n    \"Antigüedad laboral 6 meses\",\n    \"Sin antecedentes negativos\"\n  ],\n  \"features\": [\n    \"Compras en comercios afiliados\",\n    \"Disposición de efectivo\",\n    \"Estado de cuenta digital\",\n    \"App móvil incluida\"\n  ],\n  \"benefits\": [\n    \"Sin costo de membresía primer año\",\n    \"Programa de puntos básico\",\n    \"Seguro de compras\",\n    \"Asistencia 24/7\"\n  ],\n  \"allowedRanks\": [\"BRONCE\"],\n  \"active\": true\n}"
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/products",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["products"]
+                    },
+                    "description": "Crea la Tarjeta de Crédito básica específica para clientes rango BRONCE"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PLATA Products",
+              "description": "Productos específicos para clientes con rango PLATA",
+              "item": [
+                {
+                  "name": "POST Crear Préstamo Personal Plata Plus",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"id\": \"PRESTAMO_PLATA_001\",\n  \"name\": \"Préstamo Personal Plata Plus\",\n  \"description\": \"Préstamo personal para clientes PLATA con condiciones mejoradas. Montos más altos y tasas preferenciales para empleados consolidados con buen historial. Perfecto para proyectos personales, educación o inversiones medianas.\",\n  \"category\": \"PRESTAMO_PERSONAL\",\n  \"subcategory\": \"PLATA\",\n  \"minimumAmount\": 8000.00,\n  \"maximumAmount\": 50000.00,\n  \"currency\": \"S/\",\n  \"term\": \"12 a 48 meses\",\n  \"minimumRate\": 15.50,\n  \"maximumRate\": 20.50,\n  \"requirements\": [\n    \"Ingresos mínimos S/4,500 mensuales\",\n    \"Antigüedad laboral mínima 2 años\",\n    \"Buen historial crediticio\",\n    \"Estados de cuenta últimos 6 meses\"\n  ],\n  \"features\": [\n    \"Tasa de interés preferencial\",\n    \"Períodos de gracia disponibles\",\n    \"Renovación automática de línea\",\n    \"Gestión digital avanzada\"\n  ],\n  \"benefits\": [\n    \"Acceso a seguros opcionales\",\n    \"Línea de crédito adicional\",\n    \"Asesoría financiera personalizada\",\n    \"Descuentos en otros productos\"\n  ],\n  \"allowedRanks\": [\"PLATA\", \"ORO\", \"PLATINO\", \"PREMIUM\"],\n  \"active\": true\n}"
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/products",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["products"]
+                    },
+                    "description": "Crea el producto Préstamo Personal mejorado para clientes rango PLATA"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "ORO Products",
+              "description": "Productos específicos para clientes con rango ORO",
+              "item": [
+                {
+                  "name": "POST Crear Préstamo Personal ORO Elite",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"id\": \"PRESTAMO_ORO_ELITE\",\n  \"name\": \"Préstamo Personal ORO Elite\",\n  \"description\": \"Préstamo premium para clientes ORO con excelente capacidad de pago. Tasas altamente competitivas y montos elevados para profesionales exitosos. Ideal para inversiones importantes, viajes, estudios especializados o consolidación de deudas grandes.\",\n  \"category\": \"PRESTAMO_PERSONAL\",\n  \"subcategory\": \"ORO_ELITE\",\n  \"minimumAmount\": 15000.00,\n  \"maximumAmount\": 120000.00,\n  \"currency\": \"S/\",\n  \"term\": \"12 a 60 meses\",\n  \"minimumRate\": 12.50,\n  \"maximumRate\": 17.50,\n  \"requirements\": [\n    \"Ingresos mínimos S/6,500 mensuales\",\n    \"Antigüedad laboral mínima 3 años\",\n    \"Excelente historial crediticio\",\n    \"Ahorros o inversiones demostrables\"\n  ],\n  \"features\": [\n    \"Tasas ultra competitivas\",\n    \"Cuotas flexibles\",\n    \"Sin comisiones adicionales\",\n    \"Ejecutivo de cuenta asignado\"\n  ],\n  \"benefits\": [\n    \"Acceso prioritario a nuevos productos\",\n    \"Seguros de vida incluidos\",\n    \"Banca por Internet premium\",\n    \"Eventos y beneficios exclusivos\"\n  ],\n  \"allowedRanks\": [\"ORO\", \"PLATINO\", \"PREMIUM\"],\n  \"active\": true\n}"
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/products",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["products"]
+                    },
+                    "description": "Crea el producto Préstamo Personal premium para clientes rango ORO"
+                  }
+                },
+                {
+                  "name": "POST Crear Crédito Hipotecario ORO",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"id\": \"HIPOTECARIO_ORO_CASA\",\n  \"name\": \"Crédito Hipotecario ORO Mi Casa\",\n  \"description\": \"Crédito hipotecario diseñado para clientes ORO que buscan adquirir su primera vivienda o una propiedad de inversión. Condiciones preferenciales y procesos ágiles para profesionales consolidados.\",\n  \"category\": \"CREDITO_HIPOTECARIO\",\n  \"subcategory\": \"VIVIENDA\",\n  \"minimumAmount\": 80000.00,\n  \"maximumAmount\": 500000.00,\n  \"currency\": \"S/\",\n  \"term\": \"8 a 25 años\",\n  \"minimumRate\": 8.50,\n  \"maximumRate\": 12.50,\n  \"requirements\": [\n    \"Ingresos mínimos S/6,500 mensuales\",\n    \"Cuota inicial 20% del valor\",\n    \"Antigüedad laboral 3+ años\",\n    \"Capacidad de pago verificada\"\n  ],\n  \"features\": [\n    \"Cuotas fijas o variables\",\n    \"Seguro de desgravamen incluido\",\n    \"Procesos digitales\",\n    \"Tasación gratuita\"\n  ],\n  \"benefits\": [\n    \"Asesoría inmobiliaria\",\n    \"Descuentos en seguros\",\n    \"Flexibilidad de pagos\",\n    \"Sin penalidad por prepago total\"\n  ],\n  \"allowedRanks\": [\"ORO\", \"PLATINO\", \"PREMIUM\"],\n  \"active\": true\n}"
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/products",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["products"]
+                    },
+                    "description": "Crea el producto Crédito Hipotecario para clientes rango ORO"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PLATINO Products",
+              "description": "Productos específicos para clientes con rango PLATINO",
+              "item": [
+                {
+                  "name": "POST Crear Línea Crédito PLATINO VIP",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"id\": \"CREDITO_PLATINO_VIP\",\n  \"name\": \"Línea de Crédito PLATINO VIP\",\n  \"description\": \"Línea de crédito revolvente exclusiva para clientes PLATINO. Acceso inmediato a capital con las mejores condiciones del mercado. Para ejecutivos y empresarios que requieren liquidez flexible para oportunidades de inversión y gastos ejecutivos.\",\n  \"category\": \"LINEA_CREDITO\",\n  \"subcategory\": \"PLATINO_VIP\",\n  \"minimumAmount\": 50000.00,\n  \"maximumAmount\": 300000.00,\n  \"currency\": \"S/\",\n  \"term\": \"Revolvente 24 meses renovable\",\n  \"minimumRate\": 9.50,\n  \"maximumRate\": 14.50,\n  \"requirements\": [\n    \"Ingresos mínimos S/10,000 mensuales\",\n    \"Patrimonio demostrable\",\n    \"Historial crediticio impecable\",\n    \"Relación bancaria de 2+ años\"\n  ],\n  \"features\": [\n    \"Disposición inmediata 24/7\",\n    \"Pago solo de lo utilizado\",\n    \"Renovación automática\",\n    \"Sin garantías adicionales\"\n  ],\n  \"benefits\": [\n    \"Banca privada básica\",\n    \"Asesor financiero dedicado\",\n    \"Productos de inversión exclusivos\",\n    \"Concierge bancario\"\n  ],\n  \"allowedRanks\": [\"PLATINO\", \"PREMIUM\"],\n  \"active\": true\n}"
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/products",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["products"]
+                    },
+                    "description": "Crea la Línea de Crédito exclusiva para clientes rango PLATINO"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PREMIUM Products",
+              "description": "Productos específicos para clientes con rango PREMIUM",
+              "item": [
+                {
+                  "name": "POST Crear Crédito PREMIUM Private Banking",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"id\": \"PREMIUM_PRIVATE_001\",\n  \"name\": \"Crédito PREMIUM Private Banking\",\n  \"description\": \"Producto financiero exclusivo para clientes PREMIUM con patrimonio excepcional. Estructuras de crédito sofisticadas, tasas institucionales y servicios de banca privada completos. Para grandes inversiones, adquisiciones empresariales y estructuras patrimoniales complejas.\",\n  \"category\": \"BANCA_PRIVADA\",\n  \"subcategory\": \"PREMIUM_EXCLUSIVE\",\n  \"minimumAmount\": 200000.00,\n  \"maximumAmount\": 1000000.00,\n  \"currency\": \"S/\",\n  \"term\": \"Estructurado según necesidades\",\n  \"minimumRate\": 7.50,\n  \"maximumRate\": 12.50,\n  \"requirements\": [\n    \"Ingresos superiores a S/20,000 mensuales\",\n    \"Patrimonio líquido mínimo S/500,000\",\n    \"Relación patrimonial integral\",\n    \"Evaluación de family office\"\n  ],\n  \"features\": [\n    \"Tasas institucionales negociables\",\n    \"Estructuras financieras a medida\",\n    \"Monedas múltiples disponibles\",\n    \"Productos derivados incluidos\"\n  ],\n  \"benefits\": [\n    \"Banca privada completa\",\n    \"Gestión patrimonial integral\",\n    \"Investment banking access\",\n    \"Servicios fiduciarios\",\n    \"Family office services\"\n  ],\n  \"allowedRanks\": [\"PREMIUM\"],\n  \"active\": true\n}"
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/products",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["products"]
+                    },
+                    "description": "Crea el producto de Private Banking exclusivo para clientes rango PREMIUM"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ranks",
+      "description": "Gestión de rangos de clientes con sincronización automática en Azure AI Search para análisis semántico",
+      "item": [
+        {
+          "name": "GET Lista de rangos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ranks?name=ORO&page=0&size=20&sort=name",
+              "host": ["{{baseUrl}}"],
+              "path": ["ranks"],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "ORO",
+                  "description": "Filtrar por nombre del rango (búsqueda parcial)",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Número de página (basado en 0)",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "20",
+                  "description": "Tamaño de página",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "name",
+                  "description": "Campo de ordenación",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Devuelve una lista completa de rangos de clientes disponibles con filtros opcionales"
+          },
+          "response": [
+            {
+              "name": "200 Success",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/ranks",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["ranks"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"ORO\",\n      \"name\": \"ORO\",\n      \"description\": \"Cliente premium con ingresos sólidos entre S/6,000 - S/12,000 mensuales. Profesional universitario, ejecutivo medio, empresario con negocio establecido 3+ años.\"\n    },\n    {\n      \"id\": \"PLATA\",\n      \"name\": \"PLATA\",\n      \"description\": \"Cliente consolidado con ingresos estables entre S/3,000 - S/6,000 mensuales. Empleado con antigüedad laboral 1-3 años en empresa formal.\"\n    }\n  ],\n  \"total\": 5,\n  \"totalPages\": 1,\n  \"currentPage\": 0\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has correct structure\", function () {",
+                  "    pm.response.to.be.json;",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData).to.have.property('total');",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Crear rango",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"PREMIUM\",\n  \"name\": \"PREMIUM\",\n  \"description\": \"Cliente premium con ingresos excepcionales superiores a S/15,000 mensuales. Alto ejecutivo, empresario exitoso con múltiples fuentes de ingresos. Portfolio diversificado con inversiones sofisticadas y bienes raíces. Acceso a productos exclusivos de banca privada.\",\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ranks",
+              "host": ["{{baseUrl}}"],
+              "path": ["ranks"]
+            },
+            "description": "Crea un nuevo rango de cliente que se sincroniza automáticamente con Azure AI Search para habilitar búsquedas semánticas y análisis inteligentes de perfil de clientes"
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"id\": \"PREMIUM\",\n  \"name\": \"PREMIUM\",\n  \"description\": \"Cliente premium con ingresos excepcionales superiores a S/15,000 mensuales.\",\n  \"active\": true\n}"
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"id\": \"PREMIUM\",\n  \"name\": \"PREMIUM\",\n  \"description\": \"Cliente premium con ingresos excepcionales superiores a S/15,000 mensuales. Alto ejecutivo, empresario exitoso con múltiples fuentes de ingresos. Portfolio diversificado con inversiones sofisticadas y bienes raíces. Acceso a productos exclusivos de banca privada.\"\n}"
+            },
+            {
+              "name": "400 Bad Request - Validación",
+              "originalRequest": {
+                "method": "POST"
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"error\": \"Validation Error\",\n  \"message\": \"Los datos proporcionados no son válidos\",\n  \"details\": [\n    {\n      \"field\": \"id\",\n      \"message\": \"El ID del rango es obligatorio\"\n    },\n    {\n      \"field\": \"name\",\n      \"message\": \"El nombre no puede estar vacío\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "409 Conflict - Rango ya existe",
+              "originalRequest": {
+                "method": "POST"
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"error\": \"Rank Already Exists\",\n  \"message\": \"El rango con ID PREMIUM ya existe\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 or error status\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400, 409]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    pm.test(\"Rank created successfully\", function () {",
+                  "        pm.response.to.be.json;",
+                  "        const jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('id');",
+                  "        pm.expect(jsonData).to.have.property('name');",
+                  "        pm.expect(jsonData).to.have.property('description');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Crear rangos en lote",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ranks\": [\n    {\n      \"id\": \"PLATINO\",\n      \"name\": \"PLATINO\",\n      \"description\": \"Cliente de alto valor con ingresos superiores a S/12,000 mensuales. Alto ejecutivo, profesional especializado, empresario exitoso con múltiples negocios.\",\n      \"active\": true\n    },\n    {\n      \"id\": \"DIAMANTE\",\n      \"name\": \"DIAMANTE\",\n      \"description\": \"Cliente ultra premium con patrimonio excepcional. Acceso exclusivo a banca privada.\",\n      \"active\": true\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ranks/batch",
+              "host": ["{{baseUrl}}"],
+              "path": ["ranks", "batch"]
+            },
+            "description": "Crea múltiples rangos de cliente en una sola operación. Todos los rangos se sincronizan automáticamente con Azure AI Search a través del listener para habilitar búsquedas semánticas y análisis inteligente"
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ranks\": [\n    {\n      \"id\": \"PLATINO\",\n      \"name\": \"PLATINO\",\n      \"description\": \"Cliente de alto valor con ingresos elevados entre S/12,000 - S/30,000 mensuales.\",\n      \"active\": true\n    },\n    {\n      \"id\": \"PREMIUM\",\n      \"name\": \"PREMIUM\",\n      \"description\": \"Cliente de muy alto patrimonio con ingresos excepcionales superiores a S/30,000 mensuales.\",\n      \"active\": true\n    }\n  ]\n}"
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"message\": \"Rangos creados exitosamente\",\n  \"totalRanks\": 2,\n  \"createdRanks\": 2,\n  \"failedRanks\": 0,\n  \"createdRankIds\": [\"PLATINO\", \"DIAMANTE\"]\n}"
+            },
+            {
+              "name": "400 Bad Request - Validación",
+              "originalRequest": {
+                "method": "POST"
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"error\": \"Validation Error\",\n  \"message\": \"Algunos datos del lote no son válidos\",\n  \"details\": [\n    {\n      \"field\": \"ranks[0].id\",\n      \"message\": \"El ID del rango es obligatorio\"\n    },\n    {\n      \"field\": \"ranks[1].name\",\n      \"message\": \"El nombre no puede estar vacío\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "409 Conflict - Rangos duplicados",
+              "originalRequest": {
+                "method": "POST"
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"error\": \"Duplicate Ranks\",\n  \"message\": \"Algunos rangos del lote ya existen\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 or error status\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400, 409]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    pm.test(\"Batch creation response structure\", function () {",
+                  "        pm.response.to.be.json;",
+                  "        const jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('success', true);",
+                  "        pm.expect(jsonData).to.have.property('totalRanks');",
+                  "        pm.expect(jsonData).to.have.property('createdRanks');",
+                  "        pm.expect(jsonData).to.have.property('failedRanks');",
+                  "        pm.expect(jsonData).to.have.property('createdRankIds');",
+                  "        ",
+                  "        // Validate that totalRanks equals created + failed ranks",
+                  "        const total = jsonData.totalRanks;",
+                  "        const created = jsonData.createdRanks;",
+                  "        const failed = jsonData.failedRanks;",
+                  "        pm.expect(total).to.equal(created + failed);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

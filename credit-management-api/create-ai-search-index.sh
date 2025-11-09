@@ -5,10 +5,26 @@
 # Author: Marco Villarreal
 # =============================================
 
+set -e
+
+# Verificar que existe el archivo main.env
+if [ ! -f "main.env" ]; then
+    echo "❌ Error: El archivo main.env no existe."
+    echo "💡 Por favor, copia main.env.example a main.env y configura las variables necesarias."
+    exit 1
+fi
+
+echo "📁 Cargando variables de entorno desde main.env"
+
+# Exportar variables de entorno desde main.env
+set -a
+source main.env
+set +a
+
 # Verificar que las variables de entorno estén cargadas
 if [ -z "$AI_SEARCH_ENDPOINT" ] || [ -z "$AI_SEARCH_KEY" ]; then
-    echo "❌ Error: Variables de entorno no encontradas"
-    echo "💡 Ejecuta primero: export \$(cat main.env | xargs)"
+    echo "❌ Error: Variables de entorno AI_SEARCH_ENDPOINT y AI_SEARCH_KEY no encontradas"
+    echo "💡 Verifica que main.env contenga las variables necesarias"
     exit 1
 fi
 
@@ -325,9 +341,8 @@ echo "====================="
 echo "✅ products: Listo para usar"
 echo "✅ ranks: Listo para usar"
 echo ""
-echo "💡 Ahora puedes reiniciar la aplicación y probar:"
-echo "   cd /Users/marcovillarreal/workspaces/GENIA_TON_IFS/credit-management-api"
-echo "   export \$(cat main.env | xargs) && ./gradlew bootRun"
+echo "💡 Ahora puedes reiniciar la aplicación con:"
+echo "   ./local-run.sh"
 echo ""
 echo "📦 Y luego probar la sincronización con:"
 echo "   ./test-ai-search-sync.sh"

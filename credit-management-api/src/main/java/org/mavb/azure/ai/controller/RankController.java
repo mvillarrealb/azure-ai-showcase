@@ -18,16 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * REST Controller for rank management.
- * Handles HTTP requests for rank listing, creation, and batch creation.
- * All ranks are automatically synchronized to Azure AI Search via JPA listeners.
- * 
- * Base path: /ranks
- * 
- * Endpoints:
- * - GET /ranks - Lista rangos con filtros opcionales y paginación
- * - POST /ranks - Crea un nuevo rango con sincronización automática a AI Search
- * - POST /ranks/batch - Crea múltiples rangos en lote con sincronización automática
+ * REST Controller for rank operations.
  */
 @RestController
 @RequestMapping("/ranks")

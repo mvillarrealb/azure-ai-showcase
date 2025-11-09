@@ -257,7 +257,7 @@ paths:
       description: |
         Evalúa la elegibilidad de un cliente para productos crediticios usando IA semántica.
         Utiliza información del cliente almacenada en base de datos y análisis semántico 
-        para proporcionar recomendaciones inteligentes.
+        para proporcionar recomendaciones inteligentes basadas en Azure AI Search.
       tags:
         - Evaluation
       requestBody:

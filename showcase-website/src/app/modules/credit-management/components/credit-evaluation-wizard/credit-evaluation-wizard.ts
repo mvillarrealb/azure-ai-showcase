@@ -56,7 +56,7 @@ export class CreditEvaluationWizardComponent {
     this.isEvaluating.set(true);
 
     try {
-      const result = await this.creditManagementService.evaluateClientEligibility(this.evaluationRequest).toPromise();
+      const result = await this.creditManagementService.evaluateClient(this.evaluationRequest).toPromise();
       
       if (result) {
         this.evaluationResult.set(result);

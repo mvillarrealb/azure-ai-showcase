@@ -1,0 +1,236 @@
+{
+  "products": [
+    {
+      "id": "PRESTAMO_BRONCE_001",
+      "name": "Préstamo Personal Bronce",
+      "description": "Préstamo personal diseñado para clientes con perfil BRONCE. Montos accesibles con tasas justas para empleados estables que están construyendo su historial crediticio. Ideal para gastos personales, consolidación de deudas menores o inversiones básicas.",
+      "category": "PRESTAMO_PERSONAL",
+      "subcategory": "BRONCE",
+      "minimumAmount": 3000.00,
+      "maximumAmount": 25000.00,
+      "currency": "S/",
+      "term": "12 a 36 meses",
+      "minimumRate": 18.50,
+      "maximumRate": 24.50,
+      "requirements": [
+        "Ingresos mínimos S/2,500 mensuales",
+        "Antigüedad laboral mínima 6 meses",
+        "DNI vigente",
+        "Recibo de servicios",
+        "Boletas de pago últimos 3 meses"
+      ],
+      "features": [
+        "Cuotas fijas mensuales",
+        "Sin penalidad por prepago",
+        "Desembolso en 24 horas",
+        "Trámite 100% digital"
+      ],
+      "benefits": [
+        "Construcción de historial crediticio",
+        "Acceso a futuras mejoras de línea",
+        "Asesoría financiera básica",
+        "Sin comisiones por evaluación"
+      ],
+      "allowedRanks": ["BRONCE"],
+      "active": true
+    },
+    {
+      "id": "PRESTAMO_PLATA_001",
+      "name": "Préstamo Personal Plata Plus",
+      "description": "Préstamo personal para clientes PLATA con condiciones mejoradas. Montos más altos y tasas preferenciales para empleados consolidados con buen historial. Perfecto para proyectos personales, educación o inversiones medianas.",
+      "category": "PRESTAMO_PERSONAL",
+      "subcategory": "PLATA",
+      "minimumAmount": 8000.00,
+      "maximumAmount": 50000.00,
+      "currency": "S/",
+      "term": "12 a 48 meses",
+      "minimumRate": 15.50,
+      "maximumRate": 20.50,
+      "requirements": [
+        "Ingresos mínimos S/4,500 mensuales",
+        "Antigüedad laboral mínima 2 años",
+        "Buen historial crediticio",
+        "Estados de cuenta últimos 6 meses"
+      ],
+      "features": [
+        "Tasa de interés preferencial",
+        "Períodos de gracia disponibles",
+        "Renovación automática de línea",
+        "Gestión digital avanzada"
+      ],
+      "benefits": [
+        "Acceso a seguros opcionales",
+        "Línea de crédito adicional",
+        "Asesoría financiera personalizada",
+        "Descuentos en otros productos"
+      ],
+      "allowedRanks": ["PLATA", "ORO", "PLATINO", "PREMIUM"],
+      "active": true
+    },
+    {
+      "id": "PRESTAMO_ORO_ELITE",
+      "name": "Préstamo Personal ORO Elite",
+      "description": "Préstamo premium para clientes ORO con excelente capacidad de pago. Tasas altamente competitivas y montos elevados para profesionales exitosos. Ideal para inversiones importantes, viajes, estudios especializados o consolidación de deudas grandes.",
+      "category": "PRESTAMO_PERSONAL",
+      "subcategory": "ORO_ELITE",
+      "minimumAmount": 15000.00,
+      "maximumAmount": 120000.00,
+      "currency": "S/",
+      "term": "12 a 60 meses",
+      "minimumRate": 12.50,
+      "maximumRate": 17.50,
+      "requirements": [
+        "Ingresos mínimos S/6,500 mensuales",
+        "Antigüedad laboral mínima 3 años",
+        "Excelente historial crediticio",
+        "Ahorros o inversiones demostrables"
+      ],
+      "features": [
+        "Tasas ultra competitivas",
+        "Cuotas flexibles",
+        "Sin comisiones adicionales",
+        "Ejecutivo de cuenta asignado"
+      ],
+      "benefits": [
+        "Acceso prioritario a nuevos productos",
+        "Seguros de vida incluidos",
+        "Banca por Internet premium",
+        "Eventos y beneficios exclusivos"
+      ],
+      "allowedRanks": ["ORO", "PLATINO", "PREMIUM"],
+      "active": true
+    },
+    {
+      "id": "CREDITO_PLATINO_VIP",
+      "name": "Línea de Crédito PLATINO VIP",
+      "description": "Línea de crédito revolvente exclusiva para clientes PLATINO. Acceso inmediato a capital con las mejores condiciones del mercado. Para ejecutivos y empresarios que requieren liquidez flexible para oportunidades de inversión y gastos ejecutivos.",
+      "category": "LINEA_CREDITO",
+      "subcategory": "PLATINO_VIP",
+      "minimumAmount": 50000.00,
+      "maximumAmount": 300000.00,
+      "currency": "S/",
+      "term": "Revolvente 24 meses renovable",
+      "minimumRate": 9.50,
+      "maximumRate": 14.50,
+      "requirements": [
+        "Ingresos mínimos S/10,000 mensuales",
+        "Patrimonio demostrable",
+        "Historial crediticio impecable",
+        "Relación bancaria de 2+ años"
+      ],
+      "features": [
+        "Disposición inmediata 24/7",
+        "Pago solo de lo utilizado",
+        "Renovación automática",
+        "Sin garantías adicionales"
+      ],
+      "benefits": [
+        "Banca privada básica",
+        "Asesor financiero dedicado",
+        "Productos de inversión exclusivos",
+        "Concierge bancario"
+      ],
+      "allowedRanks": ["PLATINO", "PREMIUM"],
+      "active": true
+    },
+    {
+      "id": "PREMIUM_PRIVATE_001",
+      "name": "Crédito PREMIUM Private Banking",
+      "description": "Producto financiero exclusivo para clientes PREMIUM con patrimonio excepcional. Estructuras de crédito sofisticadas, tasas institucionales y servicios de banca privada completos. Para grandes inversiones, adquisiciones empresariales y estructuras patrimoniales complejas.",
+      "category": "BANCA_PRIVADA",
+      "subcategory": "PREMIUM_EXCLUSIVE",
+      "minimumAmount": 200000.00,
+      "maximumAmount": 1000000.00,
+      "currency": "S/",
+      "term": "Estructurado según necesidades",
+      "minimumRate": 7.50,
+      "maximumRate": 12.50,
+      "requirements": [
+        "Ingresos superiores a S/20,000 mensuales",
+        "Patrimonio líquido mínimo S/500,000",
+        "Relación patrimonial integral",
+        "Evaluación de family office"
+      ],
+      "features": [
+        "Tasas institucionales negociables",
+        "Estructuras financieras a medida",
+        "Monedas múltiples disponibles",
+        "Productos derivados incluidos"
+      ],
+      "benefits": [
+        "Banca privada completa",
+        "Gestión patrimonial integral",
+        "Investment banking access",
+        "Servicios fiduciarios",
+        "Family office services"
+      ],
+      "allowedRanks": ["PREMIUM"],
+      "active": true
+    },
+    {
+      "id": "TARJETA_BRONCE_BASIC",
+      "name": "Tarjeta de Crédito Bronce Basic",
+      "description": "Tarjeta de crédito básica para clientes BRONCE que inician su historial crediticio. Límites apropiados y funcionalidades esenciales para compras cotidianas y emergencias menores.",
+      "category": "TARJETA_CREDITO",
+      "subcategory": "BASIC",
+      "minimumAmount": 1000.00,
+      "maximumAmount": 8000.00,
+      "currency": "S/",
+      "term": "Revolvente",
+      "minimumRate": 36.00,
+      "maximumRate": 45.00,
+      "requirements": [
+        "Ingresos mínimos S/2,500 mensuales",
+        "Antigüedad laboral 6 meses",
+        "Sin antecedentes negativos"
+      ],
+      "features": [
+        "Compras en comercios afiliados",
+        "Disposición de efectivo",
+        "Estado de cuenta digital",
+        "App móvil incluida"
+      ],
+      "benefits": [
+        "Sin costo de membresía primer año",
+        "Programa de puntos básico",
+        "Seguro de compras",
+        "Asistencia 24/7"
+      ],
+      "allowedRanks": ["BRONCE"],
+      "active": true
+    },
+    {
+      "id": "HIPOTECARIO_ORO_CASA",
+      "name": "Crédito Hipotecario ORO Mi Casa",
+      "description": "Crédito hipotecario diseñado para clientes ORO que buscan adquirir su primera vivienda o una propiedad de inversión. Condiciones preferenciales y procesos ágiles para profesionales consolidados.",
+      "category": "CREDITO_HIPOTECARIO",
+      "subcategory": "VIVIENDA",
+      "minimumAmount": 80000.00,
+      "maximumAmount": 500000.00,
+      "currency": "S/",
+      "term": "8 a 25 años",
+      "minimumRate": 8.50,
+      "maximumRate": 12.50,
+      "requirements": [
+        "Ingresos mínimos S/6,500 mensuales",
+        "Cuota inicial 20% del valor",
+        "Antigüedad laboral 3+ años",
+        "Capacidad de pago verificada"
+      ],
+      "features": [
+        "Cuotas fijas o variables",
+        "Seguro de desgravamen incluido",
+        "Procesos digitales",
+        "Tasación gratuita"
+      ],
+      "benefits": [
+        "Asesoría inmobiliaria",
+        "Descuentos en seguros",
+        "Flexibilidad de pagos",
+        "Sin penalidad por prepago total"
+      ],
+      "allowedRanks": ["ORO", "PLATINO", "PREMIUM"],
+      "active": true
+    }
+  ]
+}

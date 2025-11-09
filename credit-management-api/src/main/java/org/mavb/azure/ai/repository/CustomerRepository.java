@@ -1,5 +1,6 @@
 package org.mavb.azure.ai.repository;
 
+import org.mavb.azure.ai.dto.projection.CustomerEmploymentData;
 import org.mavb.azure.ai.entity.CustomerEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,14 +12,12 @@ import java.util.Optional;
 
 /**
  * Repository interface for Customer entity operations.
- * Used for customer profile management and credit evaluation processes.
  */
 @Repository
 public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> {
 
     /**
-     * Find customer with their 2 most recent employment records by identity document.
-     * Returns customer with employment history limited to 2 most recent jobs.
+     * Finds customer with recent employment records.
      */
     @Query("SELECT DISTINCT c FROM CustomerEntity c " +
            "LEFT JOIN FETCH c.employmentHistory eh " +
@@ -31,4 +30,27 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
            "  LIMIT 2" +
            "))")
     Optional<CustomerEntity> findByIdentityDocumentWithRecentEmployments(@Param("identityDocument") String identityDocument);
+
+    /**
+     * Finds customer employment data for semantic analysis.
+     */
+    @Query(value = """
+        SELECT c.identity_document as identityDocument,
+               c.monthly_income as monthlyIncome, 
+               c.current_debt as currentDebt, 
+               eh.start_date as startDate,
+               eh.end_date as endDate,
+               eh.income as income
+        FROM customers c
+        LEFT JOIN LATERAL (
+            SELECT start_date, end_date, income
+            FROM employment_history
+            WHERE customer_id = c.id
+            ORDER BY end_date DESC NULLS FIRST, start_date DESC
+            LIMIT 2
+        ) eh ON TRUE
+        WHERE c.identity_document = :identityDocument 
+          AND c.active = true
+        """, nativeQuery = true)
+    List<CustomerEmploymentData> findCustomerEmploymentDataForSemanticAnalysis(@Param("identityDocument") String identityDocument);
 }

@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, map, of } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { 
   PageableAdapter, 
   PageableResult, 
@@ -14,46 +14,6 @@ export class RanksPageableAdapter implements PageableAdapter<Rank> {
   
   private currentFilters: RankFilters = {};
   private currentPageSize = 15; // Siguiendo el estándar CRUD_SPEC
-  
-  // Datos mock para los rangos ya que la API solo permite upload
-  // En un caso real estos vendrían de un endpoint GET /ranks
-  private mockRanks: Rank[] = [
-    {
-      id: 'ORO',
-      name: 'ORO',
-      description: 'Cliente premium con ingresos sólidos entre S/6,000 - S/12,000 mensuales. Profesional universitario, ejecutivo medio, empresario con negocio establecido 3+ años.',
-      createdAt: '2024-01-15',
-      updatedAt: '2024-01-15'
-    },
-    {
-      id: 'PLATA',
-      name: 'PLATA',
-      description: 'Cliente con perfil medio-alto, ingresos entre S/3,000 - S/6,000 mensuales. Profesional técnico, empleado con estabilidad laboral, pequeño empresario.',
-      createdAt: '2024-01-15',
-      updatedAt: '2024-01-15'
-    },
-    {
-      id: 'BRONCE',
-      name: 'BRONCE',
-      description: 'Cliente con perfil medio, ingresos entre S/1,500 - S/3,000 mensuales. Empleado dependiente, trabajador independiente con ingresos regulares.',
-      createdAt: '2024-01-15',
-      updatedAt: '2024-01-15'
-    },
-    {
-      id: 'BASICO',
-      name: 'BÁSICO',
-      description: 'Cliente inicial con ingresos entre S/930 - S/1,500 mensuales. Primer empleo, trabajador dependiente con poco historial crediticio.',
-      createdAt: '2024-01-15',
-      updatedAt: '2024-01-15'
-    },
-    {
-      id: 'PREMIUM',
-      name: 'PREMIUM',
-      description: 'Cliente VIP con ingresos superiores a S/12,000 mensuales. Alto ejecutivo, empresario consolidado, inversionista con patrimonio significativo.',
-      createdAt: '2024-01-15',
-      updatedAt: '2024-01-15'
-    }
-  ];
 
   loadData(): Observable<PageableResult<Rank>> {
     return this.getFilteredData(0, this.currentPageSize);
@@ -84,49 +44,31 @@ export class RanksPageableAdapter implements PageableAdapter<Rank> {
     sortField?: string, 
     sortDirection?: SortDirection
   ): Observable<PageableResult<Rank>> {
-    // Aplicar filtros
-    let filteredData = [...this.mockRanks];
-    
-    if (this.currentFilters.name) {
-      const nameFilter = this.currentFilters.name.toLowerCase();
-      filteredData = filteredData.filter(rank => 
-        rank.name.toLowerCase().includes(nameFilter) ||
-        rank.description.toLowerCase().includes(nameFilter)
-      );
-    }
-
-    // Aplicar ordenamiento
-    if (sortField && sortDirection) {
-      filteredData.sort((a, b) => {
-        const aValue = (a as any)[sortField];
-        const bValue = (b as any)[sortField];
-        
-        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-        return 0;
-      });
-    }
-
-    // Calcular paginación
-    const totalElements = filteredData.length;
-    const totalPages = Math.ceil(totalElements / pageSize);
-    const startIndex = page * pageSize;
-    const endIndex = Math.min(startIndex + pageSize, totalElements);
-    const pageData = filteredData.slice(startIndex, endIndex);
-
-    const result: PageableResult<Rank> = {
-      data: pageData,
-      totalElements,
-      totalPages,
-      currentPage: page,
-      pageSize,
-      hasNext: page < totalPages - 1,
-      hasPrevious: page > 0,
-      sortField,
-      sortDirection
+    // Construir parámetros para la API
+    const filters = {
+      ...this.currentFilters,
+      page,
+      size: pageSize,
+      sort: sortField || 'name'
     };
 
-    return of(result);
+    // Llamar a la API real
+    return this.creditManagementService.getRanks(filters).pipe(
+      map(response => {
+        const result: PageableResult<Rank> = {
+          data: response.data,
+          totalElements: response.total,
+          totalPages: response.totalPages,
+          currentPage: response.currentPage,
+          pageSize,
+          hasNext: response.currentPage < response.totalPages - 1,
+          hasPrevious: response.currentPage > 0,
+          sortField,
+          sortDirection
+        };
+        return result;
+      })
+    );
   }
 
   /**
@@ -151,21 +93,9 @@ export class RanksPageableAdapter implements PageableAdapter<Rank> {
   }
 
   /**
-   * Agregar nuevo rango a los datos mock
-   * En un caso real esto triggearía una recarga desde la API
+   * Refrescar datos (útil después de crear/editar rangos)
    */
-  addRank(rank: Rank): void {
-    this.mockRanks.unshift({
-      ...rank,
-      createdAt: new Date().toISOString().split('T')[0],
-      updatedAt: new Date().toISOString().split('T')[0]
-    });
-  }
-
-  /**
-   * Obtener todos los rangos (para uso en otros componentes)
-   */
-  getAllRanks(): Rank[] {
-    return [...this.mockRanks];
+  refresh(): Observable<PageableResult<Rank>> {
+    return this.getFilteredData(0, this.currentPageSize);
   }
 }

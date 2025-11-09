@@ -18,15 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 
 /**
- * REST Controller for credit product management.
- * Handles HTTP requests for product listing, creation, and detailed product information.
- * 
- * Base path: /products
- * 
- * Endpoints:
- * - GET /products - Lista productos crediticios con filtros opcionales
- * - GET /products/{productId} - Obtiene detalles de un producto específico
- * - POST /products - Crea un nuevo producto crediticio con sincronización automática a AI Search
+ * REST Controller for product operations.
  */
 @RestController
 @RequestMapping("/products")

@@ -19,7 +19,7 @@ databaseChangeLog:
         stripComments: true
         path: "classpath:/db/v_1_0_0/data.sql"
       rollback:
-        sql: "DELETE FROM credit_products; DELETE FROM customers WHERE identity_document LIKE 'TEST%';"
+        sql: "DELETE FROM credit_products; DELETE FROM customers WHERE identity_document IN ('10456789001', '10456789002');"
         
   - changeSet:
       id: v_1_1_0
@@ -41,7 +41,7 @@ databaseChangeLog:
         stripComments: true
         path: "classpath:/db/v_1_1_0/data.sql"
       rollback:
-        sql: "DELETE FROM employment_history WHERE customer_id IN (SELECT id FROM customers WHERE identity_document LIKE 'EMP%');"
+        sql: "DELETE FROM employment_history WHERE customer_id IN (SELECT id FROM customers WHERE identity_document LIKE '10456789%' AND LENGTH(identity_document) = 11);"
         
   - changeSet:
       id: v_1_2_0_fixed
@@ -62,15 +62,3 @@ databaseChangeLog:
         stripComments: true
         path: "classpath:/db/v_1_3_0/main.sql"
         endDelimiter: "$EXECUTE$"
-        
-  - changeSet:
-      id: v_1_3_0_data
-      author: "Marco Villarreal"
-      comment: "Datos iniciales de rangos - clasificaciones BRONCE, PLATA, ORO, PLATINO, DIAMANTE con descripciones detalladas"
-      contexts: dev,data-load
-      sqlFile:
-        encoding: utf8
-        stripComments: true
-        path: "classpath:/db/v_1_3_0/data.sql"
-      rollback:
-        sql: "DELETE FROM ranks WHERE id IN ('BRONCE', 'PLATA', 'ORO', 'PLATINO', 'DIAMANTE');"

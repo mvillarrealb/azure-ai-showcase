@@ -128,3 +128,10 @@ export interface ProductFilters {
 export interface RankFilters {
   name?: string;
 }
+
+export interface RankListResponse {
+  data: Rank[];
+  total: number;
+  totalPages: number;
+  currentPage: number;
+}

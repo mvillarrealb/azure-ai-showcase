@@ -21,10 +21,12 @@ import org.mavb.azure.ai.exception.RankAlreadyExistsException;
 import org.mavb.azure.ai.exception.RankNotFoundException;
 import org.mavb.azure.ai.mapper.RankMapper;
 import org.mavb.azure.ai.repository.RankRepository;
+import org.mavb.azure.ai.repository.RankSpecifications;
 import org.mavb.azure.ai.service.RankService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,10 +63,16 @@ public class RankServiceImpl implements RankService {
     public RankListResponseDTO getRanks(RankFilterDTO filter, Pageable pageable) {
         log.info("Retrieving ranks with filter: {} and pagination: {}", filter, pageable);
         
-        Page<RankEntity> ranksPage = rankRepository.findWithFilters(
-                filter.getName(),
-                pageable
-        );
+        // Construir la especificación usando el patrón estándar del proyecto
+        Specification<RankEntity> spec = RankSpecifications.isActive();
+        
+        // Agregar filtro por nombre si está presente
+        if (filter.getName() != null && !filter.getName().trim().isEmpty()) {
+            spec = spec.and(RankSpecifications.hasNameContaining(filter.getName()));
+        }
+        
+        // Ejecutar consulta usando JpaSpecificationExecutor
+        Page<RankEntity> ranksPage = rankRepository.findAll(spec, pageable);
 
         List<RankDTO> rankDTOs = rankMapper.toDtoList(ranksPage.getContent());
 
@@ -168,9 +176,14 @@ public class RankServiceImpl implements RankService {
         log.info("Resolving rank for client description using AI semantic search");
         
         try {
+            // Create embeddings options with proper configuration
+            EmbeddingsOptions options = new EmbeddingsOptions(List.of(clientDescription));
+            options.setUser("rank-resolution-system");
+            options.setInputType("text");
+            
             Embeddings emb = openAI.getEmbeddings(
                     azure.getOpenai().getEmbeddingModel(),
-                    new EmbeddingsOptions(List.of(clientDescription))
+                    options
             );
             List<Float> vector = emb.getData().get(0).getEmbedding().stream().map(Double::floatValue).toList();
 
