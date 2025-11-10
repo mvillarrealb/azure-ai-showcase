@@ -1,0 +1,854 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API de Gestión de Finanzas Personales",
+        "description": "Una API RESTful para permitir a los usuarios gestionar sus finanzas personales, incluyendo categorías, transacciones, escaneo de facturas y reportes mensuales.",
+        "version": "1.0.0",
+        "contact": {
+            "name": "Soporte API",
+            "email": "soporte@finanzas-personales.com"
+        }
+    },
+    "servers": [
+        {
+            "url": "https://your-url-prod",
+            "description": "Servidor de producción"
+        }
+    ],
+    "paths": {
+        "/categories": {
+            "get": {
+                "operationId": "getCategories",
+                "summary": "Obtener todas las categorías",
+                "description": "Devuelve una lista completa de categorías de gastos e ingresos disponibles para clasificar transacciones financieras.",
+                "tags": [
+                    "Categorías"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de categorías obtenida exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Category"
+                                    }
+                                },
+                                "examples": {
+                                    "categorias_ejemplo": {
+                                        "summary": "Ejemplo de categorías",
+                                        "value": [
+                                            {
+                                                "id": "cat-001",
+                                                "name": "Alimentación",
+                                                "type": "expense"
+                                            },
+                                            {
+                                                "id": "cat-002",
+                                                "name": "Transporte",
+                                                "type": "expense"
+                                            },
+                                            {
+                                                "id": "cat-003",
+                                                "name": "Salario",
+                                                "type": "income"
+                                            },
+                                            {
+                                                "id": "cat-004",
+                                                "name": "Entretenimiento",
+                                                "type": "expense"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/transactions": {
+            "get": {
+                "operationId": "getTransactions",
+                "summary": "Obtener todas las transacciones",
+                "description": "Devuelve una lista paginada de todas las transacciones financieras del usuario, con opciones de filtrado por fechas y categorías.",
+                "tags": [
+                    "Transacciones"
+                ],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Número de página para la paginación (comienza en 1)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Número máximo de transacciones por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100,
+                            "default": 20
+                        }
+                    },
+                    {
+                        "name": "categoryId",
+                        "in": "query",
+                        "description": "Filtrar transacciones por ID de categoría específica",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "startDate",
+                        "in": "query",
+                        "description": "Fecha de inicio para filtrar transacciones (formato ISO 8601)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "endDate",
+                        "in": "query",
+                        "description": "Fecha de fin para filtrar transacciones (formato ISO 8601)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de transacciones obtenida exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Transaction"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "$ref": "#/components/schemas/Pagination"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "transacciones_ejemplo": {
+                                        "summary": "Ejemplo de transacciones",
+                                        "value": {
+                                            "data": [
+                                                {
+                                                    "id": "txn-001",
+                                                    "amount": -45.5,
+                                                    "date": "2024-11-07T14:30:00Z",
+                                                    "categoryId": "cat-001",
+                                                    "description": "Compra en supermercado"
+                                                },
+                                                {
+                                                    "id": "txn-002",
+                                                    "amount": 3000,
+                                                    "date": "2024-11-01T09:00:00Z",
+                                                    "categoryId": "cat-003",
+                                                    "description": "Salario mensual"
+                                                }
+                                            ],
+                                            "pagination": {
+                                                "currentPage": 1,
+                                                "totalPages": 5,
+                                                "totalItems": 95,
+                                                "itemsPerPage": 20
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "createTransaction",
+                "summary": "Crear una nueva transacción",
+                "description": "Permite a los usuarios agregar una nueva transacción financiera al sistema, ya sea un gasto o un ingreso.",
+                "tags": [
+                    "Transacciones"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TransactionCreate"
+                            },
+                            "examples": {
+                                "gasto_ejemplo": {
+                                    "summary": "Ejemplo de gasto",
+                                    "value": {
+                                        "amount": -25.75,
+                                        "date": "2024-11-07T16:45:00Z",
+                                        "categoryId": "cat-001",
+                                        "description": "Almuerzo en restaurante"
+                                    }
+                                },
+                                "ingreso_ejemplo": {
+                                    "summary": "Ejemplo de ingreso",
+                                    "value": {
+                                        "amount": 500,
+                                        "date": "2024-11-07T10:00:00Z",
+                                        "categoryId": "cat-003",
+                                        "description": "Pago freelance"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Transacción creada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Transaction"
+                                },
+                                "examples": {
+                                    "transaccion_creada": {
+                                        "summary": "Transacción creada exitosamente",
+                                        "value": {
+                                            "id": "txn-003",
+                                            "amount": -25.75,
+                                            "date": "2024-11-07T16:45:00Z",
+                                            "categoryId": "cat-001",
+                                            "description": "Almuerzo en restaurante"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Datos de entrada inválidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                },
+                                "examples": {
+                                    "categoria_inexistente": {
+                                        "summary": "Categoría no existe",
+                                        "value": {
+                                            "error": "Datos inválidos",
+                                            "message": "La categoría especificada no existe",
+                                            "code": "INVALID_CATEGORY"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/invoices/scan": {
+            "post": {
+                "operationId": "scanInvoice",
+                "summary": "Escanear y procesar factura PDF",
+                "description": "Permite a los usuarios subir un archivo PDF de una factura para su análisis automático y extracción de datos mediante OCR e inteligencia artificial.",
+                "tags": [
+                    "Facturas"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary",
+                                        "description": "Archivo PDF de la factura a procesar"
+                                    }
+                                },
+                                "required": [
+                                    "file"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Factura procesada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvoiceAnalysis"
+                                },
+                                "examples": {
+                                    "factura_procesada": {
+                                        "summary": "Resultado del análisis de factura",
+                                        "value": {
+                                            "invoiceNumber": "INV-2024-001234",
+                                            "date": "2024-11-05T00:00:00Z",
+                                            "totalAmount": 127.5,
+                                            "vendor": "Supermercado La Esperanza",
+                                            "lineItems": [
+                                                {
+                                                    "description": "Pan integral",
+                                                    "quantity": 2,
+                                                    "unitPrice": 3.5,
+                                                    "totalPrice": 7
+                                                },
+                                                {
+                                                    "description": "Leche descremada 1L",
+                                                    "quantity": 1,
+                                                    "unitPrice": 4.25,
+                                                    "totalPrice": 4.25
+                                                },
+                                                {
+                                                    "description": "Manzanas rojas (kg)",
+                                                    "quantity": 1.5,
+                                                    "unitPrice": 6.8,
+                                                    "totalPrice": 10.2
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Archivo inválido o datos no procesables",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                },
+                                "examples": {
+                                    "archivo_invalido": {
+                                        "summary": "Archivo no es PDF válido",
+                                        "value": {
+                                            "error": "Archivo inválido",
+                                            "message": "El archivo debe ser un PDF válido y legible",
+                                            "code": "INVALID_FILE_FORMAT"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/monthly": {
+            "get": {
+                "operationId": "getMonthlyReport",
+                "summary": "Obtener reporte financiero mensual",
+                "description": "Devuelve un informe detallado de gastos e ingresos para un mes específico, incluyendo totales y desglose por categorías.",
+                "tags": [
+                    "Reportes"
+                ],
+                "parameters": [
+                    {
+                        "name": "month",
+                        "in": "query",
+                        "description": "Mes para el reporte en formato YYYY-MM (ejemplo 2024-11)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[0-9]{4}-[0-9]{2}$",
+                            "example": "2024-11"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reporte mensual generado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MonthlyReport"
+                                },
+                                "examples": {
+                                    "reporte_noviembre": {
+                                        "summary": "Reporte de noviembre 2024",
+                                        "value": {
+                                            "month": "2024-11",
+                                            "totalIncome": 3500,
+                                            "totalExpense": 2750.25,
+                                            "netSavings": 749.75,
+                                            "categoryBreakdown": [
+                                                {
+                                                    "categoryId": "cat-003",
+                                                    "categoryName": "Salario",
+                                                    "categoryType": "income",
+                                                    "totalAmount": 3500
+                                                },
+                                                {
+                                                    "categoryId": "cat-001",
+                                                    "categoryName": "Alimentación",
+                                                    "categoryType": "expense",
+                                                    "totalAmount": 890.5
+                                                },
+                                                {
+                                                    "categoryId": "cat-002",
+                                                    "categoryName": "Transporte",
+                                                    "categoryType": "expense",
+                                                    "totalAmount": 450
+                                                },
+                                                {
+                                                    "categoryId": "cat-004",
+                                                    "categoryName": "Entretenimiento",
+                                                    "categoryType": "expense",
+                                                    "totalAmount": 320.75
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No se encontraron datos para el mes especificado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                },
+                                "examples": {
+                                    "mes_sin_datos": {
+                                        "summary": "Mes sin transacciones",
+                                        "value": {
+                                            "error": "Datos no encontrados",
+                                            "message": "No se encontraron transacciones para el mes especificado",
+                                            "code": "NO_DATA_FOUND"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Category": {
+                "type": "object",
+                "description": "Representa una categoría de transacción financiera",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Identificador único de la categoría",
+                        "example": "cat-001"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Nombre descriptivo de la categoría",
+                        "example": "Alimentación"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "income",
+                            "expense"
+                        ],
+                        "description": "Tipo de categoría - ingreso o gasto",
+                        "example": "expense"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "type"
+                ]
+            },
+            "Transaction": {
+                "type": "object",
+                "description": "Representa una transacción financiera completa",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Identificador único de la transacción",
+                        "example": "txn-001"
+                    },
+                    "amount": {
+                        "type": "number",
+                        "description": "Monto de la transacción (positivo para ingresos, negativo para gastos)",
+                        "example": -45.5
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Fecha y hora de la transacción en formato ISO 8601",
+                        "example": "2024-11-07T14:30:00Z"
+                    },
+                    "categoryId": {
+                        "type": "string",
+                        "description": "ID de la categoría asociada a la transacción",
+                        "example": "cat-001"
+                    },
+                    "categoryName": {
+                        "type": "string",
+                        "description": "Nombre legible de la categoría asociada a la transacción",
+                        "example": "Alimentación"
+                    },
+                    "categoryType": {
+                        "type": "string",
+                        "description": "Tipo de categoría (income o expense)",
+                        "enum": [
+                            "income",
+                            "expense"
+                        ],
+                        "example": "expense"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Descripción detallada de la transacción",
+                        "example": "Compra en supermercado"
+                    }
+                },
+                "required": [
+                    "id",
+                    "amount",
+                    "date",
+                    "categoryId",
+                    "categoryName",
+                    "categoryType",
+                    "description"
+                ]
+            },
+            "TransactionCreate": {
+                "type": "object",
+                "description": "Datos necesarios para crear una nueva transacción",
+                "properties": {
+                    "amount": {
+                        "type": "number",
+                        "description": "Monto de la transacción (positivo para ingresos, negativo para gastos)",
+                        "example": -45.5
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Fecha y hora de la transacción en formato ISO 8601",
+                        "example": "2024-11-07T14:30:00Z"
+                    },
+                    "categoryId": {
+                        "type": "string",
+                        "description": "ID de la categoría asociada a la transacción",
+                        "example": "cat-001"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Descripción detallada de la transacción",
+                        "example": "Compra en supermercado",
+                        "maxLength": 500
+                    }
+                },
+                "required": [
+                    "amount",
+                    "date",
+                    "categoryId",
+                    "description"
+                ]
+            },
+            "InvoiceLineItem": {
+                "type": "object",
+                "description": "Representa un elemento de línea en una factura",
+                "properties": {
+                    "description": {
+                        "type": "string",
+                        "description": "Descripción del producto o servicio",
+                        "example": "Pan integral"
+                    },
+                    "quantity": {
+                        "type": "number",
+                        "description": "Cantidad del producto o servicio",
+                        "example": 2
+                    },
+                    "unitPrice": {
+                        "type": "number",
+                        "description": "Precio unitario del producto o servicio",
+                        "example": 3.5
+                    },
+                    "totalPrice": {
+                        "type": "number",
+                        "description": "Precio total de la línea (cantidad × precio unitario)",
+                        "example": 7
+                    }
+                },
+                "required": [
+                    "description",
+                    "quantity",
+                    "unitPrice",
+                    "totalPrice"
+                ]
+            },
+            "InvoiceAnalysis": {
+                "type": "object",
+                "description": "Resultado del análisis automático de una factura",
+                "properties": {
+                    "invoiceNumber": {
+                        "type": "string",
+                        "description": "Número de factura extraído del documento",
+                        "example": "INV-2024-001234"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Fecha de la factura en formato ISO 8601",
+                        "example": "2024-11-05T00:00:00Z"
+                    },
+                    "totalAmount": {
+                        "type": "number",
+                        "description": "Monto total de la factura",
+                        "example": 127.5
+                    },
+                    "vendor": {
+                        "type": "string",
+                        "description": "Nombre del vendedor o proveedor",
+                        "example": "Supermercado La Esperanza"
+                    },
+                    "lineItems": {
+                        "type": "array",
+                        "description": "Lista detallada de productos o servicios en la factura",
+                        "items": {
+                            "$ref": "#/components/schemas/InvoiceLineItem"
+                        }
+                    }
+                },
+                "required": [
+                    "invoiceNumber",
+                    "date",
+                    "totalAmount",
+                    "vendor",
+                    "lineItems"
+                ]
+            },
+            "CategoryBreakdown": {
+                "type": "object",
+                "description": "Desglose de montos por categoría",
+                "properties": {
+                    "categoryId": {
+                        "type": "string",
+                        "description": "ID de la categoría",
+                        "example": "cat-001"
+                    },
+                    "categoryName": {
+                        "type": "string",
+                        "description": "Nombre de la categoría",
+                        "example": "Alimentación"
+                    },
+                    "categoryType": {
+                        "type": "string",
+                        "description": "Tipo de categoría",
+                        "enum": [
+                            "income",
+                            "expense"
+                        ],
+                        "example": "expense"
+                    },
+                    "totalAmount": {
+                        "type": "number",
+                        "description": "Monto total para esta categoría (siempre positivo)",
+                        "example": 890.5
+                    }
+                },
+                "required": [
+                    "categoryId",
+                    "categoryName",
+                    "categoryType",
+                    "totalAmount"
+                ]
+            },
+            "MonthlyReport": {
+                "type": "object",
+                "description": "Reporte financiero mensual completo",
+                "properties": {
+                    "month": {
+                        "type": "string",
+                        "description": "Mes del reporte en formato YYYY-MM",
+                        "example": "2024-11",
+                        "pattern": "^[0-9]{4}-[0-9]{2}$"
+                    },
+                    "totalIncome": {
+                        "type": "number",
+                        "description": "Total de ingresos del mes",
+                        "example": 3500
+                    },
+                    "totalExpense": {
+                        "type": "number",
+                        "description": "Total de gastos del mes (valor positivo)",
+                        "example": 2750.25
+                    },
+                    "netSavings": {
+                        "type": "number",
+                        "description": "Ahorro neto del mes (ingresos - gastos)",
+                        "example": 749.75
+                    },
+                    "categoryBreakdown": {
+                        "type": "array",
+                        "description": "Desglose detallado por categoría",
+                        "items": {
+                            "$ref": "#/components/schemas/CategoryBreakdown"
+                        }
+                    }
+                },
+                "required": [
+                    "month",
+                    "totalIncome",
+                    "totalExpense",
+                    "netSavings",
+                    "categoryBreakdown"
+                ]
+            },
+            "Pagination": {
+                "type": "object",
+                "description": "Información de paginación para listas de datos",
+                "properties": {
+                    "currentPage": {
+                        "type": "integer",
+                        "description": "Página actual",
+                        "example": 1
+                    },
+                    "totalPages": {
+                        "type": "integer",
+                        "description": "Total de páginas disponibles",
+                        "example": 5
+                    },
+                    "totalItems": {
+                        "type": "integer",
+                        "description": "Total de elementos en toda la colección",
+                        "example": 95
+                    },
+                    "itemsPerPage": {
+                        "type": "integer",
+                        "description": "Número de elementos por página",
+                        "example": 20
+                    }
+                },
+                "required": [
+                    "currentPage",
+                    "totalPages",
+                    "totalItems",
+                    "itemsPerPage"
+                ]
+            },
+            "Error": {
+                "type": "object",
+                "description": "Estructura estándar para respuestas de error",
+                "properties": {
+                    "error": {
+                        "type": "string",
+                        "description": "Título breve del error",
+                        "example": "Datos inválidos"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Descripción detallada del error",
+                        "example": "El campo 'amount' es requerido y debe ser un número"
+                    },
+                    "code": {
+                        "type": "string",
+                        "description": "Código único del error para facilitar el manejo programático",
+                        "example": "VALIDATION_ERROR"
+                    }
+                },
+                "required": [
+                    "error",
+                    "message",
+                    "code"
+                ]
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Categorías",
+            "description": "Operaciones relacionadas con categorías de transacciones"
+        },
+        {
+            "name": "Transacciones",
+            "description": "Operaciones para gestionar transacciones financieras"
+        },
+        {
+            "name": "Facturas",
+            "description": "Operaciones para procesar y analizar facturas"
+        },
+        {
+            "name": "Reportes",
+            "description": "Generación de reportes e informes financieros"
+        }
+    ]
+}

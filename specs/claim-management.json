@@ -1,0 +1,828 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Claim Management API",
+        "description": "API REST para la gestión integral de reclamos de clientes bancarios",
+        "version": "1.0.0",
+        "contact": {
+            "name": "Equipo de Desarrollo",
+            "email": "dev-team@banco.com"
+        }
+    },
+    "servers": [
+        {
+            "url": "https://your-url-prod",
+            "description": "Servidor de producción"
+        }
+    ],
+    "paths": {
+        "/claims": {
+            "post": {
+                "operationId": "createClaim",
+                "summary": "Crear un nuevo reclamo",
+                "description": "Crea un nuevo reclamo de cliente con todos los detalles requeridos",
+                "tags": [
+                    "Claims"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateClaimRequest"
+                            },
+                            "example": {
+                                "date": "2024-11-08T10:30:00Z",
+                                "amount": 1500.75,
+                                "identityDocument": "12345678",
+                                "description": "Cargo no autorizado en mi tarjeta de crédito por compra que no realicé",
+                                "reason": "Cargo indebido",
+                                "subReason": "Transacción no autorizada"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Reclamo creado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Claim"
+                                },
+                                "example": {
+                                    "id": "CLM-2024-001234",
+                                    "date": "2024-11-08T10:30:00Z",
+                                    "amount": 1500.75,
+                                    "identityDocument": "12345678",
+                                    "description": "Cargo no autorizado en mi tarjeta de crédito por compra que no realicé",
+                                    "reason": "Cargo indebido",
+                                    "subReason": "Transacción no autorizada",
+                                    "status": "open",
+                                    "comments": null,
+                                    "createdAt": "2024-11-08T10:30:00Z",
+                                    "updatedAt": "2024-11-08T10:30:00Z"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error de validación en los datos enviados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "error": "Validation Error",
+                                    "message": "Los campos requeridos no están completos",
+                                    "details": [
+                                        {
+                                            "field": "identityDocument",
+                                            "message": "El documento de identidad es requerido"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "error": "Internal Server Error",
+                                    "message": "Error inesperado al procesar el reclamo"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "operationId": "getClaims",
+                "summary": "Obtener lista de reclamos",
+                "description": "Obtiene una lista paginada de reclamos con filtros opcionales",
+                "tags": [
+                    "Claims"
+                ],
+                "parameters": [
+                    {
+                        "name": "identityDocument",
+                        "in": "query",
+                        "description": "Filtrar por documento de identidad del cliente",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "12345678"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Número de página (empezando en 1)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        },
+                        "example": 1
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Número de elementos por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "minimum": 1,
+                            "maximum": 100
+                        },
+                        "example": 20
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filtrar por estado del reclamo",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "open",
+                                "inProgress",
+                                "resolved"
+                            ]
+                        },
+                        "example": "open"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de reclamos obtenida exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ClaimListResponse"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": "CLM-2024-001234",
+                                            "date": "2024-11-08T10:30:00Z",
+                                            "amount": 1500.75,
+                                            "identityDocument": "12345678",
+                                            "description": "Cargo no autorizado en mi tarjeta de crédito",
+                                            "reason": "Cargo indebido",
+                                            "subReason": "Transacción no autorizada",
+                                            "status": "open",
+                                            "comments": null,
+                                            "createdAt": "2024-11-08T10:30:00Z",
+                                            "updatedAt": "2024-11-08T10:30:00Z"
+                                        },
+                                        {
+                                            "id": "CLM-2024-001235",
+                                            "date": "2024-11-07T14:15:00Z",
+                                            "amount": 250,
+                                            "identityDocument": "87654321",
+                                            "description": "Error en el cálculo de intereses en mi cuenta de ahorros",
+                                            "reason": "Error en cálculos",
+                                            "subReason": "Intereses mal calculados",
+                                            "status": "inProgress",
+                                            "comments": "En revisión por el área técnica",
+                                            "createdAt": "2024-11-07T14:15:00Z",
+                                            "updatedAt": "2024-11-08T09:20:00Z"
+                                        }
+                                    ],
+                                    "pagination": {
+                                        "page": 1,
+                                        "limit": 20,
+                                        "total": 2,
+                                        "totalPages": 1
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Parámetros de consulta inválidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "error": "Invalid Query Parameters",
+                                    "message": "Los parámetros de búsqueda son inválidos"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/claims/{id}": {
+            "get": {
+                "operationId": "getClaimById",
+                "summary": "Obtener detalles de un reclamo específico",
+                "description": "Obtiene todos los detalles de un reclamo por su ID",
+                "tags": [
+                    "Claims"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID único del reclamo",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "CLM-2024-001234"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalles del reclamo obtenidos exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Claim"
+                                },
+                                "example": {
+                                    "id": "CLM-2024-001234",
+                                    "date": "2024-11-08T10:30:00Z",
+                                    "amount": 1500.75,
+                                    "identityDocument": "12345678",
+                                    "description": "Cargo no autorizado en mi tarjeta de crédito por compra que no realicé en tienda online",
+                                    "reason": "Cargo indebido",
+                                    "subReason": "Transacción no autorizada",
+                                    "status": "inProgress",
+                                    "comments": "Se ha iniciado la investigación con el comercio correspondiente",
+                                    "createdAt": "2024-11-08T10:30:00Z",
+                                    "updatedAt": "2024-11-08T15:45:00Z"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Reclamo no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "error": "Claim Not Found",
+                                    "message": "El reclamo con ID CLM-2024-001234 no existe"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/claims/{id}/resolve": {
+            "post": {
+                "operationId": "resolveClaim",
+                "summary": "Marcar un reclamo como resuelto",
+                "description": "Cambia el estado del reclamo a resuelto y añade comentarios de resolución",
+                "tags": [
+                    "Claims"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID único del reclamo a resolver",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "CLM-2024-001234"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ResolveClaimRequest"
+                            },
+                            "example": {
+                                "comments": "Reclamo resuelto: Se ha confirmado que la transacción fue fraudulenta. Se ha reembolsado el monto completo a la cuenta del cliente y se han implementado medidas adicionales de seguridad."
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Reclamo resuelto exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Claim"
+                                },
+                                "example": {
+                                    "id": "CLM-2024-001234",
+                                    "date": "2024-11-08T10:30:00Z",
+                                    "amount": 1500.75,
+                                    "identityDocument": "12345678",
+                                    "description": "Cargo no autorizado en mi tarjeta de crédito por compra que no realicé",
+                                    "reason": "Cargo indebido",
+                                    "subReason": "Transacción no autorizada",
+                                    "status": "resolved",
+                                    "comments": "Reclamo resuelto: Se ha confirmado que la transacción fue fraudulenta. Se ha reembolsado el monto completo.",
+                                    "createdAt": "2024-11-08T10:30:00Z",
+                                    "updatedAt": "2024-11-08T16:30:00Z"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Datos de resolución inválidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "error": "Invalid Resolution Data",
+                                    "message": "Los comentarios de resolución son requeridos"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Reclamo no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "error": "Claim Not Found",
+                                    "message": "El reclamo con ID CLM-2024-001234 no existe"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/claims/import": {
+            "post": {
+                "operationId": "importClaims",
+                "summary": "Importar reclamos desde archivo Excel",
+                "description": "Procesa un archivo Excel y crea múltiples reclamos basándose en los datos proporcionados",
+                "tags": [
+                    "Claims"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary",
+                                        "description": "Archivo Excel con los datos de los reclamos"
+                                    }
+                                },
+                                "required": [
+                                    "file"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Reclamos importados exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ImportResponse"
+                                },
+                                "example": {
+                                    "message": "Importación completada exitosamente",
+                                    "totalProcessed": 25,
+                                    "successful": 23,
+                                    "failed": 2,
+                                    "claimsCreated": [
+                                        {
+                                            "id": "CLM-2024-001240",
+                                            "identityDocument": "11111111",
+                                            "amount": 500,
+                                            "reason": "Fraude / Seguridad",
+                                            "subReason": "Transacción no reconocida"
+                                        },
+                                        {
+                                            "id": "CLM-2024-001241",
+                                            "identityDocument": "22222222",
+                                            "amount": 750.5,
+                                            "reason": "Operaciones bancarias",
+                                            "subReason": "Transferencia no acreditada"
+                                        }
+                                    ],
+                                    "errors": [
+                                        {
+                                            "row": 5,
+                                            "error": "Documento de identidad inválido"
+                                        },
+                                        {
+                                            "row": 12,
+                                            "error": "Monto requerido"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Archivo inválido o formato incorrecto",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "error": "Invalid File",
+                                    "message": "El archivo debe ser un Excel válido (.xlsx)"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor durante la importación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Claim": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "ID único del reclamo (generado automáticamente)",
+                        "example": "CLM-2024-001234"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Fecha del reclamo",
+                        "example": "2024-11-08T10:30:00Z"
+                    },
+                    "amount": {
+                        "type": "number",
+                        "format": "float",
+                        "description": "Monto del reclamo",
+                        "example": 1500.75
+                    },
+                    "identityDocument": {
+                        "type": "string",
+                        "description": "Documento de identidad del cliente",
+                        "example": "12345678"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Descripción detallada del reclamo",
+                        "example": "Cargo no autorizado en mi tarjeta de crédito"
+                    },
+                    "reason": {
+                        "type": "string",
+                        "description": "Motivo principal del reclamo",
+                        "example": "Cargo indebido"
+                    },
+                    "subReason": {
+                        "type": "string",
+                        "description": "Submotivo específico del reclamo",
+                        "example": "Transacción no autorizada"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "open",
+                            "inProgress",
+                            "resolved"
+                        ],
+                        "description": "Estado actual del reclamo",
+                        "example": "open"
+                    },
+                    "comments": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Comentarios adicionales (usado principalmente para resolución)",
+                        "example": "En proceso de verificación"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Fecha de creación del reclamo",
+                        "example": "2024-11-08T10:30:00Z"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Fecha de última actualización",
+                        "example": "2024-11-08T10:30:00Z"
+                    }
+                },
+                "required": [
+                    "id",
+                    "date",
+                    "amount",
+                    "identityDocument",
+                    "description",
+                    "reason",
+                    "subReason",
+                    "status"
+                ]
+            },
+            "CreateClaimRequest": {
+                "type": "object",
+                "properties": {
+                    "date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Fecha del reclamo",
+                        "example": "2024-11-08T10:30:00Z"
+                    },
+                    "amount": {
+                        "type": "number",
+                        "format": "float",
+                        "description": "Monto del reclamo",
+                        "minimum": 0,
+                        "example": 1500.75
+                    },
+                    "identityDocument": {
+                        "type": "string",
+                        "description": "Documento de identidad del cliente",
+                        "minLength": 8,
+                        "maxLength": 12,
+                        "example": "12345678"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Descripción detallada del reclamo",
+                        "minLength": 10,
+                        "maxLength": 1000,
+                        "example": "Cargo no autorizado en mi tarjeta de crédito"
+                    },
+                    "reason": {
+                        "type": "string",
+                        "description": "Motivo principal del reclamo",
+                        "minLength": 3,
+                        "maxLength": 100,
+                        "example": "Cargo indebido"
+                    },
+                    "subReason": {
+                        "type": "string",
+                        "description": "Submotivo específico del reclamo",
+                        "minLength": 3,
+                        "maxLength": 100,
+                        "example": "Transacción no autorizada"
+                    }
+                },
+                "required": [
+                    "date",
+                    "amount",
+                    "identityDocument",
+                    "description",
+                    "reason",
+                    "subReason"
+                ]
+            },
+            "ResolveClaimRequest": {
+                "type": "object",
+                "properties": {
+                    "comments": {
+                        "type": "string",
+                        "description": "Comentarios de resolución del reclamo",
+                        "minLength": 10,
+                        "maxLength": 1000,
+                        "example": "Reclamo resuelto satisfactoriamente después de verificación"
+                    }
+                },
+                "required": [
+                    "comments"
+                ]
+            },
+            "ClaimListResponse": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Claim"
+                        }
+                    },
+                    "pagination": {
+                        "type": "object",
+                        "properties": {
+                            "page": {
+                                "type": "integer",
+                                "description": "Página actual",
+                                "example": 1
+                            },
+                            "limit": {
+                                "type": "integer",
+                                "description": "Elementos por página",
+                                "example": 20
+                            },
+                            "total": {
+                                "type": "integer",
+                                "description": "Total de elementos",
+                                "example": 150
+                            },
+                            "totalPages": {
+                                "type": "integer",
+                                "description": "Total de páginas",
+                                "example": 8
+                            }
+                        },
+                        "required": [
+                            "page",
+                            "limit",
+                            "total",
+                            "totalPages"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "pagination"
+                ]
+            },
+            "ImportResponse": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "description": "Mensaje de resultado de la importación",
+                        "example": "Importación completada exitosamente"
+                    },
+                    "totalProcessed": {
+                        "type": "integer",
+                        "description": "Total de registros procesados",
+                        "example": 25
+                    },
+                    "successful": {
+                        "type": "integer",
+                        "description": "Número de reclamos creados exitosamente",
+                        "example": 23
+                    },
+                    "failed": {
+                        "type": "integer",
+                        "description": "Número de registros que fallaron",
+                        "example": 2
+                    },
+                    "claimsCreated": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "example": "CLM-2024-001240"
+                                },
+                                "identityDocument": {
+                                    "type": "string",
+                                    "example": "11111111"
+                                },
+                                "amount": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "example": 500
+                                },
+                                "reason": {
+                                    "type": "string",
+                                    "description": "Motivo principal del reclamo asignado por IA",
+                                    "example": "Fraude / Seguridad"
+                                },
+                                "subReason": {
+                                    "type": "string",
+                                    "description": "Submotivo específico del reclamo asignado por IA",
+                                    "example": "Transacción no reconocida"
+                                }
+                            }
+                        }
+                    },
+                    "errors": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "row": {
+                                    "type": "integer",
+                                    "description": "Número de fila con error",
+                                    "example": 5
+                                },
+                                "error": {
+                                    "type": "string",
+                                    "description": "Descripción del error",
+                                    "example": "Documento de identidad inválido"
+                                }
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "message",
+                    "totalProcessed",
+                    "successful",
+                    "failed"
+                ]
+            },
+            "ErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "type": "string",
+                        "description": "Tipo de error",
+                        "example": "Validation Error"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Mensaje descriptivo del error",
+                        "example": "Los datos proporcionados no son válidos"
+                    },
+                    "details": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "field": {
+                                    "type": "string",
+                                    "description": "Campo que causó el error",
+                                    "example": "identityDocument"
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "description": "Mensaje específico del campo",
+                                    "example": "El documento de identidad es requerido"
+                                }
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "error",
+                    "message"
+                ]
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Claims",
+            "description": "Operaciones para la gestión de reclamos de clientes"
+        }
+    ]
+}
