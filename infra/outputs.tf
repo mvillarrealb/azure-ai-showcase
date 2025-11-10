@@ -34,38 +34,51 @@ output "container_app_environment_id" {
   value       = module.container_app_environment.id
 }
 
-output "container_app_url" {
-  description = "URL of the deployed container app"
-  value       = module.container_app_instance.app_url
+# 🆕 OUTPUTS PARA PERSONAL FINANCE API
+output "personal_finance_app_url" {
+  description = "URL of the Personal Finance API"
+  value       = module.personal_finance_api.app_url
 }
 
-output "container_app_fqdn" {
-  description = "FQDN of the deployed container app"
-  value       = module.container_app_instance.fqdn
+output "personal_finance_app_fqdn" {
+  description = "FQDN of the Personal Finance API"
+  value       = module.personal_finance_api.fqdn
 }
 
-# 🆕 NUEVOS OUTPUTS
-output "container_app_port" {
-  description = "Puerto configurado para la aplicación"
-  value       = module.container_app_instance.target_port
+# 🆕 OUTPUTS PARA CLAIM MANAGEMENT API
+output "claim_management_app_url" {
+  description = "URL of the Claim Management API"
+  value       = module.claim_management_api.app_url
 }
 
-output "container_app_outbound_ips" {
-  description = "Direcciones IP de salida de la Container App"
-  value       = module.container_app_instance.outbound_ip_addresses
+output "claim_management_app_fqdn" {
+  description = "FQDN of the Claim Management API"
+  value       = module.claim_management_api.fqdn
 }
 
-output "environment_variables_count" {
-  description = "Número de variables de entorno configuradas"
-  value       = module.container_app_instance.environment_variables_count
+# 🆕 OUTPUTS PARA CREDIT MANAGEMENT API
+output "credit_management_app_url" {
+  description = "URL of the Credit Management API"
+  value       = module.credit_management_api.app_url
 }
 
-output "container_app_id" {
-  description = "ID completo de la Container App"
-  value       = module.container_app_instance.id
+output "credit_management_app_fqdn" {
+  description = "FQDN of the Credit Management API"
+  value       = module.credit_management_api.fqdn
 }
 
-output "latest_revision_name" {
-  description = "Nombre de la última revisión desplegada"
-  value       = module.container_app_instance.latest_revision_name
+# 🆕 OUTPUTS GENERALES DE CONTAINER APPS
+output "all_container_app_urls" {
+  description = "URLs de todas las Container Apps desplegadas"
+  value = {
+    personal_finance = module.personal_finance_api.app_url
+    claim_management = module.claim_management_api.app_url
+    credit_management = module.credit_management_api.app_url
+  }
+}
+
+# 🆕 INFORMACIÓN DE POSTGRESQL
+output "postgresql_server_fqdn" {
+  description = "FQDN del servidor PostgreSQL"
+  value       = module.postgresql_flexible_server.server_fqdn
 }

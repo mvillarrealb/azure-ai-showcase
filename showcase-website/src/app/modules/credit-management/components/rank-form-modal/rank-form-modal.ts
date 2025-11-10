@@ -24,6 +24,8 @@ export class RankFormModalComponent {
   // Signals para el estado del componente
   isVisible = signal(false);
   isSubmitting = signal(false);
+  hasIdError = signal(false);
+  isIdValid = signal(false);
 
   // Datos del formulario
   formData: RankUploadRequest = {
@@ -31,6 +33,63 @@ export class RankFormModalComponent {
     name: '',
     description: ''
   };
+
+  /**
+   * Validar entrada del ID en tiempo real
+   */
+  validateIdInput(event: any): void {
+    let value = event.target.value;
+    
+    // Auto-convertir a mayúsculas y limpiar caracteres inválidos
+    const cleanValue = value.toUpperCase().replace(/[^A-Z0-9_]/g, '');
+    
+    // Si el valor cambió, actualizar el input
+    if (cleanValue !== value) {
+      this.formData.id = cleanValue;
+      event.target.value = cleanValue;
+      value = cleanValue;
+    }
+    
+    // Validar patrón: solo mayúsculas, números y guión bajo
+    const isValidPattern = /^[A-Z0-9_]*$/.test(value);
+    
+    // Validar longitud mínima y que no termine o empiece con _
+    const hasValidLength = value.length >= 2;
+    const hasValidFormat = value.length === 0 || (!value.startsWith('_') && !value.endsWith('_'));
+    
+    // Validar que tenga contenido meaningful (no solo guiones bajos)
+    const hasMeaningfulContent = /[A-Z0-9]/.test(value);
+    
+    const isValid = isValidPattern && hasValidLength && hasValidFormat && hasMeaningfulContent;
+    
+    this.hasIdError.set(!isValidPattern || (value.length > 0 && (!hasValidFormat || !hasMeaningfulContent)));
+    this.isIdValid.set(isValid && value.length >= 2);
+  }
+
+  /**
+   * Verificar si el formulario es válido
+   */
+  isFormValid(): boolean {
+    const { id, name, description } = this.formData;
+    
+    // Campos obligatorios
+    if (!id?.trim() || !name?.trim() || !description?.trim()) {
+      return false;
+    }
+    
+    // ID válido
+    const idPattern = /^[A-Z0-9_]+$/;
+    if (!idPattern.test(id) || id.length < 2) {
+      return false;
+    }
+    
+    // Descripción mínima
+    if (description.trim().length < 20) {
+      return false;
+    }
+    
+    return true;
+  }
 
   /**
    * Cerrar modal
@@ -48,8 +107,8 @@ export class RankFormModalComponent {
     if (this.isSubmitting()) return;
 
     // Validaciones básicas
-    if (!this.validateForm()) {
-      alert('Por favor, complete todos los campos obligatorios.');
+    if (!this.isFormValid()) {
+      alert('Por favor, complete todos los campos correctamente.');
       return;
     }
 
@@ -63,12 +122,9 @@ export class RankFormModalComponent {
         // También agregar al adapter local para que aparezca en la grilla inmediatamente
         // En un caso real esto se haría con una recarga desde la API
         const ranksAdapter = inject(RanksPageableAdapter);
-        const newRank: Rank = {
-          ...this.formData,
-          createdAt: new Date().toISOString().split('T')[0],
-          updatedAt: new Date().toISOString().split('T')[0]
-        };
-        ranksAdapter.addRank(newRank);
+        
+        // Refrescar el adaptador para mostrar el nuevo rango
+        ranksAdapter.refresh();
         
         // Éxito
         alert('Rango creado exitosamente y sincronizado con Azure AI Search');
@@ -87,34 +143,6 @@ export class RankFormModalComponent {
   }
 
   /**
-   * Validar formulario
-   */
-  private validateForm(): boolean {
-    const required = ['id', 'name', 'description'];
-
-    for (const field of required) {
-      if (!this.formData[field as keyof RankUploadRequest]?.trim()) {
-        return false;
-      }
-    }
-
-    // Validación adicional para ID (solo mayúsculas, números y guiones)
-    const idPattern = /^[A-Z0-9_-]+$/;
-    if (!idPattern.test(this.formData.id)) {
-      alert('El ID debe contener solo letras mayúsculas, números, guiones y guiones bajos');
-      return false;
-    }
-
-    // Validación de longitud mínima para descripción
-    if (this.formData.description.trim().length < 20) {
-      alert('La descripción debe tener al menos 20 caracteres para un mejor análisis semántico');
-      return false;
-    }
-
-    return true;
-  }
-
-  /**
    * Resetear formulario
    */
   private resetForm(): void {
@@ -123,5 +151,7 @@ export class RankFormModalComponent {
       name: '',
       description: ''
     };
+    this.hasIdError.set(false);
+    this.isIdValid.set(false);
   }
 }

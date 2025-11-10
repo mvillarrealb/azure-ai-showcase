@@ -8,19 +8,6 @@ databaseChangeLog:
         stripComments: true
         path: "classpath:/db/v_1_0_0/main.sql"
         endDelimiter: "$EXECUTE$"
-  
-  - changeSet:
-      id: v_1_0_0_data
-      author: "Marco Villarreal"
-      comment: "Datos iniciales de productos financieros de crédito"
-      contexts: dev,data-load
-      sqlFile:
-        encoding: utf8
-        stripComments: true
-        path: "classpath:/db/v_1_0_0/data.sql"
-      rollback:
-        sql: "DELETE FROM credit_products; DELETE FROM customers WHERE identity_document LIKE 'TEST%';"
-        
   - changeSet:
       id: v_1_1_0
       author: "Marco Villarreal"
@@ -30,19 +17,7 @@ databaseChangeLog:
         stripComments: true
         path: "classpath:/db/v_1_1_0/main.sql"
         endDelimiter: "$EXECUTE$"
-        
-  - changeSet:
-      id: v_1_1_0_data
-      author: "Marco Villarreal"
-      comment: "Datos de prueba para historial de empleo - casos de estabilidad y desempleo"
-      contexts: dev,data-load
-      sqlFile:
-        encoding: utf8
-        stripComments: true
-        path: "classpath:/db/v_1_1_0/data.sql"
-      rollback:
-        sql: "DELETE FROM employment_history WHERE customer_id IN (SELECT id FROM customers WHERE identity_document LIKE 'EMP%');"
-        
+
   - changeSet:
       id: v_1_2_0_fixed
       author: "Marco Villarreal"
@@ -52,3 +27,25 @@ databaseChangeLog:
         stripComments: true
         path: "classpath:/db/v_1_2_0/main.sql"
         endDelimiter: "$EXECUTE$"
+        
+  - changeSet:
+      id: v_1_3_0
+      author: "Marco Villarreal"
+      comment: "Gestión de Rankings/Clasificaciones - tabla ranks con índices y constraints para análisis semántico"
+      sqlFile:
+        encoding: utf8
+        stripComments: true
+        path: "classpath:/db/v_1_3_0/main.sql"
+        endDelimiter: "$EXECUTE$"
+        
+  - changeSet:
+      id: v_1_4_0_ai_search_data
+      author: "Marco Villarreal"
+      comment: "Datos de muestra para AI Search - 15 clientes tipo con historiales laborales por cada rango (BRONCE, PLATA, ORO, PLATINO, PREMIUM)"
+      contexts: dev,data-load
+      sqlFile:
+        encoding: utf8
+        stripComments: true
+        path: "classpath:/db/v_1_4_0/data.sql"
+      rollback:
+        sql: "DELETE FROM employment_history WHERE customer_id IN (SELECT id FROM customers WHERE identity_document LIKE '10025%'); DELETE FROM customers WHERE identity_document LIKE '10025%';"

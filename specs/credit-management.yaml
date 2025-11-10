@@ -2,14 +2,14 @@ openapi: 3.0.3
 info:
   title: Credit Management API
   description: API REST para la gestión y evaluación de productos crediticios bancarios con capacidades de IA semántica
-  version: 1.1.0
+  version: 1.2.0
   contact:
     name: Equipo de Desarrollo
     email: dev-team@banco.com
 servers:
-  - url: https://api.banco.com/v1
+  - url: https://api.banco.com
     description: Servidor de producción
-  - url: https://api-dev.banco.com/v1
+  - url: https://api-dev.banco.com
     description: Servidor de desarrollo
 
 paths:
@@ -257,7 +257,7 @@ paths:
       description: |
         Evalúa la elegibilidad de un cliente para productos crediticios usando IA semántica.
         Utiliza información del cliente almacenada en base de datos y análisis semántico 
-        para proporcionar recomendaciones inteligentes.
+        para proporcionar recomendaciones inteligentes basadas en Azure AI Search.
       tags:
         - Evaluation
       requestBody:
@@ -332,54 +332,80 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /ranks/upload:
-    post:
-      operationId: uploadRank
-      summary: Cargar clasificación individual a Azure AI Search
-      description: |
-        Carga una clasificación individual directamente al índice de Azure AI Search.
-        Este endpoint permite subir información de rangos/clasificaciones que se utilizan
-        para análisis semántico y categorización de productos crediticios.
+  /ranks:
+    get:
+      operationId: getRanks
+      summary: Obtener lista de rangos/clasificaciones
+      description: Devuelve una lista completa de rangos de clientes disponibles con filtros opcionales
       tags:
         - Ranks
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RankUploadRequest'
-            example:
-              id: "PLATA"
-              name: "PLATA"
-              description: "Cliente consolidado con ingresos estables entre S/3,000 - S/6,000 mensuales. Empleado con antigüedad laboral 1-3 años en empresa formal o independiente con negocio registrado. Historial crediticio favorable con operaciones diversificadas. Cuenta con ahorros, posible CTS, algunas inversiones menores. Accede a préstamos personales amplios, créditos vehiculares, tarjetas de crédito gold, financiamiento de vivienda inicial. Montos hasta S/80,000."
+      parameters:
+        - name: name
+          in: query
+          description: Filtrar por nombre del rango (búsqueda parcial)
+          required: false
+          schema:
+            type: string
+          example: "ORO"
+        - name: page
+          in: query
+          description: Número de página (basado en 0)
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          example: 0
+        - name: size
+          in: query
+          description: Tamaño de página
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          example: 20
+        - name: sort
+          in: query
+          description: Campo de ordenación
+          required: false
+          schema:
+            type: string
+            default: "name"
+          example: "name"
       responses:
-        '201':
-          description: Clasificación cargada exitosamente
+        '200':
+          description: Lista de rangos obtenida exitosamente
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RankUploadResponse'
+                $ref: '#/components/schemas/RankListResponse'
         '400':
-          description: Datos de clasificación inválidos
+          description: Parámetros de consulta inválidos
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Invalid Query Parameters"
+                message: "Los parámetros de búsqueda son inválidos"
+                details:
+                  - field: "size"
+                    message: "El tamaño de página debe estar entre 1 y 100"
         '500':
-          description: Error interno del servidor durante la carga
+          description: Error interno del servidor
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /ranks/upload-batch:
     post:
-      operationId: uploadRanksBatch
-      summary: Cargar clasificaciones en lote a Azure AI Search
+      operationId: createRank
+      summary: Crear un nuevo rango/clasificación
       description: |
-        Carga múltiples clasificaciones en lote al índice de Azure AI Search.
-        Optimizado para cargas masivas de datos de clasificación que mejoran
-        las capacidades de búsqueda semántica del sistema.
+        Crea un nuevo rango de cliente que se sincroniza automáticamente con Azure AI Search 
+        para habilitar búsquedas semánticas y análisis inteligentes de perfil de clientes.
       tags:
         - Ranks
       requestBody:
@@ -387,33 +413,107 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RankBatchUploadRequest'
+              $ref: '#/components/schemas/CreateRankRequest'
             example:
-              ranks:
-                - id: "BASE"
-                  name: "BASE"
-                  description: "Perfil cliente inicial con ingresos limitados entre S/800 - S/1,500 mensuales"
-                - id: "BRONCE"
-                  name: "BRONCE"
-                  description: "Cliente estable con ingresos consolidados entre S/1,500 - S/3,000 mensuales"
-                - id: "BUSINESS"
-                  name: "BUSINESS"
-                  description: "Entidad empresarial corporativa con facturación anual entre S/1,000,000 - S/50,000,000"
+              id: "PREMIUM"
+              name: "PREMIUM"
+              description: "Cliente premium con ingresos excepcionales superiores a S/15,000 mensuales. Alto ejecutivo, empresario exitoso con múltiples fuentes de ingresos. Portfolio diversificado con inversiones sofisticadas y bienes raíces. Acceso a productos exclusivos de banca privada."
+              active: true
       responses:
         '201':
-          description: Lote de clasificaciones cargado exitosamente
+          description: Rango creado exitosamente
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RankBatchUploadResponse'
+                $ref: '#/components/schemas/Rank'
+        '400':
+          description: Datos de creación inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Validation Error"
+                message: "Los datos proporcionados no son válidos"
+                details:
+                  - field: "id"
+                    message: "El ID del rango es obligatorio"
+                  - field: "name"
+                    message: "El nombre no puede estar vacío"
+        '409':
+          description: Rango con ID o nombre duplicado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Rank Already Exists"
+                message: "El rango con ID PREMIUM ya existe"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /ranks/batch:
+    post:
+      operationId: createRanksBatch
+      summary: Crear múltiples rangos en lote
+      description: |
+        Crea múltiples rangos de cliente en una sola operación. Todos los rangos
+        se sincronizan automáticamente con Azure AI Search a través del listener
+        para habilitar búsquedas semánticas y análisis inteligente.
+      tags:
+        - Ranks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRanksBatchRequest'
+            example:
+              ranks:
+                - id: "PLATINO"
+                  name: "PLATINO"
+                  description: "Cliente de alto valor con ingresos superiores a S/12,000 mensuales. Alto ejecutivo, empresario exitoso con múltiples inversiones."
+                  active: true
+                - id: "DIAMANTE"
+                  name: "DIAMANTE"
+                  description: "Cliente ultra premium con patrimonio excepcional. Acceso exclusivo a banca privada."
+                  active: true
+      responses:
+        '201':
+          description: Rangos creados exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RanksBatchResponse'
         '400':
           description: Datos de lote inválidos
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Validation Error"
+                message: "Algunos datos del lote no son válidos"
+                details:
+                  - field: "ranks[0].id"
+                    message: "El ID del rango es obligatorio"
+                  - field: "ranks[1].name"
+                    message: "El nombre no puede estar vacío"
+        '409':
+          description: Algunos rangos ya existen
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Duplicate Ranks"
+                message: "Algunos rangos del lote ya existen"
         '500':
-          description: Error interno del servidor durante la carga en lote
+          description: Error interno del servidor
           content:
             application/json:
               schema:
@@ -872,56 +972,113 @@ components:
         - error
         - message
 
-    RankUploadRequest:
+    Rank:
       type: object
-      description: Solicitud para cargar una clasificación individual a Azure AI Search
       properties:
         id:
           type: string
-          description: ID único de la clasificación
+          description: ID único del rango
           maxLength: 20
-          pattern: '^[A-Za-z0-9_-]+$'
           example: "ORO"
         name:
           type: string
-          description: Nombre de la clasificación
+          description: Nombre del rango
           maxLength: 100
           example: "ORO"
         description:
           type: string
-          description: Descripción detallada de la clasificación
-          maxLength: 500
+          description: Descripción detallada del perfil de cliente para este rango
+          maxLength: 5000
           example: "Cliente premium con ingresos sólidos entre S/6,000 - S/12,000 mensuales. Profesional universitario, ejecutivo medio, empresario con negocio establecido 3+ años."
       required:
         - id
         - name
         - description
 
-    RankBatchUploadRequest:
+    CreateRankRequest:
       type: object
-      description: Solicitud para cargar múltiples clasificaciones en lote
+      properties:
+        id:
+          type: string
+          description: ID único del rango
+          maxLength: 20
+          pattern: '^[A-Za-z0-9_-]+$'
+          example: "PREMIUM"
+        name:
+          type: string
+          description: Nombre del rango
+          maxLength: 100
+          example: "PREMIUM"
+        description:
+          type: string
+          description: Descripción detallada del perfil de cliente para este rango
+          maxLength: 5000
+          example: "Cliente premium con características excepcionales y acceso a productos exclusivos de banca privada."
+        active:
+          type: boolean
+          description: Estado del rango (activo/inactivo)
+          default: true
+          example: true
+      required:
+        - id
+        - name
+        - description
+
+    RankListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rank'
+        total:
+          type: integer
+          description: Total de rangos disponibles
+          example: 5
+        totalPages:
+          type: integer
+          description: Total de páginas
+          example: 1
+        currentPage:
+          type: integer
+          description: Página actual
+          example: 0
+      required:
+        - data
+        - total
+
+    CreateRanksBatchRequest:
+      type: object
       properties:
         ranks:
           type: array
-          description: Array de clasificaciones a cargar
+          description: Array de rangos a crear
           minItems: 1
-          maxItems: 100
+          maxItems: 50
           items:
             type: object
             properties:
               id:
                 type: string
-                description: ID único de la clasificación
+                description: ID único del rango
                 maxLength: 20
                 pattern: '^[A-Za-z0-9_-]+$'
+                example: "PLATINO"
               name:
                 type: string
-                description: Nombre de la clasificación
+                description: Nombre del rango
                 maxLength: 100
+                example: "PLATINO"
               description:
                 type: string
-                description: Descripción de la clasificación
-                maxLength: 500
+                description: Descripción detallada del perfil de cliente para este rango
+                maxLength: 5000
+                example: "Cliente de alto valor con ingresos superiores a S/12,000 mensuales."
+              active:
+                type: boolean
+                description: Estado del rango (activo/inactivo)
+                default: true
+                example: true
             required:
               - id
               - name
@@ -929,33 +1086,8 @@ components:
       required:
         - ranks
 
-    RankUploadResponse:
+    RanksBatchResponse:
       type: object
-      description: Respuesta de carga individual de clasificación
-      properties:
-        success:
-          type: boolean
-          description: Indica si la carga fue exitosa
-          example: true
-        message:
-          type: string
-          description: Mensaje descriptivo del resultado
-          example: "Rank uploaded successfully"
-        rankId:
-          type: string
-          description: ID de la clasificación cargada
-          example: "ORO"
-        rankName:
-          type: string
-          description: Nombre de la clasificación cargada
-          example: "ORO"
-      required:
-        - success
-        - message
-
-    RankBatchUploadResponse:
-      type: object
-      description: Respuesta de carga en lote de clasificaciones
       properties:
         success:
           type: boolean
@@ -964,28 +1096,34 @@ components:
         message:
           type: string
           description: Mensaje descriptivo del resultado
-          example: "Batch upload completed"
+          example: "Rangos creados exitosamente"
         totalRanks:
           type: integer
-          description: Total de clasificaciones en el lote
-          minimum: 0
-          example: 10
-        successfulUploads:
-          type: integer
-          description: Número de cargas exitosas
-          minimum: 0
-          example: 8
-        failedUploads:
-          type: integer
-          description: Número de cargas fallidas
+          description: Total de rangos en el lote
           minimum: 0
           example: 2
+        createdRanks:
+          type: integer
+          description: Número de rangos creados exitosamente
+          minimum: 0
+          example: 2
+        failedRanks:
+          type: integer
+          description: Número de rangos que fallaron al crear
+          minimum: 0
+          example: 0
+        createdRankIds:
+          type: array
+          items:
+            type: string
+          description: IDs de los rangos creados exitosamente
+          example: ["PLATINO", "DIAMANTE"]
       required:
         - success
         - message
         - totalRanks
-        - successfulUploads
-        - failedUploads
+        - createdRanks
+        - failedRanks
 
 tags:
   - name: Products
@@ -1000,6 +1138,7 @@ tags:
       recomendaciones personalizadas de productos crediticios.
   - name: Ranks
     description: |
-      Operaciones para la gestión de clasificaciones y rangos en Azure AI Search.
-      Permite cargar y sincronizar datos de clasificación que mejoran las capacidades
-      de búsqueda semántica y análisis de productos crediticios.
+      Operaciones para la gestión de rangos de clientes.
+      Incluye consulta, creación individual y creación en lote de rangos.
+      Los rangos se sincronizan automáticamente con Azure AI Search a través 
+      de listeners para habilitar búsquedas semánticas y análisis inteligente.

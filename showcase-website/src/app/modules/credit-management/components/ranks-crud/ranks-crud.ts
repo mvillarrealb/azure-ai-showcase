@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CreditManagementService } from '../../services/credit-management.service';
 import { RanksPageableAdapter } from '../../adapters/ranks-pageable.adapter';
-import { Rank } from '../../interfaces/credit-management.interface';
+import { Rank, RankFilters } from '../../interfaces/credit-management.interface';
 import { PageableGridConfig, GridColumn } from '../../../../components/pageable-grid/pageable-adapter.interface';
 import { PageableGridComponent } from '../../../../components/pageable-grid/pageable-grid.component';
 
@@ -24,6 +24,9 @@ export class RanksCrudComponent implements OnInit {
   
   // Adaptador para el grid
   ranksAdapter = inject(RanksPageableAdapter);
+
+  // Filtros actuales
+  currentFilters: RankFilters = {};
 
   // Configuración del grid siguiendo estándar CRUD_SPEC
   gridConfig: PageableGridConfig = {
@@ -62,5 +65,48 @@ export class RanksCrudComponent implements OnInit {
   onViewDetails(rank: Rank) {
     // Mostrar detalles del rango (solo lectura)
     console.log('Ver detalles de rango:', rank);
+  }
+
+  /**
+   * Maneja cambios en los filtros
+   */
+  onFilterChange(): void {
+    // Aplicar filtros con debounce usando setTimeout
+    clearTimeout(this.filterTimeout);
+    this.filterTimeout = setTimeout(() => {
+      this.applyFilters();
+    }, 300);
+  }
+
+  private filterTimeout: any;
+
+  /**
+   * Aplica los filtros al adaptador
+   */
+  private applyFilters(): void {
+    this.ranksAdapter.setFilters(this.currentFilters);
+    // El grid se refrescará automáticamente
+  }
+
+  /**
+   * Limpia todos los filtros
+   */
+  clearFilters(): void {
+    this.currentFilters = {};
+    this.ranksAdapter.clearFilters();
+  }
+
+  /**
+   * Verifica si hay filtros activos
+   */
+  hasActiveFilters(): boolean {
+    return !!(this.currentFilters.name && this.currentFilters.name.trim().length > 0);
+  }
+
+  /**
+   * Refresca los datos
+   */
+  refreshData(): void {
+    this.ranksAdapter.refresh().subscribe();
   }
 }

@@ -11,7 +11,9 @@ import {
   RankBatchUploadRequest,
   RankUploadResponse,
   RankBatchUploadResponse,
-  ProductFilters
+  ProductFilters,
+  RankListResponse,
+  RankFilters
 } from '../interfaces/credit-management.interface';
 import { environment } from '../../../../environments/environment';
 
@@ -63,8 +65,28 @@ export class CreditManagementService {
   /**
    * Evaluar elegibilidad del cliente para productos crediticios
    */
-  evaluateClientEligibility(request: EvaluationRequest): Observable<EvaluationResponse> {
+  evaluateClient(request: EvaluationRequest): Observable<EvaluationResponse> {
     return this.http.post<EvaluationResponse>(`${this.baseUrl}/products/evaluate`, request);
+  }
+
+  /**
+   * Obtener lista paginada de rangos con filtros opcionales
+   */
+  getRanks(filters?: RankFilters & {
+    page?: number;
+    size?: number;
+    sort?: string;
+  }): Observable<RankListResponse> {
+    let params = new HttpParams();
+    
+    if (filters) {
+      if (filters.name) params = params.set('name', filters.name);
+      if (filters.page !== undefined) params = params.set('page', filters.page.toString());
+      if (filters.size !== undefined) params = params.set('size', filters.size.toString());
+      if (filters.sort) params = params.set('sort', filters.sort);
+    }
+
+    return this.http.get<RankListResponse>(`${this.baseUrl}/ranks`, { params });
   }
 
   /**
@@ -114,7 +136,11 @@ export class CreditManagementService {
   /**
    * Formatear moneda
    */
-  formatCurrency(amount: number, currency: 'S/' | 'USD'): string {
+  formatCurrency(amount: number | undefined | null, currency: 'S/' | 'USD'): string {
+    if (amount === undefined || amount === null || isNaN(amount)) {
+      return currency === 'S/' ? 'S/ 0.00' : 'USD 0.00';
+    }
+    
     const formatter = new Intl.NumberFormat('es-PE', {
       style: 'currency',
       currency: currency === 'S/' ? 'PEN' : 'USD',
@@ -128,7 +154,10 @@ export class CreditManagementService {
   /**
    * Formatear porcentaje
    */
-  formatPercentage(rate: number): string {
+  formatPercentage(rate: number | undefined | null): string {
+    if (rate === undefined || rate === null || isNaN(rate)) {
+      return '0.00%';
+    }
     return `${rate.toFixed(2)}%`;
   }
 }

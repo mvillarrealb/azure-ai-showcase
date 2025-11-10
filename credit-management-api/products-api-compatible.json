@@ -1,0 +1,277 @@
+{
+  "products": [
+    {
+      "id": "CP-PEN-001",
+      "name": "Crédito Personal Express",
+      "description": "Crédito personal de rápida aprobación para clientes BRONCE que inician su historial crediticio. Ideal para gastos inmediatos, consolidación de deudas menores o emergencias. Proceso digital ágil con requisitos mínimos.",
+      "category": "CREDITO_PERSONAL",
+      "subcategory": "EXPRESS",
+      "minimumAmount": 1000.00,
+      "maximumAmount": 15000.00,
+      "currency": "S/",
+      "term": "6 a 12 meses",
+      "minimumRate": 12.00,
+      "maximumRate": 16.00,
+      "requirements": [
+        "DNI vigente",
+        "Ingresos mínimos S/2,500 mensuales",
+        "Recibos de ingresos últimos 3 meses",
+        "Constancia laboral mínima 6 meses",
+        "Historial crediticio regular"
+      ],
+      "features": [
+        "Aprobación en 24 horas",
+        "Desembolso inmediato",
+        "Sin garantías adicionales",
+        "Proceso 100% digital"
+      ],
+      "benefits": [
+        "Sin penalidad por prepago",
+        "Construcción de historial crediticio",
+        "Acceso a mejores productos futuros",
+        "Asesoría financiera básica"
+      ],
+      "active": true
+    },
+    {
+      "id": "CP-PEN-002",
+      "name": "Crédito Personal Premium",
+      "description": "Crédito personal con mejores condiciones para clientes PLATA y ORO con historial crediticio sólido. Montos superiores y tasas preferenciales para profesionales consolidados con proyectos más ambiciosos.",
+      "category": "CREDITO_PERSONAL", 
+      "subcategory": "PREMIUM",
+      "minimumAmount": 15000.00,
+      "maximumAmount": 50000.00,
+      "currency": "S/",
+      "term": "13 a 24 meses",
+      "minimumRate": 14.00,
+      "maximumRate": 20.00,
+      "requirements": [
+        "DNI vigente",
+        "Ingresos mínimos S/4,500 mensuales",
+        "Recibos de ingresos últimos 6 meses",
+        "Constancia laboral mínima 2 años",
+        "Historial crediticio bueno o excelente"
+      ],
+      "features": [
+        "Tasas preferenciales",
+        "Períodos de gracia opcionales",
+        "Línea renovable automática",
+        "Ejecutivo asignado"
+      ],
+      "benefits": [
+        "Acceso a seguros opcionales",
+        "Descuentos en otros productos",
+        "Asesoría financiera especializada",
+        "Programas de fidelización"
+      ],
+      "active": true
+    },
+    {
+      "id": "CH-PEN-001", 
+      "name": "Crédito Hipotecario Mi Primera Casa",
+      "description": "Crédito hipotecario especializado para clientes ORO y superiores que buscan adquirir su primera vivienda. Condiciones preferenciales con beneficios del estado y tasas competitivas para profesionales establecidos.",
+      "category": "CREDITO_HIPOTECARIO",
+      "subcategory": "PRIMERA_VIVIENDA",
+      "minimumAmount": 50000.00,
+      "maximumAmount": 200000.00,
+      "currency": "S/",
+      "term": "10 a 20 años",
+      "minimumRate": 6.00,
+      "maximumRate": 8.50,
+      "requirements": [
+        "DNI vigente",
+        "Ingresos familiares mínimos S/6,500 mensuales",
+        "Recibos de ingresos últimos 6 meses",
+        "Constancia laboral mínima 3 años",
+        "Historial crediticio excelente",
+        "Tasación de propiedad",
+        "Certificado de no poseer otra vivienda"
+      ],
+      "features": [
+        "Cuota inicial desde 10%",
+        "Seguro de desgravamen incluido",
+        "Tasas fijas o variables",
+        "Beneficios Mivivienda"
+      ],
+      "benefits": [
+        "Asesoría inmobiliaria gratuita",
+        "Evaluación sin costo",
+        "Trámites legales incluidos",
+        "Descuentos en seguros"
+      ],
+      "active": true
+    },
+    {
+      "id": "CA-PEN-001",
+      "name": "Crédito Automotriz Nuevo",
+      "description": "Financiamiento especializado para compra de vehículos nuevos dirigido a clientes PLATA y superiores. Tasas preferenciales y condiciones flexibles para profesionales que requieren movilidad confiable.",
+      "category": "CREDITO_AUTOMOTRIZ",
+      "subcategory": "VEHICULO_NUEVO", 
+      "minimumAmount": 15000.00,
+      "maximumAmount": 80000.00,
+      "currency": "S/",
+      "term": "2 a 5 años",
+      "minimumRate": 8.00,
+      "maximumRate": 12.00,
+      "requirements": [
+        "DNI vigente",
+        "Licencia de conducir vigente",
+        "Ingresos mínimos S/4,500 mensuales",
+        "Recibos de ingresos últimos 3 meses",
+        "Constancia laboral mínima 2 años",
+        "Historial crediticio bueno",
+        "Cuota inicial 20% mínimo"
+      ],
+      "features": [
+        "Seguro vehicular incluido",
+        "GPS opcional",
+        "Cuotas fijas",
+        "Trámites de SUNARP incluidos"
+      ],
+      "benefits": [
+        "Descuentos por pronto pago",
+        "Mantenimiento preferencial",
+        "Seguro todo riesgo opcional",
+        "Renovación de línea automática"
+      ],
+      "active": true
+    },
+    {
+      "id": "CE-PEN-001",
+      "name": "Crédito Empresarial PYME",
+      "description": "Financiamiento integral para pequeñas y medianas empresas lideradas por clientes PLATINO. Capital de trabajo, inversión en activos y expansión de negocio con condiciones empresariales competitivas.",
+      "category": "CREDITO_EMPRESARIAL",
+      "subcategory": "PYME",
+      "minimumAmount": 10000.00,
+      "maximumAmount": 200000.00,
+      "currency": "S/",
+      "term": "1 a 5 años", 
+      "minimumRate": 7.00,
+      "maximumRate": 10.00,
+      "requirements": [
+        "RUC vigente",
+        "Estados financieros últimos 2 años",
+        "Flujo de caja proyectado",
+        "Ingresos del representante mínimo S/10,000",
+        "Constitución de empresa",
+        "Historial crediticio empresarial bueno",
+        "Ventas anuales mínimas S/120,000"
+      ],
+      "features": [
+        "Línea revolvente disponible",
+        "Desembolsos programados",
+        "Períodos de gracia",
+        "Asesoría empresarial incluida"
+      ],
+      "benefits": [
+        "Banca empresarial especializada",
+        "Productos complementarios",
+        "Networking empresarial",
+        "Capacitación financiera"
+      ],
+      "active": true
+    },
+    {
+      "id": "LINEA-CREDITO-PLATINO",
+      "name": "Línea de Crédito PLATINO Executive",
+      "description": "Línea de crédito revolvente exclusiva para clientes PLATINO con necesidades de liquidez flexible. Acceso inmediato a capital para oportunidades de inversión y gastos ejecutivos con las mejores condiciones del mercado.",
+      "category": "LINEA_CREDITO",
+      "subcategory": "EXECUTIVE",
+      "minimumAmount": 50000.00,
+      "maximumAmount": 300000.00,
+      "currency": "S/",
+      "term": "24 meses renovable",
+      "minimumRate": 9.50,
+      "maximumRate": 12.00,
+      "requirements": [
+        "DNI vigente",
+        "Ingresos mínimos S/15,000 mensuales", 
+        "Patrimonio demostrable S/200,000+",
+        "Relación bancaria mínima 2 años",
+        "Historial crediticio impecable",
+        "Estados financieros personales"
+      ],
+      "features": [
+        "Disposición 24/7 online",
+        "Pago solo de lo utilizado",
+        "Renovación automática",
+        "Múltiples formas de pago"
+      ],
+      "benefits": [
+        "Banca preferencial",
+        "Asesor financiero dedicado",
+        "Productos de inversión",
+        "Eventos exclusivos"
+      ],
+      "active": true
+    },
+    {
+      "id": "BANCA-PRIVADA-PREMIUM",
+      "name": "Crédito Banca Privada PREMIUM",
+      "description": "Producto financiero exclusivo para clientes PREMIUM con patrimonio excepcional. Estructuras de crédito sofisticadas, tasas institucionales y servicios de banca privada integral para grandes patrimonios.",
+      "category": "BANCA_PRIVADA",
+      "subcategory": "EXCLUSIVE",
+      "minimumAmount": 200000.00,
+      "maximumAmount": 2000000.00,
+      "currency": "S/",
+      "term": "Estructurado a medida",
+      "minimumRate": 7.00,
+      "maximumRate": 10.00,
+      "requirements": [
+        "DNI vigente",
+        "Ingresos superiores a S/25,000 mensuales",
+        "Patrimonio líquido mínimo S/1,000,000",
+        "Estados financieros auditados",
+        "Relación patrimonial integral",
+        "Evaluación de private banking"
+      ],
+      "features": [
+        "Tasas negociables",
+        "Estructuras a medida",
+        "Monedas múltiples",
+        "Productos derivados"
+      ],
+      "benefits": [
+        "Private banker dedicado",
+        "Gestión patrimonial integral",
+        "Investment banking",
+        "Servicios fiduciarios",
+        "Family office services"
+      ],
+      "active": true
+    },
+    {
+      "id": "TARJETA-BRONCE-BASIC",
+      "name": "Tarjeta de Crédito Bronce Starter",
+      "description": "Tarjeta de crédito básica diseñada para clientes BRONCE que inician su historial crediticio. Límites apropiados y funcionalidades esenciales para compras cotidianas con beneficios de formación financiera.",
+      "category": "TARJETA_CREDITO",
+      "subcategory": "STARTER",
+      "minimumAmount": 1000.00,
+      "maximumAmount": 8000.00,
+      "currency": "S/",
+      "term": "Revolvente",
+      "minimumRate": 36.00,
+      "maximumRate": 42.00,
+      "requirements": [
+        "DNI vigente",
+        "Ingresos mínimos S/2,500 mensuales",
+        "Constancia laboral 6 meses mínimo",
+        "Sin antecedentes crediticios negativos",
+        "Domicilio verificable"
+      ],
+      "features": [
+        "App móvil completa",
+        "Estados de cuenta digitales",
+        "Alertas por SMS",
+        "Bloqueo/desbloqueo automático"
+      ],
+      "benefits": [
+        "Sin membresía primer año",
+        "Programa de puntos básico",
+        "Educación financiera gratuita",
+        "Asistencia 24/7"
+      ],
+      "active": true
+    }
+  ]
+}

@@ -54,22 +54,31 @@ export interface ClientProfile {
   creditScore?: number;
   employmentStatus?: string;
   rank?: string;
+  riskLevel?: string;
+  approvedAmount?: number;
+  recommendedTerm?: string;
+  semanticRank?: string;
+  semanticConfidence?: number;
+  semanticDescription?: string;
 }
 
 export interface EligibleProduct {
-  productId: string;
-  productName: string;
+  id: string;
+  name: string;
   eligibilityScore: number;
-  recommendedAmount: number;
-  recommendedRate: number;
+  approvedAmount: number;
+  approvedRate: number;
+  recommendation: string;
   conditions: string[];
 }
 
 export interface EvaluationSummary {
-  overallScore: number;
-  recommendation: string;
-  approvalProbability: number;
-  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
+  totalEligibleProducts: number;
+  bestOption?: {
+    productId: string;
+    reason: string;
+  };
+  evaluationDate: string;
 }
 
 export interface EvaluationResponse {
@@ -127,4 +136,11 @@ export interface ProductFilters {
 
 export interface RankFilters {
   name?: string;
+}
+
+export interface RankListResponse {
+  data: Rank[];
+  total: number;
+  totalPages: number;
+  currentPage: number;
 }

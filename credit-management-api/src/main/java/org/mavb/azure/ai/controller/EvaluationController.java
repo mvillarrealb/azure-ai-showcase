@@ -8,15 +8,10 @@ import org.mavb.azure.ai.dto.response.EvaluationResponseDTO;
 import org.mavb.azure.ai.service.EvaluationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 /**
  * REST Controller for credit evaluation operations.
- * Handles HTTP requests for customer credit eligibility assessment.
- * 
- * Base path: /products
- * 
- * Endpoints:
- * - POST /products/evaluate - Evalúa elegibilidad del cliente para productos crediticios
  */
 @RestController
 @RequestMapping("/products")
@@ -27,26 +22,26 @@ public class EvaluationController {
     private final EvaluationService evaluationService;
 
     /**
-     * Evaluar elegibilidad del cliente para productos crediticios.
-     * Evalúa la elegibilidad de un cliente para productos crediticios basado en su perfil financiero.
+     * Evaluates client credit eligibility using AI Search (Reactive).
      *
-     * @param request Datos del cliente y parámetros del crédito solicitado
-     * @return Respuesta con productos elegibles y recomendaciones
+     * @param request Evaluation request data
+     * @return Mono with credit evaluation response
      */
     @PostMapping("/evaluate")
-    public ResponseEntity<EvaluationResponseDTO> evaluateClientEligibility(
+    public Mono<ResponseEntity<EvaluationResponseDTO>> evaluateClientEligibility(
             @Valid @RequestBody EvaluationRequestDTO request) {
 
-        log.debug("POST /products/evaluate - Starting evaluation for customer: {}", 
+        log.debug("POST /products/evaluate - Starting AI Search evaluation for customer: {}", 
                 request.getIdentityDocument());
 
-        EvaluationResponseDTO response = evaluationService.evaluateClientEligibility(request);
-
-        log.info("Credit evaluation completed for customer: {}, eligible products: {}, risk level: {}",
-                request.getIdentityDocument(),
-                response.getEligibleProducts().size(),
-                response.getClientProfile().getRiskLevel());
-
-        return ResponseEntity.ok(response);
+        return evaluationService.evaluateClientEligibility(request)
+                .map(response -> {
+                    log.info("AI Search evaluation completed for customer: {}, eligible products: {}, semantic rank: {}",
+                            request.getIdentityDocument(),
+                            response.getEligibleProducts().size(),
+                            response.getClientProfile().getSemanticRank());
+                    
+                    return ResponseEntity.ok(response);
+                });
     }
 }

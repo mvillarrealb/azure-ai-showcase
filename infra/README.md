@@ -44,6 +44,33 @@ graph TB
 - **Azure Container Registry**: Almacenamiento seguro de imágenes Docker
 - **Log Analytics**: Monitoreo centralizado y observabilidad
 
+## ¿Qué NO incluye esta infraestructura?
+
+> ⚠️ **Importante**: Los siguientes servicios deben crearse manualmente desde Azure Portal
+
+### Servicios Azure AI que requieren configuración manual:
+
+| Servicio | Razón | Guía de Creación |
+|----------|--------|------------------|
+| **AI Foundry** | Configuración compleja de workspace y modelos | [🔗 Crear AI Foundry](https://learn.microsoft.com/azure/ai-studio/how-to/create-azure-ai-resource) |
+| **Document Intelligence** | Keys específicas por tipo de documento | [🔗 Crear Document Intelligence](https://docs.microsoft.com/azure/ai-services/document-intelligence/create-document-intelligence-resource) |
+| **Azure AI Search** | Índices y configuración semántica personalizada | [🔗 Crear AI Search](https://docs.microsoft.com/azure/search/search-create-service-portal) |
+| **Web App (Frontend)** | Requiere configuración específica de dominio | [🔗 Crear Static Web Apps](https://docs.microsoft.com/azure/static-web-apps/getting-started) |
+
+### Pasos post-despliegue requeridos:
+
+1. **Crear servicios AI manualmente** usando los enlaces de arriba
+2. **Configurar variables de entorno** con las keys obtenidas:
+   ```bash
+   export TF_VAR_document_intelligence_key="your-key-here"
+   export TF_VAR_ai_search_endpoint="https://your-search.search.windows.net"
+   # etc...
+   ```
+3. **Re-ejecutar deployment** para aplicar las nuevas configuraciones
+4. **Configurar índices AI Search** según tus necesidades de búsqueda semántica
+
+> 💡 **Tip**: Una vez creados los servicios, puedes actualizar `main.env` y ejecutar `./deploy.sh dev apply` para integrarlos.
+
 ## Despliegue Rápido
 
 ### Prerequisitos

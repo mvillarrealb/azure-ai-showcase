@@ -85,7 +85,7 @@ module "personal_finance_api" {
   container_app_environment_id = module.container_app_environment.id
   container_registry_server    = module.container_registry.login_server
   container_registry_name      = module.container_registry.name
-  source_code_path             =" ${path.module}/personal-finance-api"
+  source_code_path             = "${path.module}/../personal-finance-api"
   image_name                   = "personal-finance-api"
   image_tag                    = "0.0.1"
   
@@ -128,7 +128,7 @@ module "claim_management_api" {
   container_app_environment_id = module.container_app_environment.id
   container_registry_server    = module.container_registry.login_server
   container_registry_name      = module.container_registry.name
-  source_code_path             =" ${path.module}/claim-management-api"
+  source_code_path             = "${path.module}/../claim-management-api"
   image_name                   = "claim-management-api"
   image_tag                    = "0.0.1"
   
@@ -172,7 +172,7 @@ module "credit_management_api" {
   container_app_environment_id = module.container_app_environment.id
   container_registry_server    = module.container_registry.login_server
   container_registry_name      = module.container_registry.name
-  source_code_path             =" ${path.module}/credit-management-api"
+  source_code_path             ="${path.module}/../credit-management-api"
   image_name                   = "credit-management-api"
   image_tag                    = "0.0.1"
   

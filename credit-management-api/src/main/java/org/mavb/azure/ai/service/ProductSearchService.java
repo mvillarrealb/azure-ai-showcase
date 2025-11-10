@@ -168,6 +168,7 @@ public class ProductSearchService {
             // Create options with proper user field
             EmbeddingsOptions options = new EmbeddingsOptions(List.of(text.trim()));
             options.setUser("credit-management-system");
+            options.setInputType("text");
             
             log.debug("Calling Azure OpenAI for embeddings with model: {}", azureProperties.getOpenai().getEmbeddingModel());
             
