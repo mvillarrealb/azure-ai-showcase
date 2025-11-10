@@ -13,3 +13,6 @@ documents
 .terraform.lock.hcl
 *.tfstate
 *.tfstate.backup
+*.tfplan
+*.plan
+*.lock.info
