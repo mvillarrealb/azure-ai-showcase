@@ -21,6 +21,10 @@ export class CreditEvaluationWizardComponent {
   isEvaluating = signal(false);
   evaluationResult = signal<EvaluationResponse | null>(null);
 
+  // Signals para validación y notificaciones
+  validationErrors = signal<{[key: string]: string}>({});
+  notification = signal<{message: string, type: 'success' | 'error' | 'info'} | null>(null);
+
   // Datos del formulario de evaluación
   evaluationRequest: EvaluationRequest = {
     identityDocument: '',
@@ -42,14 +46,77 @@ export class CreditEvaluationWizardComponent {
   }
 
   /**
+   * Mostrar notificación
+   */
+  private showNotification(message: string, type: 'success' | 'error' | 'info'): void {
+    this.notification.set({ message, type });
+    // Auto-ocultar después de 5 segundos
+    setTimeout(() => {
+      this.notification.set(null);
+    }, 5000);
+  }
+
+  /**
+   * Cerrar notificación manualmente
+   */
+  closeNotification(): void {
+    this.notification.set(null);
+  }
+
+  /**
+   * Validar campo individual
+   */
+  private validateField(fieldName: string): void {
+    const errors = { ...this.validationErrors() };
+    
+    switch (fieldName) {
+      case 'identityDocument':
+        if (!this.evaluationRequest.identityDocument?.trim()) {
+          errors[fieldName] = 'El documento de identidad es requerido';
+        } else {
+          const documentPattern = /^\d{8,15}$/;
+          if (!documentPattern.test(this.evaluationRequest.identityDocument)) {
+            errors[fieldName] = 'Debe contener entre 8 y 15 dígitos';
+          } else {
+            delete errors[fieldName];
+          }
+        }
+        break;
+      
+      case 'requestedAmount':
+        if (!this.evaluationRequest.requestedAmount || this.evaluationRequest.requestedAmount <= 0) {
+          errors[fieldName] = 'El monto debe ser mayor a 0';
+        } else if (this.evaluationRequest.requestedAmount > 1000000) {
+          errors[fieldName] = 'El monto máximo es S/ 1,000,000';
+        } else {
+          delete errors[fieldName];
+        }
+        break;
+    }
+    
+    this.validationErrors.set(errors);
+  }
+
+  /**
+   * Manejar cambios en los campos del formulario
+   */
+  onFieldChange(fieldName: 'identityDocument' | 'requestedAmount'): void {
+    this.validateField(fieldName);
+  }
+
+  /**
    * Enviar evaluación
    */
   async onSubmitEvaluation(): Promise<void> {
     if (this.isEvaluating()) return;
 
-    // Validaciones básicas
-    if (!this.validateEvaluationForm()) {
-      alert('Por favor, complete todos los campos correctamente.');
+    // Validar todos los campos
+    this.validateField('identityDocument');
+    this.validateField('requestedAmount');
+
+    // Verificar si hay errores de validación
+    if (Object.keys(this.validationErrors()).length > 0) {
+      this.showNotification('Por favor, corrija los errores en el formulario', 'error');
       return;
     }
 
@@ -61,41 +128,27 @@ export class CreditEvaluationWizardComponent {
       if (result) {
         this.evaluationResult.set(result);
         this.currentStep.set(2);
+        this.showNotification('Evaluación completada exitosamente', 'success');
       } else {
         throw new Error('No se recibieron resultados de la evaluación');
       }
       
     } catch (error: any) {
       console.error('Error en evaluación:', error);
-      alert('Error al evaluar cliente: ' + (error.error?.message || error.message || 'Error desconocido'));
+      const errorMessage = error.error?.message || error.message || 'Error desconocido al procesar la evaluación';
+      this.showNotification(`Error: ${errorMessage}`, 'error');
     } finally {
       this.isEvaluating.set(false);
     }
   }
 
   /**
-   * Validar formulario de evaluación
+   * Validar formulario de evaluación (método legacy simplificado)
    */
   private validateEvaluationForm(): boolean {
-    // Validar documento de identidad
-    if (!this.evaluationRequest.identityDocument?.trim()) {
-      return false;
-    }
-
-    // Validar que sea un DNI peruano válido (8 dígitos) o similar
-    const documentPattern = /^\d{8,15}$/;
-    if (!documentPattern.test(this.evaluationRequest.identityDocument)) {
-      alert('El documento de identidad debe contener entre 8 y 15 dígitos');
-      return false;
-    }
-
-    // Validar monto solicitado
-    if (!this.evaluationRequest.requestedAmount || this.evaluationRequest.requestedAmount <= 0) {
-      alert('El monto solicitado debe ser mayor a 0');
-      return false;
-    }
-
-    return true;
+    this.validateField('identityDocument');
+    this.validateField('requestedAmount');
+    return Object.keys(this.validationErrors()).length === 0;
   }
 
   /**
@@ -105,6 +158,8 @@ export class CreditEvaluationWizardComponent {
     this.currentStep.set(1);
     this.evaluationResult.set(null);
     this.isEvaluating.set(false);
+    this.validationErrors.set({});
+    this.notification.set(null);
     this.evaluationRequest = {
       identityDocument: '',
       requestedAmount: 0
@@ -147,32 +202,40 @@ export class CreditEvaluationWizardComponent {
    */
   exportResults(): void {
     const result = this.evaluationResult();
-    if (!result) return;
+    if (!result) {
+      this.showNotification('No hay resultados para exportar', 'error');
+      return;
+    }
 
-    const exportData = {
-      evaluacion: {
-        fecha: new Date().toISOString().split('T')[0],
-        documento: this.evaluationRequest.identityDocument,
-        montoSolicitado: this.evaluationRequest.requestedAmount
-      },
-      cliente: result.clientProfile,
-      resumen: result.summary,
-      productosRecomendados: result.eligibleProducts
-    };
+    try {
+      const exportData = {
+        evaluacion: {
+          fecha: new Date().toISOString().split('T')[0],
+          documento: this.evaluationRequest.identityDocument,
+          montoSolicitado: this.evaluationRequest.requestedAmount
+        },
+        cliente: result.clientProfile,
+        resumen: result.summary,
+        productosRecomendados: result.eligibleProducts
+      };
 
-    const dataStr = JSON.stringify(exportData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `evaluacion_crediticia_${this.evaluationRequest.identityDocument}_${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    URL.revokeObjectURL(url);
-    
-    alert('Resultados exportados exitosamente');
+      const dataStr = JSON.stringify(exportData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `evaluacion_crediticia_${this.evaluationRequest.identityDocument}_${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      URL.revokeObjectURL(url);
+      
+      this.showNotification('Resultados exportados exitosamente', 'success');
+    } catch (error) {
+      console.error('Error al exportar:', error);
+      this.showNotification('Error al exportar los resultados', 'error');
+    }
   }
 }
