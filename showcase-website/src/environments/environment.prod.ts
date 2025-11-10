@@ -1,8 +1,8 @@
 export const environment = {
   production: true,
-  personalFinance: 'https://api.genia-ton-ifs.com/personal-finance',
-  claimManagement: 'https://api.genia-ton-ifs.com/claim-management',
-  creditManagement: 'https://api.genia-ton-ifs.com/credit-management',
+  personalFinance: 'https://personal-finance-api.mangoground-5579e41c.westus.azurecontainerapps.io',
+  claimManagement: 'https://claim-management-api.mangoground-5579e41c.westus.azurecontainerapps.io',
+  creditManagement: 'https://credit-management-api.mangoground-5579e41c.westus.azurecontainerapps.io',
   localization: {
     locale: 'es-PE',
     currency: 'PEN'
