@@ -14,6 +14,8 @@ import org.mavb.azure.ai.service.AISearchClient;
 import org.mavb.azure.ai.service.EvaluationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -35,24 +37,28 @@ public class AISearchEvaluationServiceImpl implements EvaluationService {
 
     @Override
     @Transactional
-    public EvaluationResponseDTO evaluateClientEligibility(EvaluationRequestDTO request) {
+    public Mono<EvaluationResponseDTO> evaluateClientEligibility(EvaluationRequestDTO request) {
         log.info("Starting AI Search-based credit evaluation for customer: {}, amount: {}", 
                 request.getIdentityDocument(), request.getRequestedAmount());
 
-        try {
-            CustomerEmploymentProjection customerData = getCustomerEmploymentProjection(request.getIdentityDocument());
-            RankDocument resolvedRank = resolveCustomerRank(customerData);
-            List<AISearchClient.ProductSearchResult> productResults = searchEligibleProducts(
-                    resolvedRank != null ? resolvedRank.getId() : "UNDEFINED", 
-                    request.getRequestedAmount());
-            
-            return buildEvaluationResponse(request, customerData, resolvedRank, productResults);
+        return Mono.fromCallable(() -> getCustomerEmploymentProjection(request.getIdentityDocument()))
+                .subscribeOn(Schedulers.boundedElastic())
+                .flatMap(customerData -> {
+                    // Generate semantic description
+                    String semanticDescription = customerData.generateSemanticDescription();
+                    log.info("Generated semantic description: {}", semanticDescription);
                     
-        } catch (Exception e) {
-            log.error("Error in AI Search evaluation for customer {}: {}", 
-                    request.getIdentityDocument(), e.getMessage(), e);
-            throw new EvaluationException("Error processing AI Search evaluation: " + e.getMessage(), e);
-        }
+                    // Resolve rank reactively
+                    return aiSearchClient.resolveRankReactive(semanticDescription)
+                            .flatMap(resolvedRank -> {
+                                String rankId = resolvedRank != null ? resolvedRank.getId() : "UNDEFINED";
+                                
+                                // Search products reactively
+                                return aiSearchClient.searchProductsByRankAndAmountReactive(rankId, request.getRequestedAmount())
+                                        .map(productResults -> buildEvaluationResponse(request, customerData, resolvedRank, productResults));
+                            });
+                })
+                .onErrorMap(e -> new EvaluationException("Error processing AI Search evaluation: " + e.getMessage(), e));
     }
 
     /**
@@ -94,42 +100,6 @@ public class AISearchEvaluationServiceImpl implements EvaluationService {
                 projection.getEmploymentHistory().size());
         
         return projection;
-    }
-
-    /**
-     * Resolves customer rank using semantic search.
-     */
-    private RankDocument resolveCustomerRank(CustomerEmploymentProjection customerData) {
-        log.debug("Resolving customer rank using semantic description");
-        
-        // Generate semantic description
-        String semanticDescription = customerData.generateSemanticDescription();
-        log.info("Generated semantic description: {}", semanticDescription);
-        
-        // Use AI Search to resolve rank
-        RankDocument resolvedRank = aiSearchClient.resolveRank(semanticDescription);
-        
-        if (resolvedRank != null) {
-            log.info("Successfully resolved rank: {} for customer", resolvedRank.getId());
-        } else {
-            log.warn("No rank resolved for customer, will use default fallback");
-        }
-        
-        return resolvedRank;
-    }
-
-    /**
-     * Searches eligible products using rank and amount.
-     */
-    private List<AISearchClient.ProductSearchResult> searchEligibleProducts(String rankId, BigDecimal requestedAmount) {
-        log.debug("Searching eligible products for rank: {} and amount: {}", rankId, requestedAmount);
-        
-        List<AISearchClient.ProductSearchResult> productResults = aiSearchClient.searchProductsByRankAndAmount(
-                rankId, requestedAmount);
-        
-        log.info("Found {} eligible products", productResults.size());
-        
-        return productResults;
     }
 
     /**

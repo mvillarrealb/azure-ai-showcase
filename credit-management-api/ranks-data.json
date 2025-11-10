@@ -3,31 +3,31 @@
     {
       "id": "BRONCE",
       "name": "BRONCE",
-      "description": "Cliente con ingresos entre S/2,500 - S/4,500 mensuales. Endeudamiento moderado, puede tener períodos de desempleo recientes o cambios laborales frecuentes. Perfil de riesgo medio-alto que requiere evaluación cuidadosa. Candidato para productos básicos con montos limitados y tasas ajustadas al riesgo.",
+      "description": "Cliente con ingresos entre S/2,500 - S/4,500 mensuales. Endeudamiento hasta 40% de ingresos. Historial laboral mínimo 6 meses, puede tener gaps de hasta 3 meses. Credit score 580-650. Perfil de riesgo medio-alto para productos básicos con garantías.",
       "active": true
     },
     {
       "id": "PLATA",
-      "name": "PLATA",
-      "description": "Cliente con ingresos estables entre S/4,500 - S/6,500 mensuales. Endeudamiento controlado, historial laboral con estabilidad razonable, períodos de desempleo cortos o inexistentes. Perfil de riesgo medio con capacidad de pago demostrable. Acceso a productos intermedios con condiciones regulares.",
+      "name": "PLATA", 
+      "description": "Cliente con ingresos estables entre S/4,500 - S/6,500 mensuales. Endeudamiento máximo 35% de ingresos. Historial laboral continuo 2+ años, gaps máximo 1 mes. Credit score 650-720. Perfil de riesgo medio, acceso a productos intermedios con condiciones estándar.",
       "active": true
     },
     {
       "id": "ORO",
       "name": "ORO",
-      "description": "Cliente con ingresos sólidos entre S/6,500 - S/10,000 mensuales. Bajo endeudamiento relativo a sus ingresos, estabilidad laboral comprobada con empleo continuo o cambios laborales mínimos. Perfil de bajo riesgo con excelente capacidad de pago. Candidato para productos preferenciales con montos elevados y tasas competitivas.",
+      "description": "Cliente con ingresos sólidos entre S/6,500 - S/10,000 mensuales. Endeudamiento máximo 30% de ingresos. Historial laboral estable 3+ años sin gaps significativos. Credit score 720-780. Perfil de bajo riesgo con acceso a productos preferenciales y montos elevados.",
       "active": true
     },
     {
-      "id": "PLATINO",
+      "id": "PLATINO", 
       "name": "PLATINO",
-      "description": "Cliente de alto valor con ingresos entre S/10,000 - S/20,000 mensuales. Muy bajo endeudamiento, historial de empleo estable y continuo, sin períodos significativos de desempleo. Perfil de muy bajo riesgo con alta capacidad financiera. Acceso a productos exclusivos, líneas de crédito amplias y condiciones preferenciales.",
+      "description": "Cliente de alto valor con ingresos entre S/10,000 - S/20,000 mensuales. Endeudamiento máximo 25% de ingresos. Historial laboral estable 5+ años, promociones evidentes. Credit score 780-850. Perfil de muy bajo riesgo con acceso a líneas de crédito y banca preferencial.",
       "active": true
     },
     {
       "id": "PREMIUM",
-      "name": "PREMIUM",
-      "description": "Cliente elite con ingresos excepcionales superiores a S/20,000 mensuales. Endeudamiento mínimo o estratégico, estabilidad laboral absoluta sin interrupciones. Perfil de riesgo mínimo con capacidad financiera superior. Candidato exclusivo para productos de banca privada, líneas de crédito sin límites convencionales y tasas institucionales.",
+      "name": "PREMIUM", 
+      "description": "Cliente elite con ingresos superiores a S/20,000 mensuales. Endeudamiento estratégico máximo 20% de ingresos. Historial ejecutivo/empresarial 5+ años sin interrupciones. Credit score 850+. Perfil de riesgo mínimo para banca privada, estructuras complejas y productos exclusivos.",
       "active": true
     }
   ]

@@ -8,9 +8,9 @@ info:
     email: soporte@finanzas-personales.com
 
 servers:
-  - url: https://api.finanzas-personales.com/v1
+  - url: https://api.finanzas-personales.com
     description: Servidor de producción
-  - url: https://staging.api.finanzas-personales.com/v1
+  - url: https://staging.api.finanzas-personales.com
     description: Servidor de staging
 
 paths:

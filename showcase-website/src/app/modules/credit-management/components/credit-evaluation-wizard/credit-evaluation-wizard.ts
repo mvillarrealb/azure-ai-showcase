@@ -115,13 +115,13 @@ export class CreditEvaluationWizardComponent {
    * Obtener clase CSS para el nivel de riesgo
    */
   getRiskLevelClass(): string {
-    const riskLevel = this.evaluationResult()?.summary.riskLevel;
-    switch (riskLevel) {
-      case 'LOW':
+    const riskLevel = this.evaluationResult()?.clientProfile?.riskLevel;
+    switch (riskLevel?.toLowerCase()) {
+      case 'bajo':
         return 'text-green-600';
-      case 'MEDIUM':
+      case 'medio':
         return 'text-yellow-600';
-      case 'HIGH':
+      case 'alto':
         return 'text-red-600';
       default:
         return 'text-gray-600';
@@ -131,8 +131,15 @@ export class CreditEvaluationWizardComponent {
   /**
    * Formatear moneda
    */
-  formatCurrency(amount: number): string {
+  formatCurrency(amount: number | undefined | null): string {
     return this.creditManagementService.formatCurrency(amount, 'S/');
+  }
+
+  /**
+   * Formatear porcentaje
+   */
+  formatPercentage(rate: number | undefined | null): string {
+    return this.creditManagementService.formatPercentage(rate);
   }
 
   /**

@@ -136,7 +136,11 @@ export class CreditManagementService {
   /**
    * Formatear moneda
    */
-  formatCurrency(amount: number, currency: 'S/' | 'USD'): string {
+  formatCurrency(amount: number | undefined | null, currency: 'S/' | 'USD'): string {
+    if (amount === undefined || amount === null || isNaN(amount)) {
+      return currency === 'S/' ? 'S/ 0.00' : 'USD 0.00';
+    }
+    
     const formatter = new Intl.NumberFormat('es-PE', {
       style: 'currency',
       currency: currency === 'S/' ? 'PEN' : 'USD',
@@ -150,7 +154,10 @@ export class CreditManagementService {
   /**
    * Formatear porcentaje
    */
-  formatPercentage(rate: number): string {
+  formatPercentage(rate: number | undefined | null): string {
+    if (rate === undefined || rate === null || isNaN(rate)) {
+      return '0.00%';
+    }
     return `${rate.toFixed(2)}%`;
   }
 }

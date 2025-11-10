@@ -31,7 +31,6 @@
         "Acceso a mejores productos futuros",
         "Asesoría financiera básica"
       ],
-      "allowedRanks": ["BRONCE"],
       "active": true
     },
     {
@@ -65,7 +64,6 @@
         "Asesoría financiera especializada",
         "Programas de fidelización"
       ],
-      "allowedRanks": ["PLATA", "ORO"],
       "active": true
     },
     {
@@ -101,7 +99,6 @@
         "Trámites legales incluidos",
         "Descuentos en seguros"
       ],
-      "allowedRanks": ["ORO", "PLATINO", "PREMIUM"],
       "active": true
     },
     {
@@ -137,7 +134,6 @@
         "Seguro todo riesgo opcional",
         "Renovación de línea automática"
       ],
-      "allowedRanks": ["PLATA", "ORO", "PLATINO"],
       "active": true
     },
     {
@@ -173,7 +169,6 @@
         "Networking empresarial",
         "Capacitación financiera"
       ],
-      "allowedRanks": ["PLATINO", "PREMIUM"],
       "active": true
     },
     {
@@ -208,7 +203,6 @@
         "Productos de inversión",
         "Eventos exclusivos"
       ],
-      "allowedRanks": ["PLATINO", "PREMIUM"],
       "active": true
     },
     {
@@ -244,7 +238,6 @@
         "Servicios fiduciarios",
         "Family office services"
       ],
-      "allowedRanks": ["PREMIUM"],
       "active": true
     },
     {
@@ -278,7 +271,6 @@
         "Educación financiera gratuita",
         "Asistencia 24/7"
       ],
-      "allowedRanks": ["BRONCE"],
       "active": true
     }
   ]

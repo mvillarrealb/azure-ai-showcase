@@ -35,104 +35,99 @@ public class AISearchClient {
     private final AzureProperties azureProperties;
 
     /**
-     * Resolves the most appropriate rank using semantic search.
+     * Resolves the most appropriate rank using semantic search (Reactive).
      * 
      * @param clientSemanticDescription Description generated from customer data
-     * @return Best matching rank document or null if none found
+     * @return Mono with best matching rank document or null if none found
      */
-    public RankDocument resolveRank(String clientSemanticDescription) {
+    public reactor.core.publisher.Mono<RankDocument> resolveRankReactive(String clientSemanticDescription) {
         log.info("Resolving rank using semantic description: {}", clientSemanticDescription);
         
-        try {
-            // Generate embeddings for client description
-            List<Float> clientEmbedding = generateEmbeddings(clientSemanticDescription);
-            
-            // Create vector query
-            VectorizedQuery vectorQuery = new VectorizedQuery(clientEmbedding)
-                    .setKNearestNeighborsCount(1)
-                    .setFields("embedding");
-            
-            // Search options
-            SearchOptions searchOptions = new SearchOptions()
-                    .setVectorSearchOptions(new VectorSearchOptions().setQueries(vectorQuery))
-                    .setTop(1)
-                    .setFilter("active eq true")
-                    .setIncludeTotalCount(true);
+        return generateEmbeddingsReactive(clientSemanticDescription)
+                .flatMap(clientEmbedding -> reactor.core.publisher.Mono.fromCallable(() -> {
+                    // Create vector query
+                    VectorizedQuery vectorQuery = new VectorizedQuery(clientEmbedding)
+                            .setKNearestNeighborsCount(1)
+                            .setFields("embedding");
+                    
+                    // Search options - no filter needed for ranks, all ranks are active by default
+                    SearchOptions searchOptions = new SearchOptions()
+                            .setVectorSearchOptions(new VectorSearchOptions().setQueries(vectorQuery))
+                            .setTop(1)
+                            .setIncludeTotalCount(true);
 
-            // Execute search
-            SearchPagedIterable results = rankSearchClient.search(null, searchOptions, null);
-            
-            Optional<RankDocument> resolvedRank = results.stream()
-                    .findFirst()
-                    .map(r -> r.getDocument(RankDocument.class));
+                    // Execute search
+                    SearchPagedIterable results = rankSearchClient.search(null, searchOptions, null);
+                    
+                    Optional<RankDocument> resolvedRank = results.stream()
+                            .findFirst()
+                            .map(r -> r.getDocument(RankDocument.class));
 
-            if (resolvedRank.isPresent()) {
-                log.info("Successfully resolved rank: {} for client description", resolvedRank.get().getId());
-                return resolvedRank.get();
-            } else {
-                log.warn("No rank resolved for client description");
-                return null;
-            }
-
-        } catch (Exception e) {
-            log.error("Error resolving rank for client description: {}", e.getMessage(), e);
-            return null;
-        }
+                    if (resolvedRank.isPresent()) {
+                        log.info("Successfully resolved rank: {} for client description", resolvedRank.get().getId());
+                        return resolvedRank.get();
+                    } else {
+                        log.warn("No rank resolved for client description");
+                        return null;
+                    }
+                }).subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic()))
+                .onErrorResume(e -> {
+                    log.error("Error resolving rank for client description: {}", e.getMessage(), e);
+                    return reactor.core.publisher.Mono.just(null);
+                });
     }
 
     /**
-     * Searches for products using rank and amount criteria via semantic search.
+     * Searches for products using rank and amount criteria via semantic search (Reactive).
      * 
      * @param rankId The resolved rank ID
      * @param requestedAmount The amount requested by customer
-     * @return List of matching product documents with relevance scores
+     * @return Mono with list of matching product documents with relevance scores
      */
-    public List<ProductSearchResult> searchProductsByRankAndAmount(String rankId, BigDecimal requestedAmount) {
+    public reactor.core.publisher.Mono<List<ProductSearchResult>> searchProductsByRankAndAmountReactive(String rankId, BigDecimal requestedAmount) {
         String productSemanticQuery = String.format("Cliente con Rank %s solicita un crédito de %s soles", 
                 rankId, requestedAmount);
         
         log.info("Searching products using semantic query: {}", productSemanticQuery);
         
-        try {
-            // Generate embeddings for product search query
-            List<Float> queryEmbedding = generateEmbeddings(productSemanticQuery);
-            
-            // Create vector query
-            VectorizedQuery vectorQuery = new VectorizedQuery(queryEmbedding)
-                    .setKNearestNeighborsCount(10)
-                    .setFields("embedding");
-            
-            // Build filter for active products and amount range
-            String filter = String.format("active eq true and minimumAmount le %s and maximumAmount ge %s", 
-                    requestedAmount, requestedAmount);
-            
-            // Search options
-            SearchOptions searchOptions = new SearchOptions()
-                    .setVectorSearchOptions(new VectorSearchOptions().setQueries(vectorQuery))
-                    .setTop(10)
-                    .setFilter(filter)
-                    .setIncludeTotalCount(true);
+        return generateEmbeddingsReactive(productSemanticQuery)
+                .flatMap(queryEmbedding -> reactor.core.publisher.Mono.fromCallable(() -> {
+                    // Create vector query
+                    VectorizedQuery vectorQuery = new VectorizedQuery(queryEmbedding)
+                            .setKNearestNeighborsCount(10)
+                            .setFields("embedding");
+                    
+                    // Build filter for active products and amount range
+                    String filter = String.format("active eq true and minimumAmount le %s and maximumAmount ge %s", 
+                            requestedAmount, requestedAmount);
+                    
+                    // Search options
+                    SearchOptions searchOptions = new SearchOptions()
+                            .setVectorSearchOptions(new VectorSearchOptions().setQueries(vectorQuery))
+                            .setTop(10)
+                            .setFilter(filter)
+                            .setIncludeTotalCount(true);
 
-            // Execute search
-            SearchPagedIterable results = productSearchClient.search(null, searchOptions, null);
-            
-            List<ProductSearchResult> productResults = results.stream()
-                    .map(this::mapToProductSearchResult)
-                    .collect(Collectors.toList());
+                    // Execute search
+                    SearchPagedIterable results = productSearchClient.search(null, searchOptions, null);
+                    
+                    List<ProductSearchResult> productResults = results.stream()
+                            .map(this::mapToProductSearchResult)
+                            .collect(Collectors.toList());
 
-            log.info("Found {} products matching criteria for rank {} and amount {}", 
-                    productResults.size(), rankId, requestedAmount);
-            
-            return productResults;
-
-        } catch (Exception e) {
-            log.error("Error searching products by rank and amount: {}", e.getMessage(), e);
-            return List.of();
-        }
+                    log.info("Found {} products matching criteria for rank {} and amount {}", 
+                            productResults.size(), rankId, requestedAmount);
+                    
+                    return productResults;
+                }).subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic()))
+                .onErrorResume(e -> {
+                    log.error("Error searching products by rank and amount: {}", e.getMessage(), e);
+                    return reactor.core.publisher.Mono.just(List.of());
+                });
     }
 
     /**
-     * Generates embeddings for text using OpenAI.
+     * Generates embeddings for text using OpenAI (Synchronous - for internal use).
      */
     private List<Float> generateEmbeddings(String text) {
         try {
@@ -166,6 +161,20 @@ public class AISearchClient {
             log.error("Error generating embeddings for text '{}': {}", text, e.getMessage(), e);
             throw new RuntimeException("Failed to generate embeddings", e);
         }
+    }
+
+    /**
+     * Generates embeddings for text using OpenAI (Reactive version).
+     */
+    private reactor.core.publisher.Mono<List<Float>> generateEmbeddingsReactive(String text) {
+        return reactor.core.publisher.Mono.<List<Float>>create(sink -> {
+            try {
+                List<Float> embeddings = generateEmbeddings(text);
+                sink.success(embeddings);
+            } catch (Exception e) {
+                sink.error(e);
+            }
+        }).subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic());
     }
 
     /**

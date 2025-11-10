@@ -7,9 +7,9 @@ info:
     name: Equipo de Desarrollo
     email: dev-team@banco.com
 servers:
-  - url: https://api.banco.com/
+  - url: https://api.banco.com
     description: Servidor de producción
-  - url: https://api-dev.banco.com/
+  - url: https://api-dev.banco.com
     description: Servidor de desarrollo
 
 paths:

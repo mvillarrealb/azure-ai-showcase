@@ -178,10 +178,28 @@
                 <p class="font-medium">{{ formatCurrency(evaluationResult()!.clientProfile.income!) }}</p>
               </div>
             }
-            @if (evaluationResult()?.clientProfile?.rank) {
+            @if (evaluationResult()?.clientProfile?.semanticRank) {
               <div>
-                <span class="text-gray-600">Rango:</span>
-                <p class="font-medium text-blue-600">{{ evaluationResult()?.clientProfile?.rank }}</p>
+                <span class="text-gray-600">Rango AI:</span>
+                <p class="font-medium text-blue-600">{{ evaluationResult()?.clientProfile?.semanticRank }}</p>
+              </div>
+            }
+            @if (evaluationResult()?.clientProfile?.creditScore) {
+              <div>
+                <span class="text-gray-600">Score Crediticio:</span>
+                <p class="font-medium text-green-600">{{ evaluationResult()?.clientProfile?.creditScore }}</p>
+              </div>
+            }
+            @if (evaluationResult()?.clientProfile?.semanticConfidence) {
+              <div>
+                <span class="text-gray-600">Confianza AI:</span>
+                <p class="font-medium text-purple-600">{{ (evaluationResult()!.clientProfile.semanticConfidence! * 100).toFixed(1) }}%</p>
+              </div>
+            }
+            @if (evaluationResult()?.clientProfile?.recommendedTerm) {
+              <div>
+                <span class="text-gray-600">Plazo Recomendado:</span>
+                <p class="font-medium">{{ evaluationResult()?.clientProfile?.recommendedTerm }}</p>
               </div>
             }
           </div>
@@ -196,28 +214,39 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="text-center">
               <div class="text-2xl font-bold text-blue-600 mb-1">
-                {{ evaluationResult()?.summary?.overallScore }}%
+                {{ evaluationResult()?.summary?.totalEligibleProducts || 0 }}
               </div>
-              <p class="text-sm text-gray-600">Puntuación General</p>
+              <p class="text-sm text-gray-600">Productos Elegibles</p>
             </div>
             <div class="text-center">
-              <div class="text-2xl font-bold text-blue-600 mb-1">
-                {{ evaluationResult()?.summary?.approvalProbability }}%
+              <div class="text-2xl font-bold text-green-600 mb-1">
+                {{ formatCurrency(evaluationResult()?.clientProfile?.approvedAmount) }}
               </div>
-              <p class="text-sm text-gray-600">Prob. Aprobación</p>
+              <p class="text-sm text-gray-600">Monto Aprobado</p>
             </div>
             <div class="text-center">
               <div class="text-2xl font-bold mb-1" [class]="getRiskLevelClass()">
-                {{ evaluationResult()?.summary?.riskLevel }}
+                {{ evaluationResult()?.clientProfile?.riskLevel || 'N/A' }}
               </div>
               <p class="text-sm text-gray-600">Nivel de Riesgo</p>
             </div>
           </div>
-          <div class="mt-4 p-4 bg-white/50 rounded-lg">
-            <p class="text-sm text-gray-700">
-              <strong>Recomendación:</strong> {{ evaluationResult()?.summary?.recommendation }}
-            </p>
-          </div>
+          
+          @if (evaluationResult()?.summary?.bestOption) {
+            <div class="mt-4 p-4 bg-white/50 rounded-lg">
+              <p class="text-sm text-gray-700">
+                <strong>Mejor opción:</strong> {{ evaluationResult()?.summary?.bestOption?.reason }}
+              </p>
+            </div>
+          }
+          
+          @if (evaluationResult()?.clientProfile?.semanticDescription) {
+            <div class="mt-4 p-4 bg-white/50 rounded-lg">
+              <p class="text-sm text-gray-700">
+                <strong>Análisis AI:</strong> {{ evaluationResult()?.clientProfile?.semanticDescription }}
+              </p>
+            </div>
+          }
         </div>
 
         <!-- Productos elegibles -->
@@ -234,29 +263,37 @@
             </div>
           } @else {
             <div class="space-y-4">
-              @for (product of evaluationResult()?.eligibleProducts; track product.productId) {
+              @for (product of evaluationResult()?.eligibleProducts; track $index) {
                 <div class="bg-white/70 border border-blue-200/30 rounded-lg p-4">
                   <div class="flex justify-between items-start mb-2">
-                    <h3 class="font-semibold text-gray-900">{{ product.productName }}</h3>
+                    <h3 class="font-semibold text-gray-900">{{ product.name }}</h3>
                     <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
                       {{ product.eligibilityScore }}% compatibilidad
                     </span>
                   </div>
                   <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm mb-3">
                     <div>
-                      <span class="text-gray-600">Monto recomendado:</span>
-                      <p class="font-medium text-green-600">{{ formatCurrency(product.recommendedAmount) }}</p>
+                      <span class="text-gray-600">Monto aprobado:</span>
+                      <p class="font-medium text-green-600">{{ formatCurrency(product.approvedAmount) }}</p>
                     </div>
                     <div>
-                      <span class="text-gray-600">Tasa recomendada:</span>
-                      <p class="font-medium text-blue-600">{{ product.recommendedRate.toFixed(2) }}%</p>
+                      <span class="text-gray-600">Tasa aprobada:</span>
+                      <p class="font-medium text-blue-600">{{ formatPercentage(product.approvedRate) }}</p>
                     </div>
                   </div>
+                  
+                  @if (product.recommendation) {
+                    <div class="mb-3">
+                      <span class="text-gray-600 text-xs">Recomendación AI:</span>
+                      <p class="text-sm text-blue-700 italic">{{ product.recommendation }}</p>
+                    </div>
+                  }
+                  
                   @if (product.conditions.length > 0) {
                     <div>
                       <span class="text-gray-600 text-xs">Condiciones:</span>
                       <ul class="list-disc list-inside text-xs text-gray-700 mt-1">
-                        @for (condition of product.conditions; track condition) {
+                        @for (condition of product.conditions; track $index) {
                           <li>{{ condition }}</li>
                         }
                       </ul>
