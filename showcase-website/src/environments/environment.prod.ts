@@ -1,8 +1,8 @@
 export const environment = {
   production: true,
-  personalFinance: 'https://personal-finance-api.mangoground-5579e41c.westus.azurecontainerapps.io',
-  claimManagement: 'https://claim-management-api.mangoground-5579e41c.westus.azurecontainerapps.io',
-  creditManagement: 'https://credit-management-api.mangoground-5579e41c.westus.azurecontainerapps.io',
+  personalFinance: 'http://localhost:8080',
+  claimManagement: 'http://localhost:8081',
+  creditManagement: 'http://localhost:8082',
   localization: {
     locale: 'es-PE',
     currency: 'PEN'
